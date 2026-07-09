@@ -1,9 +1,9 @@
-// Model 层门面：组合关卡(TileMap)与马里奥(Mario)，实现 ViewModel 约定的契约。
+// Model 层门面：组合关卡(TileMap)与马里奥(Mario)，实现接口文档约定的 Model 契约。
 //
-// 对上层的数据出口（均为「绝对世界像素坐标」，不含任何相机/相对变换）：
+// 依赖方向：Model → common（单向）。不认识 ViewModel/View，仅通过 modelTrigger 被动地被订阅。
+// 对外数据均为「绝对世界像素坐标」，不含任何相机/相对变换——相对坐标由 ViewModel 换算。
 //   - 通知：modelTrigger 在状态变化时 fire(STATE_CHANGED)，ViewModel 订阅后重绘。
-//   - 数据：marioView() / levelView() 返回框架无关的纯数据快照，供 ViewModel 拉取。
-// ViewModel 拿到绝对坐标后自行换算成相对（屏幕）坐标再交给 View，从而解耦 Model↔View。
+//   - 数据：playerX/Y/W/H、playerState/Facing、tiles()、levelWidthPx/HeightPx，供 ViewModel 拉取。
 //
 // 不引入 SFML，实现细节见 GameModel.cpp。
 
@@ -11,11 +11,13 @@
 #define MARIO_GAMEMODEL_H
 
 #include <string>
+#include <vector>
 
-#include "common/EventTrigger.h"   // EventTrigger
+#include "common/EventId.h"       // MarioState, Direction
+#include "common/EventTrigger.h"  // EventTrigger
 #include "model/Mario.h"
-#include "model/PhysicsConfig.h"   // TimeType
-#include "model/RenderSnapshot.h"  // MarioView, LevelView
+#include "model/PhysicsConfig.h"  // PositionType, TimeType
+#include "model/Tile.h"
 #include "model/TileMap.h"
 
 class GameModel {
@@ -31,25 +33,36 @@ class GameModel {
   void setMoveStop() { mario_.stop(); }
   void jump() { mario_.jump(); }
 
-  // 重置：重载关卡（曾指定关卡文件则重读，失败保留原地图），马里奥回出生点。
+  // 重置：重载关卡（曾指定关卡文件则重读，失败保留原地图）+ 归位 + 重建瓦片 + 通知。
   void reset();
 
-  // 可选（非契约必需）：切换关卡文件，立即重载并归位；成功记录路径供 reset 复用。
+  // 可选（非契约必需）：切换关卡文件，立即重载并归位。
   bool loadLevelFromFile(const std::string& path);
 
-  // === 数据快照（绝对世界像素坐标，供 ViewModel 拉取后换算相对坐标）===
-  MarioView marioView() const;  // 每帧动态，逐帧拉取
-  LevelView levelView() const;  // 仅 reset/加载时变化，可缓存
+  // === 玩家数据（绝对像素坐标；供 ViewModel 换算相对坐标后交给 View）===
+  PositionType playerX() const { return mario_.x(); }
+  PositionType playerY() const { return mario_.y(); }
+  PositionType playerW() const { return mario_.width(); }
+  PositionType playerH() const { return mario_.height(); }
+  MarioState playerState() const { return mario_.state(); }
+  Direction playerFacing() const { return mario_.facing(); }
+
+  // === 关卡数据（绝对像素坐标）===
+  const std::vector<Tile>& tiles() const { return tiles_; }  // 实心瓦片列表
+  PositionType levelWidthPx() const { return tileMap_.widthPx(); }
+  PositionType levelHeightPx() const { return tileMap_.heightPx(); }
 
   // === 事件（ViewModel 订阅；EventTrigger 本身即 std::function 观察者）===
   EventTrigger modelTrigger;
 
  private:
   void notifyChanged();
+  void rebuildTiles();  // 从 TileMap 重建实心瓦片缓存（仅关卡变化时调用）
 
   TileMap tileMap_;
   Mario mario_;
-  std::string levelFile_;  // 空 = 使用内置默认关卡
+  std::vector<Tile> tiles_;  // 缓存的实心瓦片（绝对像素），供 tiles() 返回 const&
+  std::string levelFile_;    // 空 = 使用内置默认关卡
 };
 
 #endif  // MARIO_GAMEMODEL_H
