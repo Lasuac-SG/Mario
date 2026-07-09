@@ -10,10 +10,10 @@
 #include <memory>
 #include <string>
 #include <vector>
-
-/** 引入外部库请参照老师的程序示例
- * #include <FL/Fl_Text_Editor.H>
- */
-#include <FL/Fl_Text_Editor.H>
+#include <unordered_map>
+#include <algorithm>
+#include <cmath>
+/** 外部库引入：SFML 图形引擎 */
+#include <SFML/Graphics.hpp>
 
 #endif  // MARIO_PRECOMPILE_H

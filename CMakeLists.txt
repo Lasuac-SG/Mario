@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 4.2)
+cmake_minimum_required(VERSION 3.16)
 
 project(Mario)
 
-find_package(FLTK CONFIG REQUIRED) # 引入外部库示例
+find_package(SFML COMPONENTS Graphics Window System CONFIG REQUIRED)
 
-add_subdirectory(src) # 构建在 bin 文件夹中  TODO 路径待确定
+add_subdirectory(src)

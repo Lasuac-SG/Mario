@@ -19,10 +19,9 @@ uintptr_t EventTrigger::add_notification(NotificationFunction&& pn) {
   return index;
 }
 
-void EventTrigger::remove_notification(uintptr_t notificationFuncitonIndex) {
-  assert(notificationFuncitonIndex > 0 &&
-         notificationFuncitonIndex <= notificationList_.size());
-  notificationList_[notificationFuncitonIndex] = nullptr;
+void EventTrigger::remove_notification(uintptr_t notificationFunctionIndex) {
+  assert(notificationFunctionIndex < notificationList_.size());
+  notificationList_[notificationFunctionIndex] = nullptr;
 }
 
 void EventTrigger::fire(EventType eventId) noexcept {

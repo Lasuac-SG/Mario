@@ -1,8 +1,10 @@
 //
 
-#include "common/EventTrigger.h"
+#include "app/App.h"
 
 int main() {
-  std::cout << "Hello, Mario!" << std::endl;
-  return 0;
+    App app;
+    app.initialize();
+    app.run();
+    return 0;
 }

@@ -15,9 +15,9 @@ class EventTrigger {
   void clear_notificationList() noexcept;
   uintptr_t add_notification(NotificationFunction&& pn);
   // 这里移除的逻辑不清楚
-  void remove_notification(uintptr_t notificationFuncitonIndex);
+  void remove_notification(uintptr_t notificationFunctionIndex);
 
- protected:
+ public:
   void fire(EventType) noexcept;
 
  private:
