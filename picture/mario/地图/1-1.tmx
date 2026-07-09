@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.2" tiledversion="1.2.1" orientation="orthogonal" renderorder="right-down" width="220" height="16" tilewidth="40" tileheight="40" infinite="0" nextlayerid="13" nextobjectid="25">
+ <tileset firstgid="1" source="map.tsx"/>
+ <layer id="1" name="background" width="220" height="16">
+  <data encoding="base64" compression="zlib">
+   eJztw0ENAAAMA6EzWf9WZmMPSFg1VVVVVVVVVVVVVVVVVX32AFSzkP0=
+  </data>
+ </layer>
+ <layer id="11" name="writeflag" width="220" height="16">
+  <data encoding="base64" compression="zlib">
+   eJztzgEJAAAIA7Abxv4VLSEIsiVYAgAAAAAAAAAAwIau6wEAAADALwPNvQAn
+  </data>
+ </layer>
+ <layer id="3" name="scene" width="220" height="16">
+  <data encoding="base64" compression="zlib">
+   eJztl0dOw1AURZ0BINqMCSDaAugg2hJoS6CN6CDaiA6ibZUpbcaJBMhCsePy8m1H90hHcYqf7rf/NcLzhBDCPQclzzsspZ+zyYwt3DaYJUQYVns2C+7IfW+Q/ZwZF3jpsLv11PEs9lAerl+SdVfbszt8t4t7uB/wO+u1W92/KNmtidrdLDpeK6yee3GodP1e3UaoybqvmHeNN3gbMNty75SxWkeU7Hkm6vPC+vpb9tflM6+jgPdY5IesnheW/XW5BvVNCHeob0K4Q30Twh3qmxDu8PdtiuNpnMFZnFMXhTDF37d5jhdwEZdwOWHf3vAdP/ATv9LHdEqR8xc5+y9FX0NYfn/fVjhexTVcx42EfWvmvBZsxTZsTzCngXMasSmDv7Fp8yt7Oup5//j7dsTxMZ7gKZ4lzNrDeb3Yh/04UGXOCN+P4hiO//y2k9cu7P537iDvh3DY4DoGzYqTP072MhN8NpmT7JXyh2W3JOw+xl1DJVzcgyCi5n/g80d8wmd80f9vQgghxB/fuDNajw==
+  </data>
+ </layer>
+ <layer id="5" name="land" width="220" height="16">
+  <data encoding="base64" compression="zlib">
+   eJzt1skNg0AQBMBNZ8NxLHYOdtjwMLK5B5ZDgiqpJR4Mj2VakBIAAAAAAHCE/A2wr5z0DY6Qk77BEbpd07dlnnVeO9xLXx65jsx1Z8/Y86Gu6VvbXEfedT7BZy25l7a1nRna6zN2faxrd+lb9Fsz1xF929/azoztdWTfS/9F/uenunaXvkV3X9/OtbYzU3sd2fnSd9XMz3Ut+o3e2kN6KT0b57vtecq10yidL3nGleIsfqkA5Limvw==
+  </data>
+ </layer>
+ <layer id="4" name="wall" width="220" height="16">
+  <data encoding="base64" compression="zlib">
+   eJzt11sKgCAQAMA6blfw9P0USLhmBLXFDCyKL1bBj50mAAAAAIB/KW8n8ID5JKK1d97m6t4on3q+bBGtAQDIbtkC6DvWE3s9ULc9S9DPavReZ2dE4625MtAfOb+XT+bara57M+eZXet/feHPAQAAAP+2AhLHCMc=
+  </data>
+ </layer>
+ <layer id="6" name="endflag" width="220" height="16">
+  <data encoding="base64" compression="zlib">
+   eJztzrEJAAAIwDD9/2jFI0SEZOjcCAAAAICfapLXFwAAAAAAAAAAAGxpYTUBAQ==
+  </data>
+ </layer>
+ <objectgroup id="8" name="prop">
+  <object id="1" name="mushroom" x="860" y="418"/>
+  <object id="9" name="mushroom" x="3100" y="421.333"/>
+  <object id="12" name="coins" x="3740" y="422.667"/>
+  <object id="13" name="star" x="4020" y="418.667"/>
+  <object id="14" name="mushroom" x="4340" y="257.333"/>
+ </objectgroup>
+ <objectgroup id="9" name="monster">
+  <object id="2" name="red_mushroom" x="860" y="538"/>
+  <object id="5" name="red_mushroom" x="1817.33" y="540"/>
+  <object id="6" name="red_mushroom" x="2256" y="542.667"/>
+  <object id="7" name="red_mushroom" x="2218.67" y="542.667"/>
+  <object id="10" name="red_mushroom" x="3178.67" y="220"/>
+  <object id="11" name="red_mushroom" x="3218.67" y="218.667"/>
+  <object id="15" name="red_mushroom" x="4578.67" y="538.667"/>
+  <object id="16" name="red_mushroom" x="4618.67" y="540"/>
+  <object id="17" name="red_mushroom" x="5338.67" y="541.333"/>
+  <object id="18" name="red_mushroom" x="5298.67" y="541.333"/>
+  <object id="19" name="red_mushroom" x="5058.67" y="540"/>
+  <object id="20" name="red_mushroom" x="5018.67" y="541.333"/>
+  <object id="21" name="green_duck" x="4777.33" y="540"/>
+  <object id="22" name="red_mushroom" x="7098.67" y="538.667"/>
+  <object id="23" name="red_mushroom" x="7141.33" y="540"/>
+ </objectgroup>
+ <objectgroup id="12" name="hide">
+  <object id="8" name="red_livemushroom" x="2580" y="378.667"/>
+ </objectgroup>
+ <objectgroup id="10" name="position">
+  <object id="4" name="start" x="178.667" y="540"/>
+  <object id="24" name="end" x="8180" y="541.333"/>
+ </objectgroup>
+</map>
