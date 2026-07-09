@@ -71,3 +71,4 @@ Testing/
 # IDE project settings
 .idea/
 .vscode/
+.claude/
