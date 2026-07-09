@@ -1,6 +1,9 @@
 add_executable(mario
         main.cpp
         common/EventTrigger.cpp
+        model/TileMap.cpp
+        model/Mario.cpp
+        model/GameModel.cpp
 )
 
 # 统一头文件路径, 相对src/目录的路径
