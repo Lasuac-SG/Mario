@@ -33,7 +33,7 @@ class Mario {
     moveRight_ = false;
   }
 
-  // === 只读访问（供 GameModel::marioView 组装快照；轻量，内联）===
+  // === 只读访问（供 GameModel 的 player* getter 转发；轻量，内联）===
   PositionType x() const { return x_; }
   PositionType y() const { return y_; }
   PositionType width() const { return mario_cfg::kMarioWidth; }
