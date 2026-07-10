@@ -26,10 +26,14 @@ class GameView {
     void setTileInfo(const TileInfos * tileInfos){
         tileInfos_ = tileInfos;
     }
+    void setUpdateFunction(std::function<void(float)> func) {
+        updateFrameFunction_ = func;
+    }
 
    private:
     void processEvents();
     void processInput();
+    std::function<void(float)> updateFrameFunction_;
     void render();
     sf::RenderWindow window_;
     ViewModel* vm_;

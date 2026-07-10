@@ -23,7 +23,7 @@ void GameView::run() {
 
         processEvents();
         processInput();
-        vm_->tick(dt);
+        updateFrameFunction_(dt);
         render();
     }
 }
