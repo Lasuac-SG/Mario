@@ -10,16 +10,15 @@ class SimpleRenderer : public EntityRenderer {
 public:
     SimpleRenderer();
 
-    void drawPlayer(sf::RenderWindow& window,
-                    const GameModel& model,
-                    AssetManager& assets) override;
+    void draw(sf::RenderWindow& window,
+              const PlayerInfo& player,
+              AssetManager& assets) override;
 
-    void drawTile(sf::RenderWindow& window,
-                  const Tile& tile,
-                  AssetManager& assets) override;
-
+    void draw(sf::RenderWindow& window,
+              const TileInfo& tile,
+              AssetManager& assets) override;
 private:
-    void drawFallbackTile(sf::RenderWindow& window, const Tile& tile);
+    void drawFallbackTile(sf::RenderWindow& window, const TileInfo& tile);
 
     float runAnimationTime_ = 0.0f;
     MarioState lastPlayerState_ = MarioState::IDLE;

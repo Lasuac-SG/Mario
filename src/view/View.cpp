@@ -2,7 +2,6 @@
 
 #include "view/View.h"
 
-#include "viewmodel/command/Commands.h"
 #include "common/Type.h"
 
 GameView::GameView(ViewModel* vm, EntityRenderer* renderer)
@@ -97,14 +96,28 @@ void GameView::render() {
     view.setViewport(viewport);
     window_.setView(view);
 
-    // 渲染 Tile
-    const auto& tiles = vm_->gameModel().tiles();
-    for (const auto& tile : tiles) {
-        renderer_->drawTile(window_, tile, *assets_);
+    // 渲染 Tile —— 通过 ViewModel 数据绑定
+    for (const auto& tile : vm_->tileInfos()) {
+        renderer_->draw(window_, tile, *assets_);
     }
 
-    // 渲染玩家
-    renderer_->drawPlayer(window_, vm_->gameModel(), *assets_);
+    // 渲染玩家 —— 通过 ViewModel 数据绑定
+    renderer_->draw(window_, vm_->playerInfo(), *assets_);
 
     window_.display();
 }
+
+// /// === 旧实现（保留参考） ===
+// #include "viewmodel/command/Commands.h"
+// void GameView::render() {
+//     ...
+//     // 渲染 Tile
+//     const auto& tiles = vm_->gameModel().tiles();
+//     for (const auto& tile : tiles) {
+//         renderer_->drawTile(window_, tile, *assets_);
+//     }
+//     // 渲染玩家
+//     renderer_->drawPlayer(window_, vm_->gameModel(), *assets_);
+//     renderer_->drawPlayer(window_, vm_->gameModel(), *assets_);
+//     ...
+// }
