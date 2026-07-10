@@ -3,12 +3,12 @@
 #include "view/View.h"
 
 #include "common/Type.h"
+#include "view/SimpleRenderer.h"
 
-GameView::GameView(ViewModel* vm, EntityRenderer* renderer)
+GameView::GameView()
     : window_(sf::VideoMode({LOGIC_W, LOGIC_H}), "Mario Demo",
-              sf::Style::Titlebar | sf::Style::Close | sf::Style::Resize),
-      vm_(vm),
-      renderer_(renderer) {
+              sf::Style::Titlebar | sf::Style::Close | sf::Style::Resize) {
+    renderer_ = std::make_unique<SimpleRenderer>();
     assets_ = new AssetManager();
 }
 
@@ -20,10 +20,9 @@ void GameView::run() {
     while (window_.isOpen()) {
         float dt = clock.restart().asSeconds();
         dt = std::min(dt, 1.0f / 30.0f);  // 防止 delta 螺旋
-
         processEvents();
         processInput();
-        vm_->tick(dt);
+        updateFrameFunction_(dt);
         render();
     }
 }
@@ -53,29 +52,29 @@ void GameView::processInput() {
     // 左右冲突 → 停止
     if (left && right) {
         InputActionParameter p(InputAction::STOP);
-        vm_->act_Command(p);
+        actionParam_->exec(&p);
     } else if (left) {
         InputActionParameter p(InputAction::MOVE_LEFT);
-        vm_->act_Command(p);
+        actionParam_->exec(&p);
     } else if (right) {
         InputActionParameter p(InputAction::MOVE_RIGHT);
-        vm_->act_Command(p);
+        actionParam_->exec(&p);
     } else {
         InputActionParameter p(InputAction::STOP);
-        vm_->act_Command(p);
+        actionParam_->exec(&p);
     }
 
     // 跳跃边沿触发
     if (jump && !prevJump_) {
         InputActionParameter p(InputAction::JUMP);
-        vm_->act_Command(p);
+        actionParam_->exec(&p);
     }
     prevJump_ = jump;
 
     // 重启边沿触发
     if (restart && !prevRestart_) {
         InputActionParameter p(InputAction::RESTART);
-        vm_->act_Command(p);
+        actionParam_->exec(&p);
     }
     prevRestart_ = restart;
 }
@@ -91,19 +90,19 @@ void GameView::render() {
     float scale = std::min(scaleX, scaleY);
 
     sf::View view(sf::FloatRect({0.f, 0.f}, {static_cast<float>(LOGIC_W), static_cast<float>(LOGIC_H)}));
-    view.setCenter({vm_->cameraX(), vm_->cameraY()});
+    view.setCenter({*cameraX_, *cameraY_});
     sf::FloatRect viewport({(winW - LOGIC_W * scale) / (2.0f * winW), (winH - LOGIC_H * scale) / (2.0f * winH)},
                            {(LOGIC_W * scale) / winW, (LOGIC_H * scale) / winH});
     view.setViewport(viewport);
     window_.setView(view);
 
     // 渲染 Tile —— 通过 ViewModel 数据绑定
-    for (const auto& tile : vm_->tileInfos()) {
+    for (const auto& tile : *tileInfos_) {
         renderer_->draw(window_, tile, *assets_);
     }
 
     // 渲染玩家 —— 通过 ViewModel 数据绑定
-    renderer_->draw(window_, vm_->playerInfo(), *assets_);
+    renderer_->draw(window_, *playerInfo_, *assets_);
 
     window_.display();
 }

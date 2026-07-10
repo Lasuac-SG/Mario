@@ -41,5 +41,6 @@ struct TileInfoStruct {
 using PlayerInfo = PlayerInfoStruct;
 using TileInfo = TileInfoStruct;
 using InputActionParameter = TypeParameter<InputAction>;
+using TileInfos = std::vector<TileInfo>;
 
 #endif // MARIO_TYPE_H
