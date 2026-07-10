@@ -91,6 +91,7 @@ void GameView::render() {
     float scale = std::min(scaleX, scaleY);
 
     sf::View view(sf::FloatRect({0.f, 0.f}, {static_cast<float>(LOGIC_W), static_cast<float>(LOGIC_H)}));
+    view.setCenter({vm_->cameraX(), vm_->cameraY()});
     sf::FloatRect viewport({(winW - LOGIC_W * scale) / (2.0f * winW), (winH - LOGIC_H * scale) / (2.0f * winH)},
                            {(LOGIC_W * scale) / winW, (LOGIC_H * scale) / winH});
     view.setViewport(viewport);
@@ -106,18 +107,3 @@ void GameView::render() {
 
     window_.display();
 }
-
-// /// === 旧实现（保留参考） ===
-// #include "viewmodel/command/Commands.h"
-// void GameView::render() {
-//     ...
-//     // 渲染 Tile
-//     const auto& tiles = vm_->gameModel().tiles();
-//     for (const auto& tile : tiles) {
-//         renderer_->drawTile(window_, tile, *assets_);
-//     }
-//     // 渲染玩家
-//     renderer_->drawPlayer(window_, vm_->gameModel(), *assets_);
-//     renderer_->drawPlayer(window_, vm_->gameModel(), *assets_);
-//     ...
-// }
