@@ -145,7 +145,7 @@ void SimpleRenderer::draw(sf::RenderWindow& window,
     if (player.direction == Direction::LEFT) {
         sprite.setOrigin({static_cast<float>(texSize.x), 0.0f});
         sprite.setScale({-scaleX, scaleY});
-        sprite.setPosition({player.x + player.width, player.y});
+        sprite.setPosition({player.x, player.y});
     }
 
     window.draw(sprite);
