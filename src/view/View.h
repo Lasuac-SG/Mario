@@ -3,7 +3,6 @@
 #ifndef MARIO_VIEW_H
 #define MARIO_VIEW_H
 
-#include "view/View.h"
 #include "viewmodel/ViewModel.h"
 #include "view/EntityRenderer.h"
 #include "view/AssetManager.h"
@@ -11,7 +10,7 @@
 
 class GameView {
 public:
-    GameView(GameViewModel* vm, EntityRenderer* renderer);
+    GameView(ViewModel* vm, EntityRenderer* renderer);
     ~GameView();
 
     void run();   // 主循环
@@ -22,7 +21,7 @@ private:
     void render();
 
     sf::RenderWindow window_;
-    GameViewModel* vm_;
+    ViewModel* vm_;
     EntityRenderer* renderer_;
     AssetManager* assets_;
 
