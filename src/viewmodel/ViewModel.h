@@ -25,7 +25,7 @@ class ViewModel {
     MarioState playerState() const { return model_->playerState(); }
     Direction playerFacing() const { return model_->playerFacing(); }
     void addNotification(Notify_Funtion func);
-    int act_Command(InputActionParameter& param);
+    int act_Command(InputActionParameter& param) noexcept;
 
     // 下面的接口应该隐藏
     const GameModel& gameModel() const { return *model_; }  /// 需要隐藏的接口

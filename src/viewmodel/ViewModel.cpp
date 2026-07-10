@@ -17,4 +17,4 @@ void ViewModel::tick(float dt) { model_->update(dt); }
 
 void ViewModel::addNotification(Notify_Funtion func) { vmTrigger.add_notification(std::move(func)); }
 
-int ViewModel::act_Command(InputActionParameter& param) noexcept { actionCmd_.exec(&param); }
+int ViewModel::act_Command(InputActionParameter& param) noexcept { return actionCmd_.exec(&param); }
