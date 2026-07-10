@@ -19,7 +19,6 @@ public:
 private:
     std::unique_ptr<GameModel>      model_;
     std::unique_ptr<ViewModel>      vm_;
-    std::unique_ptr<SimpleRenderer> renderer_;
     std::unique_ptr<GameView>       view_;
 };
 

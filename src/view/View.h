@@ -5,12 +5,11 @@
 
 #include "view/AssetManager.h"
 #include "view/EntityRenderer.h"
-#include "viewmodel/ViewModel.h"
 #include "common/ICommand.h"
 
 class GameView {
    public:
-    GameView(ViewModel* vm, EntityRenderer* renderer);
+    GameView();
     ~GameView();
     void run();  // 主循环
     void setActionCommand(ICommandBase* cmd){
@@ -36,8 +35,7 @@ class GameView {
     std::function<void(float)> updateFrameFunction_;
     void render();
     sf::RenderWindow window_;
-    ViewModel* vm_;
-    EntityRenderer* renderer_;
+    std::unique_ptr<EntityRenderer> renderer_;
     AssetManager* assets_;
     ICommandBase* actionParam_;
 

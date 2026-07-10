@@ -3,12 +3,12 @@
 #include "view/View.h"
 
 #include "common/Type.h"
+#include "view/SimpleRenderer.h"
 
-GameView::GameView(ViewModel* vm, EntityRenderer* renderer)
+GameView::GameView()
     : window_(sf::VideoMode({LOGIC_W, LOGIC_H}), "Mario Demo",
-              sf::Style::Titlebar | sf::Style::Close | sf::Style::Resize),
-      vm_(vm),
-      renderer_(renderer) {
+              sf::Style::Titlebar | sf::Style::Close | sf::Style::Resize) {
+    renderer_ = std::make_unique<SimpleRenderer>();
     assets_ = new AssetManager();
 }
 
@@ -20,7 +20,6 @@ void GameView::run() {
     while (window_.isOpen()) {
         float dt = clock.restart().asSeconds();
         dt = std::min(dt, 1.0f / 30.0f);  // 防止 delta 螺旋
-
         processEvents();
         processInput();
         updateFrameFunction_(dt);
