@@ -5,34 +5,39 @@
 
 #include "common/EventId.h"
 #include "common/EventTrigger.h"
+#include "common/Type.h"
 #include "model/GameModel.h"
-#include "viewmodel/GameCommands.h"
+#include "viewmodel/command/Commands.h"
 
-class GameViewModel {
+class ViewModel {
    public:
-    explicit GameViewModel(GameModel* model);
-    ~GameViewModel();
+    explicit ViewModel(GameModel* model);
+    ~ViewModel();
+    ICommandBase& getActionCmd() { return actionCmd_; }
+    void tick(float dt);
 
-    // === Command 引用（View 获取后决定何时 exec）===
-    ICommandBase& getInputCmd() { return inputCmd_; }
+    const PlayerInfo& getPlayerInfo() const noexcept { return player_info_; }
+    const TileInfo& getTileInfo() const noexcept { return tile_info_; }
+    PositionType playerX() const { return model_->playerX(); }
+    PositionType playerY() const { return model_->playerY(); }
+    PositionType playerW() const { return model_->playerW(); }
+    PositionType playerH() const { return model_->playerH(); }
+    MarioState playerState() const { return model_->playerState(); }
+    Direction playerFacing() const { return model_->playerFacing(); }
+    void addNotification(Notify_Funtion func);
 
-    // === 游戏驱动 ===
-    void tick(float dt);  // → model.update(dt)
-
-    // === 渲染数据查询（View::draw 中调用）===
-    const GameModel& gameModel() const { return *model_; }
-
-    // === 事件（View 订阅）===
+    // 下面的接口应该隐藏
+    const GameModel& gameModel() const { return *model_; }  /// 需要隐藏的接口
     EventTrigger vmTrigger;
 
    private:
+    PlayerInfo player_info_;
+    TileInfo tile_info_;
     void onModelChanged(EventType ev);
 
     GameModel* model_;
-    uintptr_t modelSubId_;
-
-    // 预绑定的命令
-    InputCommand inputCmd_;
+    uintptr_t funct_calback_Index_;
+    InputCommand actionCmd_;
 };
 
 #endif  // MARIO_VIEWMODEL_H

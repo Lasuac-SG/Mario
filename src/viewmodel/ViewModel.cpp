@@ -1,19 +1,17 @@
 //
-
 #include "viewmodel/ViewModel.h"
+#include "common/Type.h"
 
-GameViewModel::GameViewModel(GameModel* model) : inputCmd_(model) {
-    model_ = model;
-
-    // 订阅 Model 状态变更
-    modelSubId_ = model_->modelTrigger.add_notification([this](EventType ev) { onModelChanged(ev); });
+ViewModel::ViewModel(GameModel* model) : model_(model), actionCmd_(model) {
+    funct_calback_Index_ = model_->modelTrigger.add_notification([this](EventType ev) { onModelChanged(ev); });
 }
 
-GameViewModel::~GameViewModel() { model_->modelTrigger.remove_notification(modelSubId_); }
+ViewModel::~ViewModel() { model_->modelTrigger.remove_notification(funct_calback_Index_); }
 
-void GameViewModel::onModelChanged(EventType /*ev*/) {
-    // Model 状态已更新 → 通知 View 重绘
+void ViewModel::onModelChanged(EventType /*ev*/) {
     vmTrigger.fire(static_cast<uint32_t>(ViewModelEvent::RENDER_UPDATE));
 }
 
-void GameViewModel::tick(float dt) { model_->update(dt); }
+void ViewModel::tick(float dt) { model_->update(dt); }
+
+void ViewModel::addNotification(Notify_Funtion func) { vmTrigger.add_notification(std::move(func)); }
