@@ -14,6 +14,7 @@ template <typename T>
 class TypeParameter : public ICommandParameter {
 public:
   T v_;
+  TypeParameter(T v): v_(v) {}
 };
 
 struct PlayerInfoStruct {
@@ -31,5 +32,6 @@ struct TileInfoStruct {
 
 using PlayerInfo = PlayerInfoStruct;
 using TileInfo = TileInfoStruct;
+using InputActionParameter = TypeParameter<InputAction>;
 
 #endif // MARIO_TYPE_H

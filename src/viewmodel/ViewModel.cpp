@@ -1,5 +1,6 @@
 //
 #include "viewmodel/ViewModel.h"
+
 #include "common/Type.h"
 
 ViewModel::ViewModel(GameModel* model) : model_(model), actionCmd_(model) {
@@ -15,3 +16,5 @@ void ViewModel::onModelChanged(EventType /*ev*/) {
 void ViewModel::tick(float dt) { model_->update(dt); }
 
 void ViewModel::addNotification(Notify_Funtion func) { vmTrigger.add_notification(std::move(func)); }
+
+int ViewModel::act_Command(InputActionParameter& param) noexcept { actionCmd_.exec(&param); }

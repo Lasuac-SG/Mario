@@ -7,7 +7,6 @@
 #include "common/Type.h"
 #include "model/GameModel.h"
 
-typedef TypeParameter<InputAction> InputActionParameter;
 
 class InputCommand : public ICommandBase {
    public:
