@@ -22,8 +22,11 @@ void GameView::run() {
         dt = std::min(dt, 1.0f / 30.0f);  // 防止 delta 螺旋
         processEvents();
         processInput();
-        updateFrameFunction_(dt);
-        render();
+        nextStepCommand_(dt);            // ③ 时钟更新 → ViewModel::tick
+        if (needsRedraw_) {              // ④ 收到通知后才渲染（脏标记）
+            render();
+            needsRedraw_ = false;
+        }
     }
 }
 

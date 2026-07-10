@@ -25,14 +25,18 @@ class GameView {
     void setTileInfo(const TileInfos * tileInfos){
         tileInfos_ = tileInfos;
     }
-    void setUpdateFunction(std::function<void(float)> func) {
-        updateFrameFunction_ = func;
+    /// 时钟更新命令（View → ViewModel::tick → Model::update）
+    void setNextStepCommand(std::function<void(float)>&& cmd) {
+        nextStepCommand_ = std::move(cmd);
     }
+
+    /// ViewModel 通知后调用，设置重绘标记（设计文档 §5.2 脏标记模式）
+    void invalidate() { needsRedraw_ = true; }
 
    private:
     void processEvents();
     void processInput();
-    std::function<void(float)> updateFrameFunction_;
+    std::function<void(float)> nextStepCommand_;
     void render();
     sf::RenderWindow window_;
     std::unique_ptr<EntityRenderer> renderer_;
@@ -47,6 +51,7 @@ class GameView {
     bool keys_[256]{false};
     bool prevJump_ = false;
     bool prevRestart_ = false;
+    bool needsRedraw_ = true;  // 脏标记：收到 ViewModel 通知后置 true
 
     static constexpr int LOGIC_W = 800;
     static constexpr int LOGIC_H = 600;
