@@ -3,53 +3,38 @@
 #ifndef MARIO_VIEW_H
 #define MARIO_VIEW_H
 
-#include "view/AssetManager.h"
-#include "view/EntityRenderer.h"
-#include "common/ICommand.h"
+#include "common/Type.h"
+#include "view/input/InputHandler.h"
+#include "view/renderer/GameRenderer.h"
 
 class GameView {
    public:
     GameView();
-    ~GameView();
-    void run();  // 主循环
-    void setActionCommand(ICommandBase* cmd){
-        actionParam_ = cmd;
-    }
-    void setCamera(const PositionType* cameraX, const PositionType* cameraY){
-        cameraX_ = cameraX;
-        cameraY_ = cameraY;
-    }
-    void setPlayerInfo(const PlayerInfo* playerInfo){
-        playerInfo_ = playerInfo;
-    }
-    void setTileInfo(const TileInfos * tileInfos){
-        tileInfos_ = tileInfos;
-    }
-    void setUpdateFunction(std::function<void(float)> func) {
-        updateFrameFunction_ = func;
-    }
+    ~GameView() = default;
+
+    // === 生命周期 ===
+    bool isOpen() const { return window_.isOpen(); }
+
+    // ★ 唯一的帧入口（等价 FLTK timeout_cb → m_next_step_command(turn)）
+    void NextStep(float dt);
+
+    // === 通知回调（等价 FLTK get_notification） ===
+    Notify_Funtion getRenderNotification();
+
+    // === 属性绑定 —— 委托给组件 ===
+    void setActionCommand(ICommandBase* cmd) { input_.setActionCommand(cmd); }
+    void setCamera(const PositionType* cx, const PositionType* cy) { renderer_.setCamera(cx, cy); }
+    void setPlayerInfo(const PlayerInfo* p) { renderer_.setPlayerInfo(p); }
+    void setTileInfos(const TileInfos* t) { renderer_.setTileInfos(t); }
+
+    // === next_step command ===
+    void setNextStepCommand(std::function<void(float)>&& cmd) { nextStepCommand_ = std::move(cmd); }
 
    private:
-    void processEvents();
-    void processInput();
-    std::function<void(float)> updateFrameFunction_;
-    void render();
     sf::RenderWindow window_;
-    std::unique_ptr<EntityRenderer> renderer_;
-    AssetManager* assets_;
-    ICommandBase* actionParam_;
-
-    const PositionType* cameraX_;
-    const PositionType* cameraY_;
-    const PlayerInfo* playerInfo_;
-    const TileInfos * tileInfos_;
-
-    bool keys_[256]{false};
-    bool prevJump_ = false;
-    bool prevRestart_ = false;
-
-    static constexpr int LOGIC_W = 800;
-    static constexpr int LOGIC_H = 600;
+    InputHandler input_;
+    GameRenderer renderer_;
+    std::function<void(float)> nextStepCommand_;
 };
 
 #endif  // MARIO_VIEW_H

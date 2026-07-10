@@ -11,6 +11,12 @@ ViewModel::ViewModel(GameModel* model, ViewportDim viewW, ViewportDim viewH)
 
 ViewModel::~ViewModel() { model_->modelTrigger.remove_notification(funct_callback_Index_); }
 
+void ViewModel::tick(float dt) {
+    model_->update(dt);
+    // model_->update 内部会 fire(STATE_CHANGED)
+    // → onModelChanged() → syncFromModel() → fire(RENDER_UPDATE)
+}
+
 void ViewModel::onModelChanged(EventType /*ev*/) {
     syncFromModel();
     vmTrigger.fire(static_cast<uint32_t>(ViewModelEvent::RENDER_UPDATE));

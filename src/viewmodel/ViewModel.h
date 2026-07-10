@@ -31,17 +31,19 @@ class ViewModel {
 
     // === 通知订阅 ===
     void addNotification(Notify_Funtion func);
-    EventTrigger& getEventTrigger(){ return vmTrigger; }
-    EventTrigger vmTrigger;
-    std::function<void(float)> getUpdateFrameFunction() {
-        return [this](float dt){ model_->update(dt);} ;
+
+    // 按设计文档模式：返回 std::function 作为 next_step command
+    std::function<void(float)> getNextStepCommand() {
+        return [this](float dt) { this->tick(dt); };
     }
 
    private:
     void onModelChanged(EventType ev);
     void syncFromModel();  // 从 Model 拉取数据，填充 player_info_ / tile_infos_
+    void tick(float dt);
 
     GameModel* model_;
+    EventTrigger vmTrigger;
     uintptr_t funct_callback_Index_;
     InputCommand actionCmd_;
 
