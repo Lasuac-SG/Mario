@@ -31,8 +31,6 @@ class ViewModel {
 
     // === 通知订阅 ===
     void addNotification(Notify_Funtion func);
-    EventTrigger& getEventTrigger(){ return vmTrigger; }
-    EventTrigger vmTrigger;
 
     // 按设计文档模式：返回 std::function 作为 next_step command
     std::function<void(float)> getNextStepCommand() {
@@ -45,6 +43,7 @@ class ViewModel {
     void tick(float dt);
 
     GameModel* model_;
+    EventTrigger vmTrigger;
     uintptr_t funct_callback_Index_;
     InputCommand actionCmd_;
 
