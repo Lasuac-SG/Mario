@@ -1,9 +1,9 @@
-﻿//
+//
 
-#include "view/SimpleRenderer.h"
-#include "view/AssetManager.h"
+#include "GameRenderer.h"
 
 namespace {
+
 constexpr const char* kTileAtlas = "picture/mario/地图/map.png";
 const sf::IntRect kPlatformRect({0, 360}, {80, 40});
 
@@ -16,19 +16,19 @@ const char* choosePlayerFrame(MarioState state, float runAnimationTime) {
     };
 
     switch (state) {
-    case MarioState::RUNNING: {
-        constexpr float kRunFrameDuration = 0.09f;
-        const int frameCount = static_cast<int>(std::size(kRunFrames));
-        int frame = static_cast<int>(runAnimationTime / kRunFrameDuration) % frameCount;
-        return kRunFrames[frame];
-    }
-    case MarioState::JUMPING:
-        return "picture/mario/人物/player_1/red_6.png";
-    case MarioState::FALLING:
-        return "picture/mario/人物/player_1/red_7.png";
-    case MarioState::IDLE:
-    default:
-        return "picture/mario/人物/player_1/red_1.png";
+        case MarioState::RUNNING: {
+            constexpr float kRunFrameDuration = 0.09f;
+            const int frameCount = static_cast<int>(std::size(kRunFrames));
+            int frame = static_cast<int>(runAnimationTime / kRunFrameDuration) % frameCount;
+            return kRunFrames[frame];
+        }
+        case MarioState::JUMPING:
+            return "picture/mario/人物/player_1/red_6.png";
+        case MarioState::FALLING:
+            return "picture/mario/人物/player_1/red_7.png";
+        case MarioState::IDLE:
+        default:
+            return "picture/mario/人物/player_1/red_1.png";
     }
 }
 
@@ -52,15 +52,11 @@ void drawBrickGround(sf::RenderWindow& window, const TileInfo& tile) {
             const float x = tile.x + offset + col * kBrickW;
             const float left = std::max(x, tile.x);
             const float right = std::min(x + kBrickW, tile.x + tile.w);
-            if (right <= left) {
-                continue;
-            }
+            if (right <= left) continue;
 
             brick.setPosition({left, y});
             brick.setSize({right - left, rowHeight});
-            brick.setFillColor(((row + col) % 2 == 0)
-                               ? sf::Color(181, 101, 29)
-                               : sf::Color(160, 82, 45));
+            brick.setFillColor(((row + col) % 2 == 0) ? sf::Color(181, 101, 29) : sf::Color(160, 82, 45));
             window.draw(brick);
         }
     }
@@ -105,27 +101,51 @@ void drawPipe(sf::RenderWindow& window, const TileInfo& tile) {
     highlight.setFillColor(sf::Color(120, 245, 120));
     window.draw(highlight);
 }
+
+}  // namespace
+
+GameRenderer::GameRenderer() { rect_.setOutlineThickness(0.0f); }
+
+void GameRenderer::render(sf::RenderWindow& window) {
+    window.clear(sf::Color(107, 140, 255));
+
+    // 设置逻辑坐标视口（保持等比缩放）
+    float winW = static_cast<float>(window.getSize().x);
+    float winH = static_cast<float>(window.getSize().y);
+    float scaleX = winW / LOGIC_W;
+    float scaleY = winH / LOGIC_H;
+    float scale = std::min(scaleX, scaleY);
+
+    sf::View view(sf::FloatRect({0.f, 0.f}, {static_cast<float>(LOGIC_W), static_cast<float>(LOGIC_H)}));
+    view.setCenter({*cameraX_, *cameraY_});
+    sf::FloatRect viewport({(winW - LOGIC_W * scale) / (2.0f * winW), (winH - LOGIC_H * scale) / (2.0f * winH)},
+                           {(LOGIC_W * scale) / winW, (LOGIC_H * scale) / winH});
+    view.setViewport(viewport);
+    window.setView(view);
+
+    // 渲染 Tile
+    for (const auto& tile : *tileInfos_) {
+        drawTile(window, tile);
+    }
+
+    // 渲染玩家
+    drawPlayer(window);
+
+    window.display();
 }
 
-SimpleRenderer::SimpleRenderer() {
-    rect_.setOutlineThickness(0.0f);
-}
-
-void SimpleRenderer::draw(sf::RenderWindow& window,
-                          const PlayerInfo& player,
-                          AssetManager& assets) {
+void GameRenderer::drawPlayer(sf::RenderWindow& window) {
+    const auto& player = *playerInfo_;
     const float deltaSeconds = animationClock_.restart().asSeconds();
     if (player.state == MarioState::RUNNING) {
-        if (lastPlayerState_ != MarioState::RUNNING) {
-            runAnimationTime_ = 0.0f;
-        }
+        if (lastPlayerState_ != MarioState::RUNNING) runAnimationTime_ = 0.0f;
         runAnimationTime_ += deltaSeconds;
     } else {
         runAnimationTime_ = 0.0f;
     }
     lastPlayerState_ = player.state;
 
-    const sf::Texture& texture = assets.load(choosePlayerFrame(player.state, runAnimationTime_));
+    const sf::Texture& texture = assets_.load(choosePlayerFrame(player.state, runAnimationTime_));
     if (texture.getSize().x == 0 || texture.getSize().y == 0) {
         rect_.setTexture(nullptr, true);
         rect_.setSize(sf::Vector2f(player.width, player.height));
@@ -151,20 +171,17 @@ void SimpleRenderer::draw(sf::RenderWindow& window,
     window.draw(sprite);
 }
 
-void SimpleRenderer::draw(sf::RenderWindow& window,
-                          const TileInfo& tile,
-                          AssetManager& assets) {
+void GameRenderer::drawTile(sf::RenderWindow& window, const TileInfo& tile) {
     if (tile.type == TileType::GROUND) {
         drawBrickGround(window, tile);
         return;
     }
-
     if (tile.type == TileType::PIPE) {
         drawPipe(window, tile);
         return;
     }
 
-    const sf::Texture& atlas = assets.load(kTileAtlas);
+    const sf::Texture& atlas = assets_.load(kTileAtlas);
     if (atlas.getSize().x == 0 || atlas.getSize().y == 0) {
         drawFallbackTile(window, tile);
         return;
@@ -175,13 +192,10 @@ void SimpleRenderer::draw(sf::RenderWindow& window,
     rect_.setTexture(&atlas, true);
     rect_.setFillColor(sf::Color::White);
 
-    switch (tile.type) {
-    case TileType::PLATFORM: {
+    if (tile.type == TileType::PLATFORM) {
         rect_.setTextureRect(sf::IntRect({kPlatformRect.position.x, kPlatformRect.position.y},
                                          {static_cast<int>(tile.w), static_cast<int>(tile.h)}));
-        break;
-    }
-    default:
+    } else {
         drawFallbackTile(window, tile);
         return;
     }
@@ -189,24 +203,24 @@ void SimpleRenderer::draw(sf::RenderWindow& window,
     window.draw(rect_);
 }
 
-void SimpleRenderer::drawFallbackTile(sf::RenderWindow& window, const TileInfo& tile) {
+void GameRenderer::drawFallbackTile(sf::RenderWindow& window, const TileInfo& tile) {
     rect_.setTexture(nullptr, true);
     rect_.setSize({tile.w, tile.h});
     rect_.setPosition({tile.x, tile.y});
 
     switch (tile.type) {
-    case TileType::GROUND:
-        rect_.setFillColor(sf::Color(139, 90, 43));
-        break;
-    case TileType::PLATFORM:
-        rect_.setFillColor(sf::Color(128, 128, 128));
-        break;
-    case TileType::PIPE:
-        rect_.setFillColor(sf::Color(50, 205, 50));
-        break;
-    default:
-        rect_.setFillColor(sf::Color::Magenta);
-        break;
+        case TileType::GROUND:
+            rect_.setFillColor(sf::Color(139, 90, 43));
+            break;
+        case TileType::PLATFORM:
+            rect_.setFillColor(sf::Color(128, 128, 128));
+            break;
+        case TileType::PIPE:
+            rect_.setFillColor(sf::Color(50, 205, 50));
+            break;
+        default:
+            rect_.setFillColor(sf::Color::Magenta);
+            break;
     }
 
     window.draw(rect_);

@@ -6,7 +6,6 @@
 #include "model/GameModel.h"
 #include "viewmodel/ViewModel.h"
 #include "view/View.h"
-#include "view/SimpleRenderer.h"
 
 class App {
 public:

@@ -8,20 +8,24 @@ void App::initialize() {
 
     view_ = std::make_unique<GameView>();
 
-    // 1. 属性绑定：View 持有 ViewModel 数据的只读指针
-    view_->setActionCommand(vm_->getActionCommand());
+    // 1. 属性绑定
     view_->setCamera(vm_->getCameraX(), vm_->getCameraY());
     view_->setPlayerInfo(vm_->getPlayerInfo());
-    view_->setTileInfo(vm_->getTileInfos());
+    view_->setTileInfos(vm_->getTileInfos());
 
-    // 2. 命令绑定：View 事件 → ViewModel 方法（设计文档 §3.2.2）
+    // 2. 命令绑定
     view_->setNextStepCommand(vm_->getNextStepCommand());
+    view_->setActionCommand(vm_->getActionCommand());
 
-    // 3. ★ 通知绑定：ViewModel.fire(RENDER_UPDATE) → View.invalidate()
-    //    贯通 MVVM 通知链路，View 收到通知后设脏标记，下一帧渲染
-    vm_->addNotification([this](EventType) { view_->invalidate(); });
-
-    model_->reset();
+    // 3. 通知绑定：ViewModel.fire(RENDER_UPDATE)  → render()
+    vm_->addNotification(view_->getRenderNotification());
 }
 
-void App::run() { view_->run(); }
+void App::run() {
+    sf::Clock clock;
+    while (view_->isOpen()) {
+        float dt = clock.restart().asSeconds();
+        dt = std::min(dt, 1.0f / 30.0f);
+        view_->NextStep(dt);
+    }
+}
