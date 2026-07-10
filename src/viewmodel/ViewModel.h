@@ -30,22 +30,12 @@ class ViewModel {
 
     // === 命令接口（View 调用 → 写入 Model） ===
     int act_Command(InputActionParameter& param) noexcept;
+    ICommandBase* getActionCommand(){ return &actionCmd_; }
 
     // === 通知订阅 ===
     void addNotification(Notify_Funtion func);
+    EventTrigger& getEventTrigger(){ return vmTrigger; }
     EventTrigger vmTrigger;
-
-    // /// === 旧接口（保留参考，待清理） ===
-    // ICommandBase& getActionCmd() { return actionCmd_; }
-    // const PlayerInfo& getPlayerInfo() const noexcept { return player_info_; }
-    // const TileInfo& getTileInfo() const noexcept { return tile_info_; }
-    // PositionType playerX() const { return model_->playerX(); }
-    // PositionType playerY() const { return model_->playerY(); }
-    // PositionType playerW() const { return model_->playerW(); }
-    // PositionType playerH() const { return model_->playerH(); }
-    // MarioState playerState() const { return model_->playerState(); }
-    // Direction playerFacing() const { return model_->playerFacing(); }
-    // const GameModel& gameModel() const { return *model_; }  // 需要隐藏
 
    private:
     void onModelChanged(EventType ev);

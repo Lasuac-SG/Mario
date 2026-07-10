@@ -53,29 +53,29 @@ void GameView::processInput() {
     // 左右冲突 → 停止
     if (left && right) {
         InputActionParameter p(InputAction::STOP);
-        vm_->act_Command(p);
+        actionParam_->exec(&p);
     } else if (left) {
         InputActionParameter p(InputAction::MOVE_LEFT);
-        vm_->act_Command(p);
+        actionParam_->exec(&p);
     } else if (right) {
         InputActionParameter p(InputAction::MOVE_RIGHT);
-        vm_->act_Command(p);
+        actionParam_->exec(&p);
     } else {
         InputActionParameter p(InputAction::STOP);
-        vm_->act_Command(p);
+        actionParam_->exec(&p);
     }
 
     // 跳跃边沿触发
     if (jump && !prevJump_) {
         InputActionParameter p(InputAction::JUMP);
-        vm_->act_Command(p);
+        actionParam_->exec(&p);
     }
     prevJump_ = jump;
 
     // 重启边沿触发
     if (restart && !prevRestart_) {
         InputActionParameter p(InputAction::RESTART);
-        vm_->act_Command(p);
+        actionParam_->exec(&p);
     }
     prevRestart_ = restart;
 }

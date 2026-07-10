@@ -3,27 +3,29 @@
 #ifndef MARIO_VIEW_H
 #define MARIO_VIEW_H
 
-#include "viewmodel/ViewModel.h"
-#include "view/EntityRenderer.h"
 #include "view/AssetManager.h"
-
+#include "view/EntityRenderer.h"
+#include "viewmodel/ViewModel.h"
+#include "common/ICommand.h"
 
 class GameView {
-public:
+   public:
     GameView(ViewModel* vm, EntityRenderer* renderer);
     ~GameView();
+    void run();  // 主循环
+    void setActionCommand(ICommandBase* cmd){
+        actionParam_ = cmd;
+    }
 
-    void run();   // 主循环
-
-private:
+   private:
     void processEvents();
     void processInput();
     void render();
-
     sf::RenderWindow window_;
     ViewModel* vm_;
     EntityRenderer* renderer_;
     AssetManager* assets_;
+    ICommandBase* actionParam_;
 
     bool keys_[256]{false};
     bool prevJump_ = false;

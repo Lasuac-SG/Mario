@@ -7,7 +7,7 @@ void App::initialize() {
     vm_ = std::make_unique<ViewModel>(model_.get());
     renderer_ = std::make_unique<SimpleRenderer>();
     view_ = std::make_unique<GameView>(vm_.get(), renderer_.get());
-
+    view_->setActionCommand(vm_->getActionCommand());
     model_->reset();
 }
 
