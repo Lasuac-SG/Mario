@@ -2,16 +2,18 @@
 
 #include "view/View.h"
 
-GameView::GameView(GameViewModel* vm, EntityRenderer* renderer)
+#include "viewmodel/command/Commands.h"
+#include "common/Type.h"
+
+GameView::GameView(ViewModel* vm, EntityRenderer* renderer)
     : window_(sf::VideoMode({LOGIC_W, LOGIC_H}), "Mario Demo",
               sf::Style::Titlebar | sf::Style::Close | sf::Style::Resize),
-      vm_(vm), renderer_(renderer) {
+      vm_(vm),
+      renderer_(renderer) {
     assets_ = new AssetManager();
 }
 
-GameView::~GameView() {
-    delete assets_;
-}
+GameView::~GameView() { delete assets_; }
 
 void GameView::run() {
     sf::Clock clock;
@@ -33,49 +35,48 @@ void GameView::processEvents() {
             window_.close();
         } else if (const auto* kp = ev->getIf<sf::Event::KeyPressed>()) {
             auto code = static_cast<int>(kp->code);
-            if (code >= 0 && code < 256)
-                keys_[code] = true;
+            if (code >= 0 && code < 256) keys_[code] = true;
         } else if (const auto* kr = ev->getIf<sf::Event::KeyReleased>()) {
             auto code = static_cast<int>(kr->code);
-            if (code >= 0 && code < 256)
-                keys_[code] = false;
+            if (code >= 0 && code < 256) keys_[code] = false;
         }
     }
 }
 
 void GameView::processInput() {
     using sf::Keyboard::Key;
-    bool left  = keys_[static_cast<int>(Key::Left)]  || keys_[static_cast<int>(Key::A)];
+    bool left = keys_[static_cast<int>(Key::Left)] || keys_[static_cast<int>(Key::A)];
     bool right = keys_[static_cast<int>(Key::Right)] || keys_[static_cast<int>(Key::D)];
-    bool jump  = keys_[static_cast<int>(Key::Space)] || keys_[static_cast<int>(Key::W)] || keys_[static_cast<int>(Key::Up)];
+    bool jump =
+        keys_[static_cast<int>(Key::Space)] || keys_[static_cast<int>(Key::W)] || keys_[static_cast<int>(Key::Up)];
     bool restart = keys_[static_cast<int>(Key::R)];
 
     // 左右冲突 → 停止
     if (left && right) {
         InputActionParameter p(InputAction::STOP);
-        vm_->inputCmd().exec(&p);
+        vm_->act_Command(p);
     } else if (left) {
         InputActionParameter p(InputAction::MOVE_LEFT);
-        vm_->inputCmd().exec(&p);
+        vm_->act_Command(p);
     } else if (right) {
         InputActionParameter p(InputAction::MOVE_RIGHT);
-        vm_->inputCmd().exec(&p);
+        vm_->act_Command(p);
     } else {
         InputActionParameter p(InputAction::STOP);
-        vm_->inputCmd().exec(&p);
+        vm_->act_Command(p);
     }
 
     // 跳跃边沿触发
     if (jump && !prevJump_) {
         InputActionParameter p(InputAction::JUMP);
-        vm_->inputCmd().exec(&p);
+        vm_->act_Command(p);
     }
     prevJump_ = jump;
 
     // 重启边沿触发
     if (restart && !prevRestart_) {
         InputActionParameter p(InputAction::RESTART);
-        vm_->inputCmd().exec(&p);
+        vm_->act_Command(p);
     }
     prevRestart_ = restart;
 }
@@ -90,14 +91,9 @@ void GameView::render() {
     float scaleY = winH / LOGIC_H;
     float scale = std::min(scaleX, scaleY);
 
-    sf::View view(sf::FloatRect({0.f, 0.f},
-                                {static_cast<float>(LOGIC_W), static_cast<float>(LOGIC_H)}));
-    sf::FloatRect viewport(
-        {(winW - LOGIC_W * scale) / (2.0f * winW),
-         (winH - LOGIC_H * scale) / (2.0f * winH)},
-        {(LOGIC_W * scale) / winW,
-         (LOGIC_H * scale) / winH}
-    );
+    sf::View view(sf::FloatRect({0.f, 0.f}, {static_cast<float>(LOGIC_W), static_cast<float>(LOGIC_H)}));
+    sf::FloatRect viewport({(winW - LOGIC_W * scale) / (2.0f * winW), (winH - LOGIC_H * scale) / (2.0f * winH)},
+                           {(LOGIC_W * scale) / winW, (LOGIC_H * scale) / winH});
     view.setViewport(viewport);
     window_.setView(view);
 
