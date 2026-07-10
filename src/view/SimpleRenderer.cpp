@@ -32,7 +32,7 @@ const char* choosePlayerFrame(MarioState state, float runAnimationTime) {
     }
 }
 
-void drawBrickGround(sf::RenderWindow& window, const Tile& tile) {
+void drawBrickGround(sf::RenderWindow& window, const TileInfo& tile) {
     constexpr float kBrickW = 32.0f;
     constexpr float kBrickH = 16.0f;
 
@@ -66,7 +66,7 @@ void drawBrickGround(sf::RenderWindow& window, const Tile& tile) {
     }
 }
 
-void drawPipe(sf::RenderWindow& window, const Tile& tile) {
+void drawPipe(sf::RenderWindow& window, const TileInfo& tile) {
     const float headH = std::min(16.0f, tile.h * 0.4f);
     const float headW = tile.w + 12.0f;
     const float bodyW = std::max(18.0f, tile.w - 8.0f);
@@ -111,11 +111,11 @@ SimpleRenderer::SimpleRenderer() {
     rect_.setOutlineThickness(0.0f);
 }
 
-void SimpleRenderer::drawPlayer(sf::RenderWindow& window,
-                                const GameModel& model,
-                                AssetManager& assets) {
+void SimpleRenderer::draw(sf::RenderWindow& window,
+                          const PlayerInfo& player,
+                          AssetManager& assets) {
     const float deltaSeconds = animationClock_.restart().asSeconds();
-    if (model.playerState() == MarioState::RUNNING) {
+    if (player.state == MarioState::RUNNING) {
         if (lastPlayerState_ != MarioState::RUNNING) {
             runAnimationTime_ = 0.0f;
         }
@@ -123,13 +123,13 @@ void SimpleRenderer::drawPlayer(sf::RenderWindow& window,
     } else {
         runAnimationTime_ = 0.0f;
     }
-    lastPlayerState_ = model.playerState();
+    lastPlayerState_ = player.state;
 
-    const sf::Texture& texture = assets.load(choosePlayerFrame(model.playerState(), runAnimationTime_));
+    const sf::Texture& texture = assets.load(choosePlayerFrame(player.state, runAnimationTime_));
     if (texture.getSize().x == 0 || texture.getSize().y == 0) {
         rect_.setTexture(nullptr, true);
-        rect_.setSize(sf::Vector2f(model.playerW(), model.playerH()));
-        rect_.setPosition(sf::Vector2f(model.playerX(), model.playerY()));
+        rect_.setSize(sf::Vector2f(player.width, player.height));
+        rect_.setPosition(sf::Vector2f(player.x, player.y));
         rect_.setFillColor(sf::Color::Red);
         window.draw(rect_);
         return;
@@ -137,23 +137,23 @@ void SimpleRenderer::drawPlayer(sf::RenderWindow& window,
 
     sf::Sprite sprite(texture);
     const auto texSize = texture.getSize();
-    const float scaleX = model.playerW() / static_cast<float>(texSize.x);
-    const float scaleY = model.playerH() / static_cast<float>(texSize.y);
+    const float scaleX = player.width / static_cast<float>(texSize.x);
+    const float scaleY = player.height / static_cast<float>(texSize.y);
     sprite.setScale({scaleX, scaleY});
-    sprite.setPosition({model.playerX(), model.playerY()});
+    sprite.setPosition({player.x, player.y});
 
-    if (model.playerFacing() == Direction::LEFT) {
+    if (player.direction == Direction::LEFT) {
         sprite.setOrigin({static_cast<float>(texSize.x), 0.0f});
         sprite.setScale({-scaleX, scaleY});
-        sprite.setPosition({model.playerX() + model.playerW(), model.playerY()});
+        sprite.setPosition({player.x + player.width, player.y});
     }
 
     window.draw(sprite);
 }
 
-void SimpleRenderer::drawTile(sf::RenderWindow& window,
-                              const Tile& tile,
-                              AssetManager& assets) {
+void SimpleRenderer::draw(sf::RenderWindow& window,
+                          const TileInfo& tile,
+                          AssetManager& assets) {
     if (tile.type == TileType::GROUND) {
         drawBrickGround(window, tile);
         return;
@@ -189,7 +189,7 @@ void SimpleRenderer::drawTile(sf::RenderWindow& window,
     window.draw(rect_);
 }
 
-void SimpleRenderer::drawFallbackTile(sf::RenderWindow& window, const Tile& tile) {
+void SimpleRenderer::drawFallbackTile(sf::RenderWindow& window, const TileInfo& tile) {
     rect_.setTexture(nullptr, true);
     rect_.setSize({tile.w, tile.h});
     rect_.setPosition({tile.x, tile.y});

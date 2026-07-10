@@ -2,9 +2,6 @@
 
 #ifndef MARIO_ASSETMANAGER_H
 #define MARIO_ASSETMANAGER_H
-
-#include "precompile.h"
-
 /// 纹理资源缓存 —— 加载并缓存 PNG 等图片
 class AssetManager {
 public:
