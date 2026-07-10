@@ -98,12 +98,12 @@ void GameView::render() {
     window_.setView(view);
 
     // 渲染 Tile —— 通过 ViewModel 数据绑定
-    for (const auto& tile : vm_->tileInfos()) {
+    for (const auto& tile : *tileInfos_) {
         renderer_->draw(window_, tile, *assets_);
     }
 
     // 渲染玩家 —— 通过 ViewModel 数据绑定
-    renderer_->draw(window_, vm_->playerInfo(), *assets_);
+    renderer_->draw(window_, *playerInfo_, *assets_);
 
     window_.display();
 }

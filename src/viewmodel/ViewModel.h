@@ -18,8 +18,9 @@ class ViewModel {
 
     // === 只读数据绑定（View 拉取，ViewModel 已从 Model 同步并缓存） ===
     const PlayerInfo& playerInfo() const noexcept { return player_info_; }
+    const PlayerInfo* getPlayerInfo() const noexcept { return &player_info_; }
     const std::vector<TileInfo>& tileInfos() const noexcept { return tile_infos_; }
-
+    const TileInfos* getTileInfos() const noexcept { return &tile_infos_; }
     // === 关卡尺寸（透传 Model，供 View 参考） ===
     PositionType levelWidthPx() const { return model_->levelWidthPx(); }
     PositionType levelHeightPx() const { return model_->levelHeightPx(); }
@@ -48,7 +49,7 @@ class ViewModel {
     InputCommand actionCmd_;
 
     PlayerInfo player_info_;
-    std::vector<TileInfo> tile_infos_;
+    TileInfos tile_infos_;
 
     // 相机状态：syncFromModel() 根据玩家位置和关卡边界更新
     PositionType cameraX_ = WorldOrigin;

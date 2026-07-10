@@ -20,6 +20,12 @@ class GameView {
         cameraX_ = cameraX;
         cameraY_ = cameraY;
     }
+    void setPlayerInfo(const PlayerInfo* playerInfo){
+        playerInfo_ = playerInfo;
+    }
+    void setTileInfo(const TileInfos * tileInfos){
+        tileInfos_ = tileInfos;
+    }
 
    private:
     void processEvents();
@@ -33,6 +39,8 @@ class GameView {
 
     const PositionType* cameraX_;
     const PositionType* cameraY_;
+    const PlayerInfo* playerInfo_;
+    const TileInfos * tileInfos_;
 
     bool keys_[256]{false};
     bool prevJump_ = false;
