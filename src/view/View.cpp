@@ -91,7 +91,7 @@ void GameView::render() {
     float scale = std::min(scaleX, scaleY);
 
     sf::View view(sf::FloatRect({0.f, 0.f}, {static_cast<float>(LOGIC_W), static_cast<float>(LOGIC_H)}));
-    view.setCenter({vm_->cameraX(), vm_->cameraY()});
+    view.setCenter({*cameraX_, *cameraY_});
     sf::FloatRect viewport({(winW - LOGIC_W * scale) / (2.0f * winW), (winH - LOGIC_H * scale) / (2.0f * winH)},
                            {(LOGIC_W * scale) / winW, (LOGIC_H * scale) / winH});
     view.setViewport(viewport);

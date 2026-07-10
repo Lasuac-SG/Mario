@@ -16,6 +16,10 @@ class GameView {
     void setActionCommand(ICommandBase* cmd){
         actionParam_ = cmd;
     }
+    void setCamera(const PositionType* cameraX, const PositionType* cameraY){
+        cameraX_ = cameraX;
+        cameraY_ = cameraY;
+    }
 
    private:
     void processEvents();
@@ -26,6 +30,9 @@ class GameView {
     EntityRenderer* renderer_;
     AssetManager* assets_;
     ICommandBase* actionParam_;
+
+    const PositionType* cameraX_;
+    const PositionType* cameraY_;
 
     bool keys_[256]{false};
     bool prevJump_ = false;

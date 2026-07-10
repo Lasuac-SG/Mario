@@ -27,6 +27,8 @@ class ViewModel {
     // === 相机中心（世界坐标，ViewModel 计算，View 直接设到 sf::View） ===
     PositionType cameraX() const { return cameraX_; }
     PositionType cameraY() const { return cameraY_; }
+    const PositionType* getCameraX() const { return &cameraX_; }
+    const PositionType* getCameraY() const { return &cameraY_; }
 
     // === 命令接口（View 调用 → 写入 Model） ===
     int act_Command(InputActionParameter& param) noexcept;

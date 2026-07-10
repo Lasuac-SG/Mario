@@ -8,6 +8,7 @@ void App::initialize() {
     renderer_ = std::make_unique<SimpleRenderer>();
     view_ = std::make_unique<GameView>(vm_.get(), renderer_.get());
     view_->setActionCommand(vm_->getActionCommand());
+    view_->setCamera(vm_->getCameraX(), vm_->getCameraY());
     model_->reset();
 }
 
