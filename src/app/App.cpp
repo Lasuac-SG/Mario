@@ -15,7 +15,7 @@ void App::initialize() {
 
     // 2. 命令绑定
     view_->setNextStepCommand(vm_->getNextStepCommand());
-    view_->setActionCommand(vm_->getActionCommand());
+    view_->getInputHandler()->setActionCommand(vm_->getActionCommand());
 
     // 3. 通知绑定：ViewModel.fire(RENDER_UPDATE)  → render()
     vm_->addNotification(view_->getRenderNotification());

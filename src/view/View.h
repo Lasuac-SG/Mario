@@ -22,13 +22,13 @@ class GameView {
     Notify_Funtion getRenderNotification();
 
     // === 属性绑定 —— 委托给组件 ===
-    void setActionCommand(ICommandBase* cmd) { input_.setActionCommand(cmd); }
     void setCamera(const PositionType* cx, const PositionType* cy) { renderer_.setCamera(cx, cy); }
     void setPlayerInfo(const PlayerInfo* p) { renderer_.setPlayerInfo(p); }
     void setTileInfos(const TileInfos* t) { renderer_.setTileInfos(t); }
 
     // === next_step command ===
     void setNextStepCommand(std::function<void(float)>&& cmd) { nextStepCommand_ = std::move(cmd); }
+    InputHandler* getInputHandler() { return &input_; }
 
    private:
     sf::RenderWindow window_;
