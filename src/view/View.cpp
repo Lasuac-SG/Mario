@@ -50,32 +50,37 @@ void GameView::processInput() {
     bool jump  = keys_[static_cast<int>(Key::Space)] || keys_[static_cast<int>(Key::W)] || keys_[static_cast<int>(Key::Up)];
     bool restart = keys_[static_cast<int>(Key::R)];
 
-    // 左右冲突 → 停止
+    ICommandBase& command = vm_->getInputCmd();
+
     if (left && right) {
-        InputActionParameter p(InputAction::STOP);
-        vm_->inputCmd().exec(&p);
+        InputActionParameter p;
+        p.v_ = InputAction::STOP;
+        command.exec(&p);
     } else if (left) {
-        InputActionParameter p(InputAction::MOVE_LEFT);
-        vm_->inputCmd().exec(&p);
+        InputActionParameter p;
+        p.v_ = InputAction::MOVE_LEFT;
+        command.exec(&p);
     } else if (right) {
-        InputActionParameter p(InputAction::MOVE_RIGHT);
-        vm_->inputCmd().exec(&p);
+        InputActionParameter p;
+        p.v_ = InputAction::MOVE_RIGHT;
+        command.exec(&p);
     } else {
-        InputActionParameter p(InputAction::STOP);
-        vm_->inputCmd().exec(&p);
+        InputActionParameter p;
+        p.v_ = InputAction::STOP;
+        command.exec(&p);
     }
 
-    // 跳跃边沿触发
     if (jump && !prevJump_) {
-        InputActionParameter p(InputAction::JUMP);
-        vm_->inputCmd().exec(&p);
+        InputActionParameter p;
+        p.v_ = InputAction::JUMP;
+        command.exec(&p);
     }
     prevJump_ = jump;
 
-    // 重启边沿触发
     if (restart && !prevRestart_) {
-        InputActionParameter p(InputAction::RESTART);
-        vm_->inputCmd().exec(&p);
+        InputActionParameter p;
+        p.v_ = InputAction::RESTART;
+        command.exec(&p);
     }
     prevRestart_ = restart;
 }
@@ -90,7 +95,18 @@ void GameView::render() {
     float scaleY = winH / LOGIC_H;
     float scale = std::min(scaleX, scaleY);
 
-    sf::View view(sf::FloatRect({0.f, 0.f},
+    const GameModel& model = vm_->gameModel();
+    const float halfViewW = static_cast<float>(LOGIC_W) * 0.5f;
+    const float levelW = model.levelWidthPx();
+    float cameraCenterX = model.playerX() + model.playerW() * 0.5f;
+
+    if (levelW > static_cast<float>(LOGIC_W)) {
+        cameraCenterX = std::clamp(cameraCenterX, halfViewW, levelW - halfViewW);
+    } else {
+        cameraCenterX = levelW * 0.5f;
+    }
+
+    sf::View view(sf::FloatRect({cameraCenterX - halfViewW, 0.f},
                                 {static_cast<float>(LOGIC_W), static_cast<float>(LOGIC_H)}));
     sf::FloatRect viewport(
         {(winW - LOGIC_W * scale) / (2.0f * winW),
@@ -101,14 +117,12 @@ void GameView::render() {
     view.setViewport(viewport);
     window_.setView(view);
 
-    // 渲染 Tile
-    const auto& tiles = vm_->gameModel().tiles();
+    const auto& tiles = model.tiles();
     for (const auto& tile : tiles) {
         renderer_->drawTile(window_, tile, *assets_);
     }
 
-    // 渲染玩家
-    renderer_->drawPlayer(window_, vm_->gameModel(), *assets_);
+    renderer_->drawPlayer(window_, model, *assets_);
 
     window_.display();
 }

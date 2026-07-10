@@ -4,6 +4,9 @@ add_executable(mario
         model/TileMap.cpp
         model/Mario.cpp
         model/GameModel.cpp
+        viewmodel/ViewModel.cpp
+        view/View.cpp
+        view/SimpleRenderer.cpp
 )
 
 # 统一头文件路径, 相对src/目录的路径
