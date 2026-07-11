@@ -1,15 +1,9 @@
-//
-
 #include "InputHandler.h"
 
 #include "common/Type.h"
 
 void InputHandler::pollEvents(sf::RenderWindow& window) {
-    while (const auto ev = window.pollEvent()) {
-        if (ev->is<sf::Event::Closed>()) {
-            window.close();
-        }
-    }
+    (void)window;
 
     using sf::Keyboard::Key;
     keys_[static_cast<int>(Key::Left)] = sf::Keyboard::isKeyPressed(Key::Left);

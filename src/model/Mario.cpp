@@ -13,22 +13,38 @@ void Mario::reset(PositionType x, PositionType y) {
   onGround_ = false;
   facing_ = Direction::RIGHT;
   state_ = MarioState::IDLE;
+  deathFalling_ = false;
   moveLeft_ = false;
   moveRight_ = false;
 }
 
 void Mario::jump() {
-  if (onGround_) {
+  if (!deathFalling_ && onGround_) {
     vy_ = -mario_cfg::kJumpSpeed;
     onGround_ = false;
   }
 }
 
+void Mario::startDeathFall() {
+  stop();
+  deathFalling_ = true;
+  onGround_ = false;
+  vx_ = 0.f;
+  vy_ = -mario_cfg::kJumpSpeed * 0.75f;
+  state_ = MarioState::DEAD;
+}
+
 void Mario::step(TimeType dt, const TileMap& map) {
+  if (deathFalling_) {
+    applyGravity(dt);
+    y_ += vy_ * dt;
+    state_ = MarioState::DEAD;
+    return;
+  }
+
   applyHorizontal(dt);
   applyGravity(dt);
 
-  // 分轴解算：先水平后竖直，避免卡墙/穿地。
   x_ += vx_ * dt;
   resolveHorizontal(map);
   y_ += vy_ * dt;
@@ -45,7 +61,6 @@ void Mario::applyHorizontal(TimeType dt) {
     vx_ = std::min(vx_ + mario_cfg::kMoveAccel * dt, mario_cfg::kMoveMaxSpeed);
     facing_ = Direction::RIGHT;
   } else {
-    // 无输入：按摩擦减速到 0。
     const VelocityType fric = (onGround_ ? mario_cfg::kGroundFriction : mario_cfg::kAirFriction) * dt;
     if (vx_ > 0.f) {
       vx_ = std::max(0.f, vx_ - fric);
@@ -62,7 +77,7 @@ void Mario::applyGravity(TimeType dt) {
 void Mario::resolveHorizontal(const TileMap& map) {
   const int r0 = map.toRow(y_);
   const int r1 = map.toRow(y_ + height() - kEps);
-  if (vx_ > 0.f) {  // 向右：检测右边界所在列
+  if (vx_ > 0.f) {
     const int col = map.toCol(x_ + width() - kEps);
     for (int r = r0; r <= r1; ++r) {
       if (map.isSolid(col, r)) {
@@ -71,7 +86,7 @@ void Mario::resolveHorizontal(const TileMap& map) {
         break;
       }
     }
-  } else if (vx_ < 0.f) {  // 向左：检测左边界所在列
+  } else if (vx_ < 0.f) {
     const int col = map.toCol(x_);
     for (int r = r0; r <= r1; ++r) {
       if (map.isSolid(col, r)) {
@@ -86,7 +101,7 @@ void Mario::resolveHorizontal(const TileMap& map) {
 void Mario::resolveVertical(const TileMap& map) {
   const int c0 = map.toCol(x_);
   const int c1 = map.toCol(x_ + width() - kEps);
-  if (vy_ > 0.f) {  // 下落：检测脚下所在行
+  if (vy_ > 0.f) {
     const int row = map.toRow(y_ + height() - kEps);
     for (int c = c0; c <= c1; ++c) {
       if (map.isSolid(c, row)) {
@@ -97,7 +112,7 @@ void Mario::resolveVertical(const TileMap& map) {
       }
     }
     onGround_ = false;
-  } else if (vy_ < 0.f) {  // 上升：检测头顶所在行
+  } else if (vy_ < 0.f) {
     const int row = map.toRow(y_);
     for (int c = c0; c <= c1; ++c) {
       if (map.isSolid(c, row)) {
@@ -111,6 +126,11 @@ void Mario::resolveVertical(const TileMap& map) {
 }
 
 void Mario::updateState() {
+  if (deathFalling_) {
+    state_ = MarioState::DEAD;
+    return;
+  }
+
   if (!onGround_) {
     state_ = (vy_ < 0.f) ? MarioState::JUMPING : MarioState::FALLING;
   } else {

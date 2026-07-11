@@ -5,6 +5,17 @@ namespace {
 constexpr const char* kTileAtlas = "picture/mario/地图/map.png";
 const sf::IntRect kPlatformRect({0, 360}, {80, 40});
 
+sf::Vector2f effectiveViewportSize(const sf::Vector2u& windowSize) {
+    const float rawW = static_cast<float>(windowSize.x);
+    const float rawH = static_cast<float>(windowSize.y);
+
+    constexpr float kGrowthFactor = 0.2f;
+    const float viewW = (rawW <= DefaultViewWidth) ? rawW : DefaultViewWidth + (rawW - DefaultViewWidth) * kGrowthFactor;
+    const float viewH = (rawH <= DefaultViewHeight) ? rawH : DefaultViewHeight + (rawH - DefaultViewHeight) * kGrowthFactor;
+
+    return {viewW, viewH};
+}
+
 const std::unordered_map<char, std::vector<std::string>>& glyphs() {
     static const std::unordered_map<char, std::vector<std::string>> kGlyphs = {
         {'A', {"01110", "10001", "10001", "11111", "10001", "10001", "10001"}},
@@ -56,6 +67,8 @@ const char* choosePlayerFrame(MarioState state, float runAnimationTime) {
             return "picture/mario/人物/player_1/red_6.png";
         case MarioState::FALLING:
             return "picture/mario/人物/player_1/red_7.png";
+        case MarioState::DEAD:
+            return "picture/mario/人物/player_1/red_27.png";
         case MarioState::IDLE:
         default:
             return "picture/mario/人物/player_1/red_1.png";
@@ -137,20 +150,11 @@ void drawPipe(sf::RenderWindow& window, const TileInfo& tile) {
 GameRenderer::GameRenderer() { rect_.setOutlineThickness(0.0f); }
 
 void GameRenderer::render(sf::RenderWindow& window, float dt) {
-    updateHud(dt);
     window.clear(sf::Color(107, 140, 255));
 
-    float winW = static_cast<float>(window.getSize().x);
-    float winH = static_cast<float>(window.getSize().y);
-    float scaleX = winW / LOGIC_W;
-    float scaleY = winH / LOGIC_H;
-    float scale = std::min(scaleX, scaleY);
-
-    sf::View view(sf::FloatRect({0.f, 0.f}, {static_cast<float>(LOGIC_W), static_cast<float>(LOGIC_H)}));
+    const auto viewSize = effectiveViewportSize(window.getSize());
+    sf::View view(sf::FloatRect({0.0f, 0.0f}, viewSize));
     view.setCenter({*cameraX_, *cameraY_});
-    sf::FloatRect viewport({(winW - LOGIC_W * scale) / (2.0f * winW), (winH - LOGIC_H * scale) / (2.0f * winH)},
-                           {(LOGIC_W * scale) / winW, (LOGIC_H * scale) / winH});
-    view.setViewport(viewport);
     window.setView(view);
 
     for (const auto& tile : *tileInfos_) {
@@ -164,16 +168,12 @@ void GameRenderer::render(sf::RenderWindow& window, float dt) {
     window.display();
 }
 
-void GameRenderer::updateHud(float dt) {
-    hudElapsedTime_ += std::max(0.0f, dt);
-}
-
 void GameRenderer::drawHud(sf::RenderWindow& window) {
-    const std::string score = "0";
-    const std::string coins = "0";
-    const std::string world = "1-1";
-    const std::string time = std::to_string(std::max(0, START_TIME - static_cast<int>(hudElapsedTime_)));
-    const std::string lives = "3";
+    const std::string score = hudInfo_ ? std::to_string(hudInfo_->score) : "0";
+    const std::string coins = hudInfo_ ? std::to_string(hudInfo_->coins) : "0";
+    const std::string world = hudInfo_ ? hudInfo_->world : "1-1";
+    const std::string time = hudInfo_ ? std::to_string(hudInfo_->timeRemaining) : "300";
+    const std::string lives = hudInfo_ ? std::to_string(hudInfo_->lives) : "3";
 
     drawHudBlock(window, "SCORE", score, 90.0f);
     drawHudBlock(window, "COINS", coins, 250.0f);
@@ -274,7 +274,7 @@ void GameRenderer::drawPlayer(sf::RenderWindow& window, float dt) {
     sprite.setScale({scaleX, scaleY});
     sprite.setPosition({player.x, player.y});
 
-    if (player.direction == Direction::LEFT) {
+    if (player.direction == Direction::LEFT && player.state != MarioState::DEAD) {
         sprite.setOrigin({static_cast<float>(texSize.x), 0.0f});
         sprite.setScale({-scaleX, scaleY});
         sprite.setPosition({player.x, player.y});
