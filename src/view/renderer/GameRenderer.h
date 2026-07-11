@@ -20,10 +20,11 @@ class GameRenderer {
     void setTileInfos(const TileInfos* t) { tileInfos_ = t; }
 
     // 渲染一帧：clear → setView → draw tiles → draw player → display
-    void render(sf::RenderWindow& window);
+    // dt 由外部（App 驱动时钟）经 View 下推，用于动画计时；渲染器不再自持时钟。
+    void render(sf::RenderWindow& window, float dt);
 
    private:
-    void drawPlayer(sf::RenderWindow& window);
+    void drawPlayer(sf::RenderWindow& window, float dt);
     void drawTile(sf::RenderWindow& window, const TileInfo& tile);
     void drawFallbackTile(sf::RenderWindow& window, const TileInfo& tile);
 
@@ -34,10 +35,9 @@ class GameRenderer {
     const PlayerInfo* playerInfo_ = nullptr;
     const TileInfos* tileInfos_ = nullptr;
 
-    // 玩家动画状态
+    // 玩家动画状态（动画计时由外部 dt 累加，不再自持 sf::Clock）
     float runAnimationTime_ = 0.0f;
     MarioState lastPlayerState_ = MarioState::IDLE;
-    sf::Clock animationClock_;
     sf::RectangleShape rect_;
 
     static constexpr int LOGIC_W = 800;

@@ -35,6 +35,7 @@ class GameView {
     InputHandler input_;
     GameRenderer renderer_;
     std::function<void(float)> nextStepCommand_;
+    float lastDt_ = 0.0f;  // 当前帧 dt（App 外部时钟下推），供通知触发的 render 使用
 };
 
 #endif  // MARIO_VIEW_H
