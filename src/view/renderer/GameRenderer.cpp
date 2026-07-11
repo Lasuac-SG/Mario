@@ -5,6 +5,17 @@ namespace {
 constexpr const char* kTileAtlas = "picture/mario/地图/map.png";
 const sf::IntRect kPlatformRect({0, 360}, {80, 40});
 
+sf::Vector2f effectiveViewportSize(const sf::Vector2u& windowSize) {
+    const float rawW = static_cast<float>(windowSize.x);
+    const float rawH = static_cast<float>(windowSize.y);
+
+    constexpr float kGrowthFactor = 0.2f;
+    const float viewW = (rawW <= DefaultViewWidth) ? rawW : DefaultViewWidth + (rawW - DefaultViewWidth) * kGrowthFactor;
+    const float viewH = (rawH <= DefaultViewHeight) ? rawH : DefaultViewHeight + (rawH - DefaultViewHeight) * kGrowthFactor;
+
+    return {viewW, viewH};
+}
+
 const std::unordered_map<char, std::vector<std::string>>& glyphs() {
     static const std::unordered_map<char, std::vector<std::string>> kGlyphs = {
         {'A', {"01110", "10001", "10001", "11111", "10001", "10001", "10001"}},
@@ -140,17 +151,9 @@ void GameRenderer::render(sf::RenderWindow& window, float dt) {
     updateHud(dt);
     window.clear(sf::Color(107, 140, 255));
 
-    float winW = static_cast<float>(window.getSize().x);
-    float winH = static_cast<float>(window.getSize().y);
-    float scaleX = winW / LOGIC_W;
-    float scaleY = winH / LOGIC_H;
-    float scale = std::min(scaleX, scaleY);
-
-    sf::View view(sf::FloatRect({0.f, 0.f}, {static_cast<float>(LOGIC_W), static_cast<float>(LOGIC_H)}));
+    const auto viewSize = effectiveViewportSize(window.getSize());
+    sf::View view(sf::FloatRect({0.0f, 0.0f}, viewSize));
     view.setCenter({*cameraX_, *cameraY_});
-    sf::FloatRect viewport({(winW - LOGIC_W * scale) / (2.0f * winW), (winH - LOGIC_H * scale) / (2.0f * winH)},
-                           {(LOGIC_W * scale) / winW, (LOGIC_H * scale) / winH});
-    view.setViewport(viewport);
     window.setView(view);
 
     for (const auto& tile : *tileInfos_) {

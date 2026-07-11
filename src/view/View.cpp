@@ -1,6 +1,21 @@
-//
-
 #include "view/View.h"
+
+#include <algorithm>
+
+namespace {
+
+sf::Vector2f effectiveViewportSize(const sf::Vector2u& windowSize) {
+    const float rawW = static_cast<float>(windowSize.x);
+    const float rawH = static_cast<float>(windowSize.y);
+
+    constexpr float kGrowthFactor = 0.2f;
+    const float viewW = (rawW <= DefaultViewWidth) ? rawW : DefaultViewWidth + (rawW - DefaultViewWidth) * kGrowthFactor;
+    const float viewH = (rawH <= DefaultViewHeight) ? rawH : DefaultViewHeight + (rawH - DefaultViewHeight) * kGrowthFactor;
+
+    return {viewW, viewH};
+}
+
+}  // namespace
 
 GameView::GameView()
     : window_(sf::VideoMode({800, 600}), "Mario Demo",
@@ -22,17 +37,38 @@ void GameView::run() {
         frameDt = std::min(frameDt, kMaxFrameDt);
         accumulator += frameDt;
 
+        processWindowEvents();
         input_.pollEvents(window_);
         input_.dispatchInput();
 
         int updates = 0;
         while (accumulator >= kFixedDt && updates < kMaxUpdatesPerFrame && window_.isOpen()) {
-            lastDt_ = kFixedDt;
-            if (nextStepCommand_) {
-                nextStepCommand_(kFixedDt);
-            }
+            NextStep(kFixedDt);
             accumulator -= kFixedDt;
             ++updates;
+        }
+    }
+}
+
+void GameView::pushCurrentViewportSize() {
+    if (!resizeCommand_) return;
+
+    const auto size = effectiveViewportSize(window_.getSize());
+    resizeCommand_(size.x, size.y);
+}
+
+void GameView::processWindowEvents() {
+    while (const auto ev = window_.pollEvent()) {
+        if (ev->is<sf::Event::Closed>()) {
+            window_.close();
+            continue;
+        }
+
+        if (const auto* resized = ev->getIf<sf::Event::Resized>()) {
+            if (resizeCommand_) {
+                const auto size = effectiveViewportSize(resized->size);
+                resizeCommand_(size.x, size.y);
+            }
         }
     }
 }
