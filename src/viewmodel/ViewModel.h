@@ -29,6 +29,10 @@ class ViewModel {
     // === 命令接口（View 调用 → 写入 Model） ===
     ICommandBase* getActionCommand(){ return &actionCmd_; }
 
+    // === 视口尺寸（View 在窗口尺寸变化时下推，用于相机 clamp）===
+    // 窗口越大看到越多地图（1:1，不拉伸）：相机可视范围 = 真实窗口尺寸，故 clamp 需用它。
+    void setViewport(ViewportDim w, ViewportDim h);
+
     // === 通知订阅 ===
     void addNotification(Notify_Funtion func);
 
@@ -37,9 +41,15 @@ class ViewModel {
         return [this](float dt) { this->tick(dt); };
     }
 
+    // 同上模式：返回 resize command，View 在 sf::Event::Resized 时以新窗口尺寸调用
+    std::function<void(ViewportDim, ViewportDim)> getResizeCommand() {
+        return [this](ViewportDim w, ViewportDim h) { this->setViewport(w, h); };
+    }
+
    private:
     void onModelChanged(EventType ev);
     void syncFromModel();  // 从 Model 拉取数据，填充 player_info_ / tile_infos_
+    void updateCamera();   // 依据玩家位置、关卡尺寸、视口尺寸重算相机中心
     void tick(float dt);
 
     GameModel* model_;
