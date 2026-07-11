@@ -9,6 +9,7 @@ void App::initialize() {
     view_->setCamera(vm_->getCameraX(), vm_->getCameraY());
     view_->setPlayerInfo(vm_->getPlayerInfo());
     view_->setTileInfos(vm_->getTileInfos());
+    view_->setHudInfo(vm_->getHudInfo());
 
     view_->setNextStepCommand(vm_->getNextStepCommand());
     view_->setResizeCommand(vm_->getResizeCommand());

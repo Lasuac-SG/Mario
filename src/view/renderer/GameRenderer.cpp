@@ -67,6 +67,8 @@ const char* choosePlayerFrame(MarioState state, float runAnimationTime) {
             return "picture/mario/人物/player_1/red_6.png";
         case MarioState::FALLING:
             return "picture/mario/人物/player_1/red_7.png";
+        case MarioState::DEAD:
+            return "picture/mario/人物/player_1/red_27.png";
         case MarioState::IDLE:
         default:
             return "picture/mario/人物/player_1/red_1.png";
@@ -148,7 +150,6 @@ void drawPipe(sf::RenderWindow& window, const TileInfo& tile) {
 GameRenderer::GameRenderer() { rect_.setOutlineThickness(0.0f); }
 
 void GameRenderer::render(sf::RenderWindow& window, float dt) {
-    updateHud(dt);
     window.clear(sf::Color(107, 140, 255));
 
     const auto viewSize = effectiveViewportSize(window.getSize());
@@ -167,16 +168,12 @@ void GameRenderer::render(sf::RenderWindow& window, float dt) {
     window.display();
 }
 
-void GameRenderer::updateHud(float dt) {
-    hudElapsedTime_ += std::max(0.0f, dt);
-}
-
 void GameRenderer::drawHud(sf::RenderWindow& window) {
-    const std::string score = "0";
-    const std::string coins = "0";
-    const std::string world = "1-1";
-    const std::string time = std::to_string(std::max(0, START_TIME - static_cast<int>(hudElapsedTime_)));
-    const std::string lives = "3";
+    const std::string score = hudInfo_ ? std::to_string(hudInfo_->score) : "0";
+    const std::string coins = hudInfo_ ? std::to_string(hudInfo_->coins) : "0";
+    const std::string world = hudInfo_ ? hudInfo_->world : "1-1";
+    const std::string time = hudInfo_ ? std::to_string(hudInfo_->timeRemaining) : "300";
+    const std::string lives = hudInfo_ ? std::to_string(hudInfo_->lives) : "3";
 
     drawHudBlock(window, "SCORE", score, 90.0f);
     drawHudBlock(window, "COINS", coins, 250.0f);
@@ -277,7 +274,7 @@ void GameRenderer::drawPlayer(sf::RenderWindow& window, float dt) {
     sprite.setScale({scaleX, scaleY});
     sprite.setPosition({player.x, player.y});
 
-    if (player.direction == Direction::LEFT) {
+    if (player.direction == Direction::LEFT && player.state != MarioState::DEAD) {
         sprite.setOrigin({static_cast<float>(texSize.x), 0.0f});
         sprite.setScale({-scaleX, scaleY});
         sprite.setPosition({player.x, player.y});
