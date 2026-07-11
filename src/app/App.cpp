@@ -21,11 +21,4 @@ void App::initialize() {
     vm_->addNotification(view_->getRenderNotification());
 }
 
-void App::run() {
-    sf::Clock clock;
-    while (view_->isOpen()) {
-        float dt = clock.restart().asSeconds();
-        dt = std::min(dt, 1.0f / 30.0f);
-        view_->NextStep(dt);
-    }
-}
+void App::run() { view_->run(); }

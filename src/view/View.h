@@ -13,10 +13,8 @@ class GameView {
     ~GameView() = default;
 
     // === 生命周期 ===
-    bool isOpen() const { return window_.isOpen(); }
-
-    // ★ 唯一的帧入口（等价 FLTK timeout_cb → m_next_step_command(turn)）
-    void NextStep(float dt);
+    // 主循环 + 驱动时钟：View 自持 sf::Clock，while(窗口打开){ 算 dt → NextStep(dt) }。
+    void run();
 
     // === 通知回调（等价 FLTK get_notification） ===
     Notify_Funtion getRenderNotification();
@@ -31,6 +29,9 @@ class GameView {
     InputHandler* getInputHandler() { return &input_; }
 
    private:
+    // 单帧步进（run 内部调用）：poll 输入 → nextStepCommand_(dt) → 通知触发 render。
+    void NextStep(float dt);
+
     sf::RenderWindow window_;
     InputHandler input_;
     GameRenderer renderer_;
