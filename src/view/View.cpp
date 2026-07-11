@@ -7,6 +7,7 @@ GameView::GameView()
               sf::Style::Titlebar | sf::Style::Close | sf::Style::Resize) {}
 
 void GameView::NextStep(float dt) {
+    lastDt_ = dt;  // 记住外部时钟下推的 dt，供通知触发的 render 使用
     input_.pollEvents(window_);
     input_.dispatchInput();
     if (nextStepCommand_) {
@@ -17,7 +18,7 @@ void GameView::NextStep(float dt) {
 Notify_Funtion GameView::getRenderNotification() {
     return [this](EventType id) {
         if (id == static_cast<EventType>(ViewModelEvent::RENDER_UPDATE)) {
-            renderer_.render(window_);
+            renderer_.render(window_, lastDt_);
         }
     };
 }

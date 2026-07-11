@@ -106,7 +106,7 @@ void drawPipe(sf::RenderWindow& window, const TileInfo& tile) {
 
 GameRenderer::GameRenderer() { rect_.setOutlineThickness(0.0f); }
 
-void GameRenderer::render(sf::RenderWindow& window) {
+void GameRenderer::render(sf::RenderWindow& window, float dt) {
     window.clear(sf::Color(107, 140, 255));
 
     // 设置逻辑坐标视口（保持等比缩放）
@@ -129,17 +129,16 @@ void GameRenderer::render(sf::RenderWindow& window) {
     }
 
     // 渲染玩家
-    drawPlayer(window);
+    drawPlayer(window, dt);
 
     window.display();
 }
 
-void GameRenderer::drawPlayer(sf::RenderWindow& window) {
+void GameRenderer::drawPlayer(sf::RenderWindow& window, float dt) {
     const auto& player = *playerInfo_;
-    const float deltaSeconds = animationClock_.restart().asSeconds();
     if (player.state == MarioState::RUNNING) {
         if (lastPlayerState_ != MarioState::RUNNING) runAnimationTime_ = 0.0f;
-        runAnimationTime_ += deltaSeconds;
+        runAnimationTime_ += dt;
     } else {
         runAnimationTime_ = 0.0f;
     }
