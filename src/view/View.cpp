@@ -4,23 +4,43 @@
 
 GameView::GameView()
     : window_(sf::VideoMode({800, 600}), "Mario Demo",
-              sf::Style::Titlebar | sf::Style::Close | sf::Style::Resize) {}
+              sf::Style::Titlebar | sf::Style::Close | sf::Style::Resize) {
+    window_.setVerticalSyncEnabled(false);
+    window_.setFramerateLimit(120);
+}
 
 void GameView::run() {
-    sf::Clock clock;  // 驱动时钟归属 View（拥有窗口者拥有主循环）
+    constexpr float kFixedDt = 1.0f / 60.0f;
+    constexpr float kMaxFrameDt = 0.1f;
+    constexpr int kMaxUpdatesPerFrame = 4;
+
+    sf::Clock clock;
+    float accumulator = 0.0f;
+
     while (window_.isOpen()) {
-        float dt = clock.restart().asSeconds();
-        dt = std::min(dt, 1.0f / 30.0f);  // 防止 delta 螺旋
-        NextStep(dt);
+        float frameDt = clock.restart().asSeconds();
+        frameDt = std::min(frameDt, kMaxFrameDt);
+        accumulator += frameDt;
+
+        input_.pollEvents(window_);
+        input_.dispatchInput();
+
+        int updates = 0;
+        while (accumulator >= kFixedDt && updates < kMaxUpdatesPerFrame && window_.isOpen()) {
+            lastDt_ = kFixedDt;
+            if (nextStepCommand_) {
+                nextStepCommand_(kFixedDt);
+            }
+            accumulator -= kFixedDt;
+            ++updates;
+        }
     }
 }
 
 void GameView::NextStep(float dt) {
-    lastDt_ = dt;  // 记住外部时钟下推的 dt，供通知触发的 render 使用
-    input_.pollEvents(window_);
-    input_.dispatchInput();
+    lastDt_ = dt;
     if (nextStepCommand_) {
-        nextStepCommand_(dt);  // ViewModel::tick → fire → 通知回调 → renderer_.render()
+        nextStepCommand_(dt);
     }
 }
 

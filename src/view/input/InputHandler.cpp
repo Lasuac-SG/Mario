@@ -8,14 +8,18 @@ void InputHandler::pollEvents(sf::RenderWindow& window) {
     while (const auto ev = window.pollEvent()) {
         if (ev->is<sf::Event::Closed>()) {
             window.close();
-        } else if (const auto* kp = ev->getIf<sf::Event::KeyPressed>()) {
-            auto code = static_cast<int>(kp->code);
-            if (code >= 0 && code < 256) keys_[code] = true;
-        } else if (const auto* kr = ev->getIf<sf::Event::KeyReleased>()) {
-            auto code = static_cast<int>(kr->code);
-            if (code >= 0 && code < 256) keys_[code] = false;
         }
     }
+
+    using sf::Keyboard::Key;
+    keys_[static_cast<int>(Key::Left)] = sf::Keyboard::isKeyPressed(Key::Left);
+    keys_[static_cast<int>(Key::A)] = sf::Keyboard::isKeyPressed(Key::A);
+    keys_[static_cast<int>(Key::Right)] = sf::Keyboard::isKeyPressed(Key::Right);
+    keys_[static_cast<int>(Key::D)] = sf::Keyboard::isKeyPressed(Key::D);
+    keys_[static_cast<int>(Key::Space)] = sf::Keyboard::isKeyPressed(Key::Space);
+    keys_[static_cast<int>(Key::W)] = sf::Keyboard::isKeyPressed(Key::W);
+    keys_[static_cast<int>(Key::Up)] = sf::Keyboard::isKeyPressed(Key::Up);
+    keys_[static_cast<int>(Key::R)] = sf::Keyboard::isKeyPressed(Key::R);
 }
 
 void InputHandler::dispatchInput() {
@@ -26,7 +30,6 @@ void InputHandler::dispatchInput() {
         keys_[static_cast<int>(Key::Space)] || keys_[static_cast<int>(Key::W)] || keys_[static_cast<int>(Key::Up)];
     bool restart = keys_[static_cast<int>(Key::R)];
 
-    // 左右冲突 → 停止
     if (left && right) {
         InputActionParameter p(InputAction::STOP);
         actionCmd_->exec(&p);
@@ -41,14 +44,12 @@ void InputHandler::dispatchInput() {
         actionCmd_->exec(&p);
     }
 
-    // 跳跃边沿触发
     if (jump && !prevJump_) {
         InputActionParameter p(InputAction::JUMP);
         actionCmd_->exec(&p);
     }
     prevJump_ = jump;
 
-    // 重启边沿触发
     if (restart && !prevRestart_) {
         InputActionParameter p(InputAction::RESTART);
         actionCmd_->exec(&p);

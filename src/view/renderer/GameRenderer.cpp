@@ -1,11 +1,41 @@
-//
-
 #include "GameRenderer.h"
 
 namespace {
 
 constexpr const char* kTileAtlas = "picture/mario/地图/map.png";
 const sf::IntRect kPlatformRect({0, 360}, {80, 40});
+
+const std::unordered_map<char, std::vector<std::string>>& glyphs() {
+    static const std::unordered_map<char, std::vector<std::string>> kGlyphs = {
+        {'A', {"01110", "10001", "10001", "11111", "10001", "10001", "10001"}},
+        {'C', {"01111", "10000", "10000", "10000", "10000", "10000", "01111"}},
+        {'D', {"11110", "10001", "10001", "10001", "10001", "10001", "11110"}},
+        {'E', {"11111", "10000", "10000", "11110", "10000", "10000", "11111"}},
+        {'I', {"11111", "00100", "00100", "00100", "00100", "00100", "11111"}},
+        {'L', {"10000", "10000", "10000", "10000", "10000", "10000", "11111"}},
+        {'M', {"10001", "11011", "10101", "10101", "10001", "10001", "10001"}},
+        {'N', {"10001", "11001", "10101", "10011", "10001", "10001", "10001"}},
+        {'O', {"01110", "10001", "10001", "10001", "10001", "10001", "01110"}},
+        {'R', {"11110", "10001", "10001", "11110", "10100", "10010", "10001"}},
+        {'S', {"01111", "10000", "10000", "01110", "00001", "00001", "11110"}},
+        {'T', {"11111", "00100", "00100", "00100", "00100", "00100", "00100"}},
+        {'V', {"10001", "10001", "10001", "10001", "10001", "01010", "00100"}},
+        {'W', {"10001", "10001", "10001", "10101", "10101", "10101", "01010"}},
+        {'0', {"01110", "10001", "10011", "10101", "11001", "10001", "01110"}},
+        {'1', {"00100", "01100", "00100", "00100", "00100", "00100", "01110"}},
+        {'2', {"01110", "10001", "00001", "00010", "00100", "01000", "11111"}},
+        {'3', {"11110", "00001", "00001", "01110", "00001", "00001", "11110"}},
+        {'4', {"00010", "00110", "01010", "10010", "11111", "00010", "00010"}},
+        {'5', {"11111", "10000", "10000", "11110", "00001", "00001", "11110"}},
+        {'6', {"01110", "10000", "10000", "11110", "10001", "10001", "01110"}},
+        {'7', {"11111", "00001", "00010", "00100", "01000", "01000", "01000"}},
+        {'8', {"01110", "10001", "10001", "01110", "10001", "10001", "01110"}},
+        {'9', {"01110", "10001", "10001", "01111", "00001", "00001", "01110"}},
+        {'-', {"00000", "00000", "00000", "11111", "00000", "00000", "00000"}},
+        {' ', {"00000", "00000", "00000", "00000", "00000", "00000", "00000"}},
+    };
+    return kGlyphs;
+}
 
 const char* choosePlayerFrame(MarioState state, float runAnimationTime) {
     static constexpr const char* kRunFrames[] = {
@@ -107,9 +137,9 @@ void drawPipe(sf::RenderWindow& window, const TileInfo& tile) {
 GameRenderer::GameRenderer() { rect_.setOutlineThickness(0.0f); }
 
 void GameRenderer::render(sf::RenderWindow& window, float dt) {
+    updateHud(dt);
     window.clear(sf::Color(107, 140, 255));
 
-    // 设置逻辑坐标视口（保持等比缩放）
     float winW = static_cast<float>(window.getSize().x);
     float winH = static_cast<float>(window.getSize().y);
     float scaleX = winW / LOGIC_W;
@@ -123,15 +153,98 @@ void GameRenderer::render(sf::RenderWindow& window, float dt) {
     view.setViewport(viewport);
     window.setView(view);
 
-    // 渲染 Tile
     for (const auto& tile : *tileInfos_) {
         drawTile(window, tile);
     }
 
-    // 渲染玩家
     drawPlayer(window, dt);
 
+    window.setView(window.getDefaultView());
+    drawHud(window);
     window.display();
+}
+
+void GameRenderer::updateHud(float dt) {
+    hudElapsedTime_ += std::max(0.0f, dt);
+}
+
+void GameRenderer::drawHud(sf::RenderWindow& window) {
+    const std::string score = "0";
+    const std::string coins = "0";
+    const std::string world = "1-1";
+    const std::string time = std::to_string(std::max(0, START_TIME - static_cast<int>(hudElapsedTime_)));
+    const std::string lives = "3";
+
+    drawHudBlock(window, "SCORE", score, 90.0f);
+    drawHudBlock(window, "COINS", coins, 250.0f);
+    drawHudBlock(window, "WORLD", world, 410.0f);
+    drawHudBlock(window, "TIME", time, 570.0f);
+    drawHudBlock(window, "LIVES", lives, 720.0f);
+}
+
+void GameRenderer::drawHudBlock(sf::RenderWindow& window, const std::string& label, const std::string& value, float centerX) {
+    constexpr float kLabelScale = 3.0f;
+    constexpr float kValueScale = 3.0f;
+    constexpr float kLabelY = 10.0f;
+    constexpr float kValueY = 46.0f;
+
+    const float labelX = centerX - measurePixelText(label, kLabelScale) * 0.5f;
+    const float valueX = centerX - measurePixelText(value, kValueScale) * 0.5f;
+
+    drawPixelText(window, label, labelX, kLabelY, kLabelScale);
+    drawPixelText(window, value, valueX, kValueY, kValueScale);
+}
+
+void GameRenderer::drawPixelText(sf::RenderWindow& window, const std::string& text, float x, float y, float scale) {
+    constexpr float kPixelGap = 1.0f;
+    constexpr float kLetterGap = 2.0f;
+    const auto& font = glyphs();
+
+    sf::RectangleShape pixel({scale, scale});
+
+    float cursorX = x;
+    for (char ch : text) {
+        auto it = font.find(ch);
+        if (it == font.end()) {
+            cursorX += 6.0f * scale;
+            continue;
+        }
+
+        const auto& rows = it->second;
+        for (std::size_t row = 0; row < rows.size(); ++row) {
+            for (std::size_t col = 0; col < rows[row].size(); ++col) {
+                if (rows[row][col] != '1') continue;
+
+                const float px = cursorX + col * (scale + kPixelGap);
+                const float py = y + row * (scale + kPixelGap);
+
+                pixel.setPosition({px + scale * 0.35f, py + scale * 0.35f});
+                pixel.setFillColor(sf::Color::Black);
+                window.draw(pixel);
+
+                pixel.setPosition({px, py});
+                pixel.setFillColor(sf::Color::White);
+                window.draw(pixel);
+            }
+        }
+
+        cursorX += rows.front().size() * (scale + kPixelGap) + kLetterGap * scale;
+    }
+}
+
+float GameRenderer::measurePixelText(const std::string& text, float scale) const {
+    constexpr float kPixelGap = 1.0f;
+    constexpr float kLetterGap = 2.0f;
+    const auto& font = glyphs();
+
+    float width = 0.0f;
+    for (char ch : text) {
+        auto it = font.find(ch);
+        const std::size_t glyphWidth = (it == font.end()) ? 5 : it->second.front().size();
+        width += glyphWidth * (scale + kPixelGap) + kLetterGap * scale;
+    }
+
+    return width > 0.0f ? width - kLetterGap * scale : 0.0f;
 }
 
 void GameRenderer::drawPlayer(sf::RenderWindow& window, float dt) {
