@@ -34,6 +34,13 @@ inline constexpr VelocityType kMaxFallSpeed = 1200.0f;  // 终端下落速度
 // 数值稳定：物理子步长上限；单帧 dt 超过则切分为多步，避免高速穿透。
 inline constexpr TimeType kMaxStep = 1.0f / 120.0f;
 
+// 敌人（棕蘑菇）：高 = 马里奥一半；宽略窄；水平匀速巡逻，不跳。
+inline constexpr PositionType kEnemyWidth = 24.0f;
+inline constexpr PositionType kEnemyHeight = kMarioHeight * 0.5f;  // 15
+inline constexpr VelocityType kEnemyMoveSpeed = 90.0f;             // 巡逻速度
+inline constexpr VelocityType kStompBounceSpeed = kJumpSpeed * 0.5f;  // 踩死后马里奥小反弹
+inline constexpr int kStompScore = 100;                            // 踩死加分
+
 }  // namespace mario_cfg
 
 #endif  // MARIO_MODEL_PHYSICSCONFIG_H

@@ -15,6 +15,7 @@ class ViewModel {
 
     const PlayerInfo* getPlayerInfo() const noexcept { return &player_info_; }
     const TileInfos* getTileInfos() const noexcept { return &tile_infos_; }
+    const EnemyInfos* getEnemyInfos() const noexcept { return &enemy_infos_; }
     const HudInfo* getHudInfo() const noexcept { return &hud_info_; }
     PositionType levelWidthPx() const { return model_->levelWidthPx(); }
     PositionType levelHeightPx() const { return model_->levelHeightPx(); }
@@ -48,6 +49,7 @@ class ViewModel {
 
     PlayerInfo player_info_;
     TileInfos tile_infos_;
+    EnemyInfos enemy_infos_;
     HudInfo hud_info_{};
 
     PositionType cameraX_ = WorldOrigin;

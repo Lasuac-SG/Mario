@@ -16,7 +16,7 @@ constexpr float kDeathSequenceSeconds = 1.2f;
 GameModel::GameModel() { reset(); }
 
 void GameModel::update(TimeType dt) {
-  if (timeoutDeathInProgress_) {
+  if (deathInProgress_) {
     if (dt > 0.f) {
       TimeType remaining = dt;
       while (remaining > 0.f) {
@@ -39,7 +39,7 @@ void GameModel::update(TimeType dt) {
   if (dt > 0.f) {
     timeRemaining_ = std::max(0.0f, timeRemaining_ - dt);
     if (timeRemaining_ <= 0.0f) {
-      beginTimeoutDeath();
+      beginDeath();
       notifyChanged();
       return;
     }
@@ -48,6 +48,11 @@ void GameModel::update(TimeType dt) {
     while (remaining > 0.f) {
       const TimeType step = std::min(remaining, mario_cfg::kMaxStep);
       mario_.step(step, tileMap_);
+      for (auto& e : enemies_) e.step(step, tileMap_);
+      if (resolveEnemyCollisions()) {  // 马里奥碰到敌人致死
+        beginDeath();
+        break;
+      }
       remaining -= step;
     }
   }
@@ -62,11 +67,12 @@ void GameModel::reset() {
   coins_ = 0;
   lives_ = kInitialLives;
   timeRemaining_ = kInitialTimeSeconds;
-  timeoutDeathInProgress_ = false;
+  deathInProgress_ = false;
   deathElapsed_ = 0.0f;
 
   mario_.reset(tileMap_.spawnX(), tileMap_.spawnY());
   rebuildTiles();
+  spawnEnemies();
   notifyChanged();
 }
 
@@ -77,10 +83,11 @@ bool GameModel::loadLevelFromFile(const std::string& path) {
   coins_ = 0;
   lives_ = kInitialLives;
   timeRemaining_ = kInitialTimeSeconds;
-  timeoutDeathInProgress_ = false;
+  deathInProgress_ = false;
   deathElapsed_ = 0.0f;
   mario_.reset(tileMap_.spawnX(), tileMap_.spawnY());
   rebuildTiles();
+  spawnEnemies();
   notifyChanged();
   return true;
 }
@@ -98,17 +105,58 @@ void GameModel::rebuildTiles() {
   }
 }
 
-void GameModel::beginTimeoutDeath() {
-  timeoutDeathInProgress_ = true;
+void GameModel::beginDeath() {
+  deathInProgress_ = true;
   deathElapsed_ = 0.0f;
   mario_.startDeathFall();
 }
 
 void GameModel::respawnAfterDeath() {
-  timeoutDeathInProgress_ = false;
+  deathInProgress_ = false;
   deathElapsed_ = 0.0f;
   timeRemaining_ = kInitialTimeSeconds;
   mario_.reset(tileMap_.spawnX(), tileMap_.spawnY());
+  spawnEnemies();  // 复活时敌人回到出生点
+}
+
+// 依关卡出生点重建敌人：脚底落在出生格底边（其下若是地面则站定），水平居中。
+void GameModel::spawnEnemies() {
+  enemies_.clear();
+  const PositionType ts = mario_cfg::kTileSize;
+  const auto& spawns = tileMap_.enemySpawns();
+  enemies_.resize(spawns.size());
+  for (std::size_t i = 0; i < spawns.size(); ++i) {
+    const PositionType x = spawns[i].col * ts + (ts - mario_cfg::kEnemyWidth) * 0.5f;
+    const PositionType y = (spawns[i].row + 1) * ts - mario_cfg::kEnemyHeight;
+    enemies_[i].reset(x, y, Direction::LEFT);
+  }
+}
+
+// 马里奥-敌人碰撞：踩顶(下落且脚在敌人上半部)→消灭敌人+小反弹+加分；其余重叠→马里奥死亡。
+bool GameModel::resolveEnemyCollisions() {
+  const PositionType mx = mario_.x();
+  const PositionType my = mario_.y();
+  const PositionType mw = mario_.width();
+  const PositionType mh = mario_.height();
+  for (auto& e : enemies_) {
+    if (!e.alive()) continue;
+    const PositionType ex = e.x();
+    const PositionType ey = e.y();
+    const PositionType ew = e.width();
+    const PositionType eh = e.height();
+    const bool overlap = mx < ex + ew && mx + mw > ex && my < ey + eh && my + mh > ey;
+    if (!overlap) continue;
+
+    const bool stomp = mario_.vy() > 0.0f && (my + mh) < ey + eh * 0.5f;
+    if (stomp) {
+      e.kill();
+      mario_.bounce(mario_cfg::kStompBounceSpeed);
+      score_ += mario_cfg::kStompScore;
+    } else {
+      return true;  // 致死
+    }
+  }
+  return false;
 }
 
 void GameModel::notifyChanged() {

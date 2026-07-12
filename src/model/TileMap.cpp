@@ -27,7 +27,7 @@ const std::string& defaultLevel() {
       "................................................................................................\n"
       "......M.........................................................................................\n"
       "..............====......PP....................====......PP....................====......PP......\n"
-      "........................PP..............................PP..............................PP......\n"
+      "........................PP....G.........................PP..G...........................PP......\n"
       "####################.###########################################################################\n"
       "################################################################################################\n";
   return kLevel;
@@ -67,6 +67,7 @@ bool TileMap::loadFromStream(std::istream& in) {
   // 默认出生点：左侧近底部；若关卡含 'M' 则被覆盖。
   int spawnCol = 1;
   int spawnRow = rows - 2;
+  std::vector<EnemySpawn> enemySpawns;
 
   for (int r = 0; r < rows; ++r) {
     const std::string& row = lines[static_cast<std::size_t>(r)];
@@ -75,6 +76,8 @@ bool TileMap::loadFromStream(std::istream& in) {
       if (ch == 'M' || ch == 'm') {
         spawnCol = c;
         spawnRow = r;  // 出生格保持 EMPTY
+      } else if (ch == 'G' || ch == 'g') {
+        enemySpawns.push_back({c, r});  // 敌人出生格保持 EMPTY
       } else {
         tiles[static_cast<std::size_t>(r) * cols + c] = charToTile(ch);
       }
@@ -83,6 +86,7 @@ bool TileMap::loadFromStream(std::istream& in) {
 
   // 全部解析成功后再提交，保证加载失败不破坏现有地图。
   tiles_ = std::move(tiles);
+  enemySpawns_ = std::move(enemySpawns);
   cols_ = cols;
   rows_ = rows;
   spawnCol_ = std::max(0, std::min(spawnCol, cols_ - 1));
