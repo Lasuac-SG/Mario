@@ -13,6 +13,13 @@ class Mario {
   void step(TimeType dt, const TileMap& map);
   void startDeathFall();
 
+  // 踩死敌人后的小反弹（GameModel 调用）。
+  void bounce(VelocityType speed) {
+    if (deathFalling_) return;
+    vy_ = -speed;
+    onGround_ = false;
+  }
+
   void setMoveLeft(bool on) {
     if (deathFalling_) return;
     moveLeft_ = on;
@@ -30,6 +37,7 @@ class Mario {
 
   PositionType x() const { return x_; }
   PositionType y() const { return y_; }
+  VelocityType vy() const { return vy_; }
   PositionType width() const { return mario_cfg::kMarioWidth; }
   PositionType height() const { return mario_cfg::kMarioHeight; }
   MarioState state() const { return state_; }

@@ -6,6 +6,7 @@
 
 #include "common/EventId.h"
 #include "common/EventTrigger.h"
+#include "model/Enemy.h"
 #include "model/Mario.h"
 #include "model/PhysicsConfig.h"
 #include "model/Tile.h"
@@ -18,19 +19,19 @@ class GameModel {
   void update(TimeType dt);
 
   void setMoveLeft(bool on) {
-    if (timeoutDeathInProgress_) return;
+    if (deathInProgress_) return;
     mario_.setMoveLeft(on);
   }
   void setMoveRight(bool on) {
-    if (timeoutDeathInProgress_) return;
+    if (deathInProgress_) return;
     mario_.setMoveRight(on);
   }
   void setMoveStop() {
-    if (timeoutDeathInProgress_) return;
+    if (deathInProgress_) return;
     mario_.stop();
   }
   void jump() {
-    if (timeoutDeathInProgress_) return;
+    if (deathInProgress_) return;
     mario_.jump();
   }
 
@@ -45,6 +46,7 @@ class GameModel {
   Direction playerFacing() const { return mario_.facing(); }
 
   const std::vector<Tile>& tiles() const { return tiles_; }
+  const std::vector<Enemy>& enemies() const { return enemies_; }
   PositionType levelWidthPx() const { return tileMap_.widthPx(); }
   PositionType levelHeightPx() const { return tileMap_.heightPx(); }
 
@@ -59,19 +61,22 @@ class GameModel {
  private:
   void notifyChanged();
   void rebuildTiles();
-  void beginTimeoutDeath();
+  void spawnEnemies();               // 依关卡出生点重建敌人列表
+  bool resolveEnemyCollisions();     // 处理马里奥-敌人碰撞；返回 true 表示马里奥死亡
+  void beginDeath();
   void respawnAfterDeath();
 
   TileMap tileMap_;
   Mario mario_;
   std::vector<Tile> tiles_;
+  std::vector<Enemy> enemies_;
   std::string levelFile_;
 
   int score_ = 0;
   int coins_ = 0;
   int lives_ = 3;
   float timeRemaining_ = 300.0f;
-  bool timeoutDeathInProgress_ = false;
+  bool deathInProgress_ = false;
   float deathElapsed_ = 0.0f;
 };
 

@@ -3,6 +3,8 @@
 namespace {
 
 constexpr const char* kTileAtlas = "picture/mario/地图/map.png";
+constexpr const char* kEnemyFrameA = "picture/mario/enemy/monster_44.png";
+constexpr const char* kEnemyFrameB = "picture/mario/enemy/monster_45.png";
 const sf::IntRect kPlatformRect({0, 360}, {80, 40});
 
 sf::Vector2f effectiveViewportSize(const sf::Vector2u& windowSize) {
@@ -73,6 +75,12 @@ const char* choosePlayerFrame(MarioState state, float runAnimationTime) {
         default:
             return "picture/mario/人物/player_1/red_1.png";
     }
+}
+
+const char* chooseEnemyFrame(float enemyAnimationTime) {
+    constexpr float kEnemyFrameDuration = 0.18f;
+    const int frame = static_cast<int>(enemyAnimationTime / kEnemyFrameDuration) % 2;
+    return frame == 0 ? kEnemyFrameA : kEnemyFrameB;
 }
 
 void drawBrickGround(sf::RenderWindow& window, const TileInfo& tile) {
@@ -150,6 +158,7 @@ void drawPipe(sf::RenderWindow& window, const TileInfo& tile) {
 GameRenderer::GameRenderer() { rect_.setOutlineThickness(0.0f); }
 
 void GameRenderer::render(sf::RenderWindow& window, float dt) {
+    enemyAnimationTime_ += std::max(0.0f, dt);
     window.clear(sf::Color(107, 140, 255));
 
     const auto viewSize = effectiveViewportSize(window.getSize());
@@ -159,6 +168,12 @@ void GameRenderer::render(sf::RenderWindow& window, float dt) {
 
     for (const auto& tile : *tileInfos_) {
         drawTile(window, tile);
+    }
+
+    if (enemyInfos_) {
+        for (const auto& enemy : *enemyInfos_) {
+            drawEnemy(window, enemy);
+        }
     }
 
     drawPlayer(window, dt);
@@ -278,6 +293,39 @@ void GameRenderer::drawPlayer(sf::RenderWindow& window, float dt) {
         sprite.setOrigin({static_cast<float>(texSize.x), 0.0f});
         sprite.setScale({-scaleX, scaleY});
         sprite.setPosition({player.x, player.y});
+    }
+
+    window.draw(sprite);
+}
+
+void GameRenderer::drawEnemy(sf::RenderWindow& window, const EnemyInfo& enemy) {
+    const sf::Texture& texture = assets_.load(chooseEnemyFrame(enemyAnimationTime_));
+    if (texture.getSize().x == 0 || texture.getSize().y == 0) {
+        rect_.setTexture(nullptr, true);
+        rect_.setSize({enemy.w, enemy.h});
+        rect_.setPosition({enemy.x, enemy.y});
+        rect_.setFillColor(sf::Color(146, 88, 44));
+        window.draw(rect_);
+        return;
+    }
+
+    sf::Sprite sprite(texture);
+    const auto texSize = texture.getSize();
+    const float texW = static_cast<float>(texSize.x);
+    const float texH = static_cast<float>(texSize.y);
+    const float uniformScale = std::min(enemy.w / texW, enemy.h / texH) * 1.25f;
+    const float drawW = texW * uniformScale;
+    const float drawH = texH * uniformScale;
+    const float drawX = enemy.x + (enemy.w - drawW) * 0.5f;
+    const float drawY = enemy.y + (enemy.h - drawH);
+
+    sprite.setScale({uniformScale, uniformScale});
+    sprite.setPosition({drawX, drawY});
+
+    if (enemy.direction == Direction::LEFT) {
+        sprite.setOrigin({texW, 0.0f});
+        sprite.setScale({-uniformScale, uniformScale});
+        sprite.setPosition({drawX + drawW, drawY});
     }
 
     window.draw(sprite);

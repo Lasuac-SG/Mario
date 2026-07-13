@@ -16,6 +16,7 @@ class GameView {
     void setCamera(const PositionType* cx, const PositionType* cy) { renderer_.setCamera(cx, cy); }
     void setPlayerInfo(const PlayerInfo* p) { renderer_.setPlayerInfo(p); }
     void setTileInfos(const TileInfos* t) { renderer_.setTileInfos(t); }
+    void setEnemyInfos(const EnemyInfos* e) { renderer_.setEnemyInfos(e); }
     void setHudInfo(const HudInfo* h) { renderer_.setHudInfo(h); }
 
     void setNextStepCommand(std::function<void(float)>&& cmd) { nextStepCommand_ = std::move(cmd); }

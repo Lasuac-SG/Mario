@@ -32,6 +32,13 @@ void ViewModel::syncFromModel() {
         tile_infos_.push_back({tile.x, tile.y, tile.w, tile.h, tile.type});
     }
 
+    // 仅同步存活敌人（绝对像素坐标；死亡的不下发，View 即不再绘制）
+    enemy_infos_.clear();
+    for (const auto& e : model_->enemies()) {
+        if (!e.alive()) continue;
+        enemy_infos_.push_back({e.x(), e.y(), e.width(), e.height(), e.facing()});
+    }
+
     hud_info_.score = model_->score();
     hud_info_.coins = model_->coins();
     hud_info_.lives = model_->lives();
