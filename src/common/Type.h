@@ -36,6 +36,12 @@ struct TileInfoStruct {
     TileType type;
 };
 
+struct EnemyInfoStruct {
+    PositionType x, y;
+    float w, h;
+    Direction direction;
+};
+
 struct HudInfoStruct {
     int score;
     int coins;
@@ -46,8 +52,10 @@ struct HudInfoStruct {
 
 using PlayerInfo = PlayerInfoStruct;
 using TileInfo = TileInfoStruct;
+using EnemyInfo = EnemyInfoStruct;
 using HudInfo = HudInfoStruct;
 using InputActionParameter = TypeParameter<InputAction>;
 using TileInfos = std::vector<TileInfo>;
+using EnemyInfos = std::vector<EnemyInfo>;
 
 #endif  // MARIO_TYPE_H

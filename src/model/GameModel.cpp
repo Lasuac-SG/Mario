@@ -49,7 +49,7 @@ void GameModel::update(TimeType dt) {
       const TimeType step = std::min(remaining, mario_cfg::kMaxStep);
       mario_.step(step, tileMap_);
       for (auto& e : enemies_) e.step(step, tileMap_);
-      if (resolveEnemyCollisions()) {  // 马里奥碰到敌人致死
+      if (resolveEnemyCollisions()) {
         beginDeath();
         break;
       }
@@ -116,10 +116,8 @@ void GameModel::respawnAfterDeath() {
   deathElapsed_ = 0.0f;
   timeRemaining_ = kInitialTimeSeconds;
   mario_.reset(tileMap_.spawnX(), tileMap_.spawnY());
-  spawnEnemies();  // 复活时敌人回到出生点
 }
 
-// 依关卡出生点重建敌人：脚底落在出生格底边（其下若是地面则站定），水平居中。
 void GameModel::spawnEnemies() {
   enemies_.clear();
   const PositionType ts = mario_cfg::kTileSize;
@@ -132,7 +130,6 @@ void GameModel::spawnEnemies() {
   }
 }
 
-// 马里奥-敌人碰撞：踩顶(下落且脚在敌人上半部)→消灭敌人+小反弹+加分；其余重叠→马里奥死亡。
 bool GameModel::resolveEnemyCollisions() {
   const PositionType mx = mario_.x();
   const PositionType my = mario_.y();
@@ -153,7 +150,7 @@ bool GameModel::resolveEnemyCollisions() {
       mario_.bounce(mario_cfg::kStompBounceSpeed);
       score_ += mario_cfg::kStompScore;
     } else {
-      return true;  // 致死
+      return true;
     }
   }
   return false;
