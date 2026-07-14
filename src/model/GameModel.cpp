@@ -62,34 +62,31 @@ void GameModel::update(TimeType dt) {
 
 void GameModel::reset() {
   if (!levelFile_.empty()) tileMap_.loadFromFile(levelFile_);
-
-  score_ = 0;
-  coins_ = 0;
   lives_ = kInitialLives;
-  timeRemaining_ = kInitialTimeSeconds;
-  deathInProgress_ = false;
-  deathElapsed_ = 0.0f;
-
-  mario_.reset(tileMap_.spawnX(), tileMap_.spawnY());
-  rebuildTiles();
-  spawnEnemies();
+  resetLevelState();
   notifyChanged();
 }
 
 bool GameModel::loadLevelFromFile(const std::string& path) {
   if (!tileMap_.loadFromFile(path)) return false;
   levelFile_ = path;
+  lives_ = kInitialLives;
+  resetLevelState();
+  notifyChanged();
+  return true;
+}
+
+// 整关状态重置（分数/金币/时间/马里奥/瓦片/敌人全部恢复初始），不含命数。
+// 供初始 reset 与死亡复活共用——死亡后同样做整关重置，只保留已扣的命数。
+void GameModel::resetLevelState() {
   score_ = 0;
   coins_ = 0;
-  lives_ = kInitialLives;
   timeRemaining_ = kInitialTimeSeconds;
   deathInProgress_ = false;
   deathElapsed_ = 0.0f;
   mario_.reset(tileMap_.spawnX(), tileMap_.spawnY());
-  rebuildTiles();
-  spawnEnemies();
-  notifyChanged();
-  return true;
+  rebuildTiles();   // 未来金币/可破坏块等也在此恢复
+  spawnEnemies();   // 之前被消灭的敌人全部回来
 }
 
 void GameModel::rebuildTiles() {
@@ -112,10 +109,8 @@ void GameModel::beginDeath() {
 }
 
 void GameModel::respawnAfterDeath() {
-  deathInProgress_ = false;
-  deathElapsed_ = 0.0f;
-  timeRemaining_ = kInitialTimeSeconds;
-  mario_.reset(tileMap_.spawnX(), tileMap_.spawnY());
+  // 死亡后整关重置：分数/金币/敌人/时间/位置全部恢复初始，仅保留已扣的命数。
+  resetLevelState();
 }
 
 void GameModel::spawnEnemies() {
