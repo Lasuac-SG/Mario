@@ -61,6 +61,7 @@ class GameModel {
  private:
   void notifyChanged();
   void rebuildTiles();
+  void resetLevelState();            // 整关状态重置(不含命数)：reset 与死亡复活共用
   void spawnEnemies();               // 依关卡出生点重建敌人列表
   bool resolveEnemyCollisions();     // 处理马里奥-敌人碰撞；返回 true 表示马里奥死亡
   void beginDeath();
