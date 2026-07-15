@@ -52,8 +52,9 @@ class ViewModel {
     EnemyInfos enemy_infos_;
     HudInfo hud_info_{};
 
-    PositionType cameraX_ = WorldOrigin;
-    PositionType cameraY_ = WorldOrigin;
+    // 相机中心初值无关紧要：构造时 syncFromModel→updateCamera 会立即覆盖为跟随玩家的值。
+    PositionType cameraX_ = 0.0f;
+    PositionType cameraY_ = 0.0f;
     ViewportDim viewW_ = DefaultViewWidth;
     ViewportDim viewH_ = DefaultViewHeight;
 };
