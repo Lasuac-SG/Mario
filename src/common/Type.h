@@ -14,7 +14,6 @@ using ViewportDim = float;
 
 inline constexpr ViewportDim DefaultViewWidth = 800.0f;
 inline constexpr ViewportDim DefaultViewHeight = 600.0f;
-inline constexpr PositionType WorldOrigin = 0.0f;
 
 template <typename T>
 class TypeParameter : public ICommandParameter {
