@@ -12,6 +12,8 @@ TileType charToTile(char ch) {
     case '#': return TileType::GROUND;
     case 'P': return TileType::PIPE;
     case '=': return TileType::PLATFORM;
+    case '?': return TileType::QUESTION;
+    case 'B': return TileType::BRICK;
     default: return TileType::EMPTY;  // '.'、空格及未知字符
   }
 }

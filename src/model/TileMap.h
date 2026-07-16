@@ -41,7 +41,14 @@ class TileMap {
   }
 
   static bool isSolidTile(TileType t) {
-    return t == TileType::GROUND || t == TileType::PIPE || t == TileType::PLATFORM;
+    return t == TileType::GROUND || t == TileType::PIPE || t == TileType::PLATFORM ||
+           t == TileType::QUESTION || t == TileType::BRICK;
+  }
+
+  // 运行时改写单格（供 GameModel 顶问号块/砸砖块）。越界忽略。
+  void setTile(int col, int row, TileType t) {
+    if (col < 0 || row < 0 || col >= cols_ || row >= rows_) return;
+    tiles_[static_cast<std::size_t>(row) * cols_ + col] = t;
   }
 
   // 像素 → 瓦片格坐标。

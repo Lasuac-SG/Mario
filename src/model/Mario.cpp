@@ -14,6 +14,10 @@ void Mario::reset(PositionType x, PositionType y) {
   facing_ = Direction::RIGHT;
   state_ = MarioState::IDLE;
   deathFalling_ = false;
+  big_ = false;
+  invincible_ = 0.f;
+  headBump_ = false;
+  headBumpRow_ = -1;
   moveLeft_ = false;
   moveRight_ = false;
 }
@@ -35,6 +39,9 @@ void Mario::startDeathFall() {
 }
 
 void Mario::step(TimeType dt, const TileMap& map) {
+  headBump_ = false;                              // 每步重置头顶碰撞标记
+  if (invincible_ > 0.f) invincible_ -= dt;       // 无敌计时衰减
+
   if (deathFalling_) {
     applyGravity(dt);
     y_ += vy_ * dt;
@@ -118,6 +125,8 @@ void Mario::resolveVertical(const TileMap& map) {
       if (map.isSolid(c, row)) {
         y_ = (row + 1) * mario_cfg::kTileSize;
         vy_ = 0.f;
+        headBump_ = true;      // 记录顶到天花板
+        headBumpRow_ = row;
         return;
       }
     }

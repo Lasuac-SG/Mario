@@ -35,13 +35,32 @@ class Mario {
     moveRight_ = false;
   }
 
+  // 变大/变小（吃蘑菇 / 碰敌）。脚底位置不变，尺寸向上增减；变小后短暂无敌。
+  void grow() {
+    if (big_) return;  // 已变大再吃无效果
+    y_ -= (mario_cfg::kMarioBigHeight - mario_cfg::kMarioHeight);
+    big_ = true;
+  }
+  void shrink() {
+    if (!big_) return;
+    y_ += (mario_cfg::kMarioBigHeight - mario_cfg::kMarioHeight);
+    big_ = false;
+    invincible_ = mario_cfg::kInvincibleSeconds;
+  }
+
   PositionType x() const { return x_; }
   PositionType y() const { return y_; }
   VelocityType vy() const { return vy_; }
-  PositionType width() const { return mario_cfg::kMarioWidth; }
-  PositionType height() const { return mario_cfg::kMarioHeight; }
+  PositionType width() const { return big_ ? mario_cfg::kMarioBigWidth : mario_cfg::kMarioWidth; }
+  PositionType height() const { return big_ ? mario_cfg::kMarioBigHeight : mario_cfg::kMarioHeight; }
   MarioState state() const { return state_; }
   Direction facing() const { return facing_; }
+  bool big() const { return big_; }
+  bool invincible() const { return invincible_ > 0.f; }
+
+  // 本步是否用头顶到了天花板，以及天花板所在瓦片行（供 GameModel 判定顶问号块/砸砖块）。
+  bool headBumped() const { return headBump_; }
+  int headBumpRow() const { return headBumpRow_; }
 
  private:
   void applyHorizontal(TimeType dt);
@@ -60,6 +79,10 @@ class Mario {
   Direction facing_ = Direction::RIGHT;
   MarioState state_ = MarioState::IDLE;
   bool deathFalling_ = false;
+  bool big_ = false;
+  TimeType invincible_ = 0.f;
+  bool headBump_ = false;
+  int headBumpRow_ = -1;
 
   bool moveLeft_ = false;
   bool moveRight_ = false;
