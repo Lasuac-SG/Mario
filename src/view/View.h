@@ -13,6 +13,7 @@ class GameView {
 
     void run();
     Notify_Funtion getRenderNotification();
+    Notify_Funtion getAudioNotification();
 
     void setCamera(const PositionType* cx, const PositionType* cy) { renderer_.setCamera(cx, cy); }
     void setPlayerInfo(const PlayerInfo* p) { renderer_.setPlayerInfo(p); }
