@@ -31,7 +31,19 @@ target_include_directories(test_model PRIVATE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SO
 target_link_libraries(test_model PRIVATE SFML::Graphics SFML::Window SFML::System)
 target_link_libraries(test_model PRIVATE GTest::gtest_main)
 
+# ── view 层测试 ─────────────────────────────────────────────────
+add_executable(test_audio
+    view/AudioManagerTest.cpp
+    ${CMAKE_SOURCE_DIR}/src/view/audio/AudioManager.cpp
+)
+target_precompile_headers(test_audio PRIVATE ${CMAKE_SOURCE_DIR}/src/precompile.h)
+target_include_directories(test_audio PRIVATE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/tests)
+target_compile_definitions(test_audio PRIVATE AUDIO_TEST_FILE="${CMAKE_SOURCE_DIR}/audio/bgm.ogg")
+target_link_libraries(test_audio PRIVATE SFML::Graphics SFML::Window SFML::System SFML::Audio)
+target_link_libraries(test_audio PRIVATE GTest::gtest_main)
+
 # ── CTest 注册 ─────────────────────────────────────────────────
 include(GoogleTest)
 gtest_discover_tests(test_common)
 gtest_discover_tests(test_model)
+gtest_discover_tests(test_audio)

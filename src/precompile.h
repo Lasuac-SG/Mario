@@ -15,5 +15,6 @@
 #include <cmath>
 
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 
 #endif  // MARIO_PRECOMPILE_H
