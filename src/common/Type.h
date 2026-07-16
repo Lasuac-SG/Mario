@@ -8,7 +8,7 @@
 #include "common/ICommand.h"
 
 using PositionType = float;
-using EventType = uint32_t;
+using EventType = uint32_t; // 将采用Event类型
 using Notify_Funtion = std::function<void(EventType)>;
 using ViewportDim = float;
 
