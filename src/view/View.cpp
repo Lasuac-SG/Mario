@@ -1,4 +1,4 @@
-#include "view/View.h"
+﻿#include "view/View.h"
 
 #include <algorithm>
 
@@ -68,6 +68,23 @@ void GameView::processWindowEvents() {
             continue;
         }
 
+        if (gameOver_ && *gameOver_) {
+            if (const auto* moved = ev->getIf<sf::Event::MouseMoved>()) {
+                const sf::Vector2f point = window_.mapPixelToCoords({moved->position.x, moved->position.y}, window_.getDefaultView());
+                renderer_.setRestartHovered(renderer_.restartButtonBounds(window_).contains(point));
+            }
+
+            if (const auto* pressed = ev->getIf<sf::Event::MouseButtonPressed>()) {
+                if (pressed->button == sf::Mouse::Button::Left) {
+                    const sf::Vector2f point = window_.mapPixelToCoords({pressed->position.x, pressed->position.y}, window_.getDefaultView());
+                    if (renderer_.restartButtonBounds(window_).contains(point)) {
+                        InputActionParameter p(InputAction::RESTART);
+                        input_.getActionCommand()->exec(&p);
+                    }
+                }
+            }
+        }
+
         if (const auto* resized = ev->getIf<sf::Event::Resized>()) {
             if (resizeCommand_) {
                 const auto size = effectiveViewportSize(resized->size);
@@ -86,7 +103,7 @@ void GameView::NextStep(float dt) {
 
 Notify_Funtion GameView::getRenderNotification() {
     return [this](EventType id) {
-        // 只在常规帧更新(帧末的完整状态)时渲染；其余细粒度事件是帧中途/点事件，不驱动重绘。
+        // 鍙湪甯歌甯ф洿鏂?甯ф湯鐨勫畬鏁寸姸鎬?鏃舵覆鏌擄紱鍏朵綑缁嗙矑搴︿簨浠舵槸甯т腑閫?鐐逛簨浠讹紝涓嶉┍鍔ㄩ噸缁樸€?
         if (id == static_cast<EventType>(Event::STATE_CHANGED)) {
             renderer_.render(window_, lastDt_);
         }

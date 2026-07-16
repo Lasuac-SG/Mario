@@ -52,6 +52,7 @@ bool TileMap::loadFromFile(const std::string& path) {
 }
 
 bool TileMap::loadFromStream(std::istream& in) {
+  try {
   std::vector<std::string> lines;
   std::string line;
   std::size_t maxLen = 0;
@@ -107,4 +108,9 @@ bool TileMap::loadFromStream(std::istream& in) {
   goalCol_ = std::max(0, std::min(goalCol, cols_ - 1));
   goalRow_ = std::max(0, std::min(goalRow, rows_ - 1));
   return true;
+  } catch (const std::exception&) {
+    // 读取/解析/内存分配等异常 → 视为加载失败；因提交在最后一步之前均为局部变量，
+    // 当前地图不受影响(事务性)。
+    return false;
+  }
 }

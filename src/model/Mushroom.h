@@ -13,7 +13,7 @@
 class Mushroom {
  public:
   // 出生：默认向右移动。
-  void reset(PositionType x, PositionType y, Direction dir = Direction::RIGHT) {
+  void reset(PositionType x, PositionType y, Direction dir = Direction::RIGHT) noexcept {
     x_ = x;
     y_ = y;
     vx_ = (dir == Direction::LEFT ? -1.0f : 1.0f) * mario_cfg::kMushroomSpeed;
@@ -21,7 +21,7 @@ class Mushroom {
     active_ = true;
   }
 
-  void step(TimeType dt, const TileMap& map) {
+  void step(TimeType dt, const TileMap& map) noexcept {
     if (!active_) return;
     // 竖直：重力 + 落地（遇空缺则继续下落，不掉头）
     vy_ = std::min(vy_ + mario_cfg::kGravity * dt, mario_cfg::kMaxFallSpeed);
@@ -32,18 +32,18 @@ class Mushroom {
     resolveHorizontal(map);
   }
 
-  void consume() { active_ = false; }
+  void consume() noexcept { active_ = false; }
 
-  bool active() const { return active_; }
-  PositionType x() const { return x_; }
-  PositionType y() const { return y_; }
-  PositionType width() const { return mario_cfg::kMushroomWidth; }
-  PositionType height() const { return mario_cfg::kMushroomHeight; }
+  bool active() const noexcept { return active_; }
+  PositionType x() const noexcept { return x_; }
+  PositionType y() const noexcept { return y_; }
+  PositionType width() const noexcept { return mario_cfg::kMushroomWidth; }
+  PositionType height() const noexcept { return mario_cfg::kMushroomHeight; }
 
  private:
   static constexpr PositionType kEps = 1e-3f;
 
-  void resolveVertical(const TileMap& map) {
+  void resolveVertical(const TileMap& map) noexcept {
     const int c0 = map.toCol(x_);
     const int c1 = map.toCol(x_ + width() - kEps);
     if (vy_ > 0.0f) {
@@ -58,7 +58,7 @@ class Mushroom {
     }
   }
 
-  void resolveHorizontal(const TileMap& map) {
+  void resolveHorizontal(const TileMap& map) noexcept {
     const int r0 = map.toRow(y_);
     const int r1 = map.toRow(y_ + height() - kEps);
     if (vx_ > 0.0f) {

@@ -24,6 +24,10 @@ class GameView {
     void setEnemyInfos(const EnemyInfos* e) { renderer_.setEnemyInfos(e); }
     void setGoalInfo(const TileInfo* g) { renderer_.setGoalInfo(g); }
     void setWon(const bool* w) { renderer_.setWon(w); }
+    void setGameOver(const bool* g) {
+        gameOver_ = g;
+        renderer_.setGameOver(g);
+    }
     void setHudInfo(const HudInfo* h) { renderer_.setHudInfo(h); }
 
     void setNextStepCommand(std::function<void(float)>&& cmd) { nextStepCommand_ = std::move(cmd); }
@@ -40,6 +44,7 @@ class GameView {
     AudioManager audio_;
     InputHandler input_;
     GameRenderer renderer_;
+    const bool* gameOver_ = nullptr;
     std::function<void(float)> nextStepCommand_;
     std::function<void(ViewportDim, ViewportDim)> resizeCommand_;
     float lastDt_ = 0.0f;

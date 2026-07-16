@@ -22,15 +22,15 @@ class GameModel {
 
   void update(TimeType dt);
 
-  void setMoveLeft(bool on) {
+  void setMoveLeft(bool on) noexcept {
     if (deathInProgress_ || goalReached_ || gameOver_) return;
     mario_.setMoveLeft(on);
   }
-  void setMoveRight(bool on) {
+  void setMoveRight(bool on) noexcept {
     if (deathInProgress_ || goalReached_ || gameOver_) return;
     mario_.setMoveRight(on);
   }
-  void setMoveStop() {
+  void setMoveStop() noexcept {
     if (deathInProgress_ || goalReached_ || gameOver_) return;
     mario_.stop();
   }
@@ -43,34 +43,34 @@ class GameModel {
   bool loadLevelFromFile(const std::string& path);
   bool testLoadLevelFromString(const std::string& text);
 
-  PositionType playerX() const { return mario_.x(); }
-  PositionType playerY() const { return mario_.y(); }
-  PositionType playerW() const { return mario_.width(); }
-  PositionType playerH() const { return mario_.height(); }
-  MarioState playerState() const { return mario_.state(); }
-  Direction playerFacing() const { return mario_.facing(); }
+  PositionType playerX() const noexcept { return mario_.x(); }
+  PositionType playerY() const noexcept { return mario_.y(); }
+  PositionType playerW() const noexcept { return mario_.width(); }
+  PositionType playerH() const noexcept { return mario_.height(); }
+  MarioState playerState() const noexcept { return mario_.state(); }
+  Direction playerFacing() const noexcept { return mario_.facing(); }
 
-  const std::vector<Tile>& tiles() const { return tiles_; }
-  const std::vector<Enemy>& enemies() const { return enemies_; }
-  const std::vector<Coin>& coinItems() const { return coinItems_; }
-  const std::vector<Mushroom>& mushrooms() const { return mushrooms_; }
-  bool playerBig() const { return mario_.big(); }
-  PositionType levelWidthPx() const { return tileMap_.widthPx(); }
-  PositionType levelHeightPx() const { return tileMap_.heightPx(); }
+  const std::vector<Tile>& tiles() const noexcept { return tiles_; }
+  const std::vector<Enemy>& enemies() const noexcept { return enemies_; }
+  const std::vector<Coin>& coinItems() const noexcept { return coinItems_; }
+  const std::vector<Mushroom>& mushrooms() const noexcept { return mushrooms_; }
+  bool playerBig() const noexcept { return mario_.big(); }
+  PositionType levelWidthPx() const noexcept { return tileMap_.widthPx(); }
+  PositionType levelHeightPx() const noexcept { return tileMap_.heightPx(); }
 
-  int score() const { return score_; }
-  int coins() const { return coins_; }
-  int lives() const { return lives_; }
-  int timeRemaining() const { return static_cast<int>(std::ceil(std::max(0.0f, timeRemaining_))); }
+  int score() const noexcept { return score_; }
+  int coins() const noexcept { return coins_; }
+  int lives() const noexcept { return lives_; }
+  int timeRemaining() const noexcept { return static_cast<int>(std::ceil(std::max(0.0f, timeRemaining_))); }
   std::string world() const { return "1-1"; }
 
-  PositionType goalX() const { return goalX_; }
-  PositionType goalY() const { return goalY_; }
-  PositionType goalW() const { return goalW_; }
-  PositionType goalH() const { return goalH_; }
-  bool goalReached() const { return goalReached_; }
-  bool won() const { return goalReached_; }
-  bool gameOver() const { return gameOver_; }  // 命数耗尽：View 据此播放 Game Over 动画/显示重开按钮
+  PositionType goalX() const noexcept { return goalX_; }
+  PositionType goalY() const noexcept { return goalY_; }
+  PositionType goalW() const noexcept { return goalW_; }
+  PositionType goalH() const noexcept { return goalH_; }
+  bool goalReached() const noexcept { return goalReached_; }
+  bool won() const noexcept { return goalReached_; }
+  bool gameOver() const noexcept { return gameOver_; }  // 命数耗尽：View 据此播放 Game Over 动画/显示重开按钮
 
   EventTrigger modelTrigger;
 
@@ -86,7 +86,7 @@ class GameModel {
   void spawnMushroomAt(int col, int row);
   void collectMushrooms();
   bool resolveEnemyCollisions();
-  bool checkGoalReached() const;
+  bool checkGoalReached() const noexcept;
   void beginGoalClear();
   void beginDeath();
   void respawnAfterDeath();

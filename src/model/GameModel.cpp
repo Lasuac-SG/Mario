@@ -306,7 +306,7 @@ void GameModel::collectMushrooms() {
   }
 }
 
-bool GameModel::checkGoalReached() const {
+bool GameModel::checkGoalReached() const noexcept {
   const PositionType mx = mario_.x();
   const PositionType my = mario_.y();
   const PositionType mw = mario_.width();

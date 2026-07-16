@@ -23,13 +23,13 @@ class ViewModel {
     const bool* getWon() const noexcept { return &won_; }
     const bool* getGameOver() const noexcept { return &game_over_; }  // 命数耗尽，供 View 播 GameOver/重开按钮
     const HudInfo* getHudInfo() const noexcept { return &hud_info_; }
-    PositionType levelWidthPx() const { return model_->levelWidthPx(); }
-    PositionType levelHeightPx() const { return model_->levelHeightPx(); }
+    PositionType levelWidthPx() const noexcept { return model_->levelWidthPx(); }
+    PositionType levelHeightPx() const noexcept { return model_->levelHeightPx(); }
 
-    const PositionType* getCameraX() const { return &cameraX_; }
-    const PositionType* getCameraY() const { return &cameraY_; }
+    const PositionType* getCameraX() const noexcept { return &cameraX_; }
+    const PositionType* getCameraY() const noexcept { return &cameraY_; }
 
-    ICommandBase* getActionCommand() { return &actionCmd_; }
+    ICommandBase* getActionCommand() noexcept { return &actionCmd_; }
 
     void setViewport(ViewportDim w, ViewportDim h);
     void addNotification(Notify_Funtion func);
@@ -45,7 +45,7 @@ class ViewModel {
    private:
     void onModelChanged(EventType ev);
     void syncFromModel();
-    void updateCamera();
+    void updateCamera() noexcept;
     void tick(float dt);
 
     GameModel* model_;
