@@ -2,6 +2,7 @@
 #define MARIO_GAMEMODEL_H
 
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 #include "common/EventId.h"
@@ -9,6 +10,7 @@
 #include "model/Coin.h"
 #include "model/Enemy.h"
 #include "model/Mario.h"
+#include "model/Mushroom.h"
 #include "model/PhysicsConfig.h"
 #include "model/Tile.h"
 #include "model/TileMap.h"
@@ -51,6 +53,8 @@ class GameModel {
   const std::vector<Tile>& tiles() const { return tiles_; }
   const std::vector<Enemy>& enemies() const { return enemies_; }
   const std::vector<Coin>& coinItems() const { return coinItems_; }  // 地图金币(含已拾取，alive 标记)
+  const std::vector<Mushroom>& mushrooms() const { return mushrooms_; }  // 变大蘑菇道具(含已吃，active 标记)
+  bool playerBig() const { return mario_.big(); }                        // 马里奥是否处于变大状态
   PositionType levelWidthPx() const { return tileMap_.widthPx(); }
   PositionType levelHeightPx() const { return tileMap_.heightPx(); }
 
@@ -69,6 +73,9 @@ class GameModel {
   void spawnEnemies();               // 依关卡出生点重建敌人列表
   void spawnCoins();                 // 依关卡出生点重建金币列表
   void collectCoins();               // 马里奥拾取重叠的金币(消失+计数+加分)
+  void handleBlockBump();            // 顶到问号块(出蘑菇)/大马里奥砸碎砖块
+  void spawnMushroomAt(int col, int row);  // 在指定问号块上方生成变大蘑菇
+  void collectMushrooms();           // 马里奥吃蘑菇变大(已大则无效果)
   bool resolveEnemyCollisions();     // 处理马里奥-敌人碰撞；返回 true 表示马里奥死亡
   void beginDeath();
   void respawnAfterDeath();
@@ -78,6 +85,8 @@ class GameModel {
   std::vector<Tile> tiles_;
   std::vector<Enemy> enemies_;
   std::vector<Coin> coinItems_;
+  std::vector<Mushroom> mushrooms_;
+  std::unordered_set<int> usedQuestions_;  // 已顶过的问号块(row*cols+col)，避免重复出道具
   std::string levelFile_;
 
   int score_ = 0;

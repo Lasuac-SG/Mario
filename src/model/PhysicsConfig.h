@@ -46,6 +46,19 @@ inline constexpr PositionType kCoinWidth = 20.0f;
 inline constexpr PositionType kCoinHeight = 20.0f;
 inline constexpr int kCoinScore = 200;  // 每枚金币加分
 
+// 大马里奥（吃变大蘑菇后）碰撞盒：更高，脚底不变、向上长高。
+inline constexpr PositionType kMarioBigWidth = 28.0f;
+inline constexpr PositionType kMarioBigHeight = 60.0f;
+inline constexpr TimeType kInvincibleSeconds = 1.5f;  // 变小后短暂无敌
+
+// 变大蘑菇道具：从问号块顶出后向右移动、受重力、遇墙掉头、遇空缺下落。
+inline constexpr PositionType kMushroomWidth = 28.0f;
+inline constexpr PositionType kMushroomHeight = 28.0f;
+inline constexpr VelocityType kMushroomSpeed = 70.0f;
+
+inline constexpr int kMushroomScore = 1000;  // 吃到变大蘑菇加分
+inline constexpr int kBrickScore = 50;       // 大马里奥砸碎砖块加分
+
 }  // namespace mario_cfg
 
 #endif  // MARIO_MODEL_PHYSICSCONFIG_H

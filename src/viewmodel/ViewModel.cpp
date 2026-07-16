@@ -46,6 +46,14 @@ void ViewModel::syncFromModel() {
         coin_infos_.push_back({c.x, c.y, c.w, c.h, TileType::EMPTY});
     }
 
+    // 仅同步未吃掉的变大蘑菇（复用 TileInfo 承载矩形）
+    mushroom_infos_.clear();
+    for (const auto& m : model_->mushrooms()) {
+        if (!m.active()) continue;
+        mushroom_infos_.push_back({m.x(), m.y(), m.width(), m.height(), TileType::EMPTY});
+    }
+    player_big_ = model_->playerBig();
+
     hud_info_.score = model_->score();
     hud_info_.coins = model_->coins();
     hud_info_.lives = model_->lives();
