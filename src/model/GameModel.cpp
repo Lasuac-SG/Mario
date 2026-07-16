@@ -49,6 +49,7 @@ void GameModel::update(TimeType dt) {
       const TimeType step = std::min(remaining, mario_cfg::kMaxStep);
       mario_.step(step, tileMap_);
       for (auto& e : enemies_) e.step(step, tileMap_);
+      collectCoins();  // 拾取重叠的金币
       if (resolveEnemyCollisions()) {
         beginDeath();
         break;
@@ -85,8 +86,9 @@ void GameModel::resetLevelState() {
   deathInProgress_ = false;
   deathElapsed_ = 0.0f;
   mario_.reset(tileMap_.spawnX(), tileMap_.spawnY());
-  rebuildTiles();   // 未来金币/可破坏块等也在此恢复
+  rebuildTiles();
   spawnEnemies();   // 之前被消灭的敌人全部回来
+  spawnCoins();     // 之前拾取的金币全部恢复
 }
 
 void GameModel::rebuildTiles() {
@@ -122,6 +124,40 @@ void GameModel::spawnEnemies() {
     const PositionType x = spawns[i].col * ts + (ts - mario_cfg::kEnemyWidth) * 0.5f;
     const PositionType y = (spawns[i].row + 1) * ts - mario_cfg::kEnemyHeight;
     enemies_[i].reset(x, y, Direction::LEFT);
+  }
+}
+
+// 依关卡出生点重建金币：在出生格内居中放置。
+void GameModel::spawnCoins() {
+  coinItems_.clear();
+  const PositionType ts = mario_cfg::kTileSize;
+  const auto& spawns = tileMap_.coinSpawns();
+  coinItems_.reserve(spawns.size());
+  for (const auto& s : spawns) {
+    Coin c;
+    c.w = mario_cfg::kCoinWidth;
+    c.h = mario_cfg::kCoinHeight;
+    c.x = s.col * ts + (ts - c.w) * 0.5f;
+    c.y = s.row * ts + (ts - c.h) * 0.5f;
+    c.alive = true;
+    coinItems_.push_back(c);
+  }
+}
+
+// 马里奥 AABB 与金币重叠即拾取：金币消失、金币数 +1、加分。
+void GameModel::collectCoins() {
+  const PositionType mx = mario_.x();
+  const PositionType my = mario_.y();
+  const PositionType mw = mario_.width();
+  const PositionType mh = mario_.height();
+  for (auto& c : coinItems_) {
+    if (!c.alive) continue;
+    const bool overlap = mx < c.x + c.w && mx + mw > c.x && my < c.y + c.h && my + mh > c.y;
+    if (overlap) {
+      c.alive = false;
+      ++coins_;
+      score_ += mario_cfg::kCoinScore;
+    }
   }
 }
 

@@ -16,6 +16,8 @@ class ViewModel {
     const PlayerInfo* getPlayerInfo() const noexcept { return &player_info_; }
     const TileInfos* getTileInfos() const noexcept { return &tile_infos_; }
     const EnemyInfos* getEnemyInfos() const noexcept { return &enemy_infos_; }
+    // 未拾取的金币（复用 TileInfo 承载矩形，type 忽略），供 View 绘制
+    const TileInfos* getCoinInfos() const noexcept { return &coin_infos_; }
     const HudInfo* getHudInfo() const noexcept { return &hud_info_; }
     PositionType levelWidthPx() const { return model_->levelWidthPx(); }
     PositionType levelHeightPx() const { return model_->levelHeightPx(); }
@@ -50,6 +52,7 @@ class ViewModel {
     PlayerInfo player_info_;
     TileInfos tile_infos_;
     EnemyInfos enemy_infos_;
+    TileInfos coin_infos_;
     HudInfo hud_info_{};
 
     // 相机中心初值无关紧要：构造时 syncFromModel→updateCamera 会立即覆盖为跟随玩家的值。

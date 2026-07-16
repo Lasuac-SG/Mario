@@ -6,6 +6,7 @@
 
 #include "common/EventId.h"
 #include "common/EventTrigger.h"
+#include "model/Coin.h"
 #include "model/Enemy.h"
 #include "model/Mario.h"
 #include "model/PhysicsConfig.h"
@@ -47,6 +48,7 @@ class GameModel {
 
   const std::vector<Tile>& tiles() const { return tiles_; }
   const std::vector<Enemy>& enemies() const { return enemies_; }
+  const std::vector<Coin>& coinItems() const { return coinItems_; }  // 地图金币(含已拾取，alive 标记)
   PositionType levelWidthPx() const { return tileMap_.widthPx(); }
   PositionType levelHeightPx() const { return tileMap_.heightPx(); }
 
@@ -63,6 +65,8 @@ class GameModel {
   void rebuildTiles();
   void resetLevelState();            // 整关状态重置(不含命数)：reset 与死亡复活共用
   void spawnEnemies();               // 依关卡出生点重建敌人列表
+  void spawnCoins();                 // 依关卡出生点重建金币列表
+  void collectCoins();               // 马里奥拾取重叠的金币(消失+计数+加分)
   bool resolveEnemyCollisions();     // 处理马里奥-敌人碰撞；返回 true 表示马里奥死亡
   void beginDeath();
   void respawnAfterDeath();
@@ -71,6 +75,7 @@ class GameModel {
   Mario mario_;
   std::vector<Tile> tiles_;
   std::vector<Enemy> enemies_;
+  std::vector<Coin> coinItems_;
   std::string levelFile_;
 
   int score_ = 0;
