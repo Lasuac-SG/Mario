@@ -15,13 +15,19 @@ constexpr int kGoalScoreBonus = 1000;
 constexpr PositionType kGoalPoleWidth = 24.0f;
 constexpr PositionType kGoalPoleHeight = 160.0f;
 
-// 默认加载的关卡文件（相对可执行文件工作目录）。切换关卡改这一行即可，例如 "map/map2.txt"。
+// 地图 id → 关卡文件（相对可执行文件工作目录）。默认(构造/未选择)为地图 1。
 // 文件缺失时回退到 TileMap 的内置极简兜底关卡。
-constexpr const char* kLevelFile = "map/map1.txt";
+const char* mapPathForId(int mapId) {
+  switch (mapId) {
+    case 2: return "map/map2.txt";
+    case 1:
+    default: return "map/map1.txt";
+  }
+}
 }
 
 GameModel::GameModel() {
-  levelFile_ = kLevelFile;  // reset() 会据此加载关卡文件
+  levelFile_ = mapPathForId(1);  // 默认关卡；reset() 会据此加载
   reset();
 }
 
@@ -97,6 +103,14 @@ void GameModel::reset() {
   lives_ = kInitialLives;
   resetLevelState();
   notifyChanged(Event::LEVEL_RESET);
+}
+
+void GameModel::startGame(int mapId) {
+  const std::string path = mapPathForId(mapId);
+  if (tileMap_.loadFromFile(path)) levelFile_ = path;  // 缺失则沿用已加载关卡(兜底)，仍照常开始
+  lives_ = kInitialLives;
+  resetLevelState();
+  notifyChanged(Event::LEVEL_LOADED);
 }
 
 bool GameModel::loadLevelFromFile(const std::string& path) {
