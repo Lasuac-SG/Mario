@@ -31,6 +31,13 @@ bool Mario::jump() noexcept {
   return false;
 }
 
+void Mario::endJump() noexcept {
+  // 仅在上升阶段生效：把向上速度截断到 kJumpCutSpeed。松开越早、剩余上升速度越大 → 被截得越多 → 跳得越低；
+  // 按住不放直到接近顶点(vy_ 已自然衰减到小于该阈值)则不再截断 → 保留最高跳。死亡下落不受影响。
+  if (deathFalling_) return;
+  if (vy_ < -mario_cfg::kJumpCutSpeed) vy_ = -mario_cfg::kJumpCutSpeed;
+}
+
 void Mario::startDeathFall() noexcept {
   stop();
   deathFalling_ = true;

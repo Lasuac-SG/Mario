@@ -10,6 +10,7 @@ class Mario {
  public:
   void reset(PositionType x, PositionType y) noexcept;
   bool jump() noexcept;  // 返回是否真的起跳(着地且非死亡态才成立)
+  void endJump() noexcept;  // 松开跳键：若仍在上升则截断上升速度，实现"按得越久跳得越高"
   void step(TimeType dt, const TileMap& map) noexcept;
   void startDeathFall() noexcept;
 
