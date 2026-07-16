@@ -9,8 +9,10 @@ sf::Vector2f effectiveViewportSize(const sf::Vector2u& windowSize) {
     const float rawH = static_cast<float>(windowSize.y);
 
     constexpr float kGrowthFactor = 0.2f;
-    const float viewW = (rawW <= DefaultViewWidth) ? rawW : DefaultViewWidth + (rawW - DefaultViewWidth) * kGrowthFactor;
-    const float viewH = (rawH <= DefaultViewHeight) ? rawH : DefaultViewHeight + (rawH - DefaultViewHeight) * kGrowthFactor;
+    const float viewW =
+        (rawW <= DefaultViewWidth) ? rawW : DefaultViewWidth + (rawW - DefaultViewWidth) * kGrowthFactor;
+    const float viewH =
+        (rawH <= DefaultViewHeight) ? rawH : DefaultViewHeight + (rawH - DefaultViewHeight) * kGrowthFactor;
 
     return {viewW, viewH};
 }
@@ -18,8 +20,7 @@ sf::Vector2f effectiveViewportSize(const sf::Vector2u& windowSize) {
 }  // namespace
 
 GameView::GameView()
-    : window_(sf::VideoMode({800, 600}), "Mario Demo",
-              sf::Style::Titlebar | sf::Style::Close | sf::Style::Resize) {
+    : window_(sf::VideoMode({800, 600}), "Mario Demo", sf::Style::Titlebar | sf::Style::Close | sf::Style::Resize) {
     window_.setVerticalSyncEnabled(false);
     window_.setFramerateLimit(120);
 }
@@ -89,4 +90,7 @@ Notify_Funtion GameView::getRenderNotification() {
             renderer_.render(window_, lastDt_);
         }
     };
+}
+Notify_Funtion GameView::getAudioNotification() {
+    return audio_.getNotification();
 }
