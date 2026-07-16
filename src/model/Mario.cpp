@@ -22,11 +22,13 @@ void Mario::reset(PositionType x, PositionType y) {
   moveRight_ = false;
 }
 
-void Mario::jump() {
+bool Mario::jump() {
   if (!deathFalling_ && onGround_) {
     vy_ = -mario_cfg::kJumpSpeed;
     onGround_ = false;
+    return true;
   }
+  return false;
 }
 
 void Mario::startDeathFall() {

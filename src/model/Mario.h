@@ -9,7 +9,7 @@ class TileMap;
 class Mario {
  public:
   void reset(PositionType x, PositionType y);
-  void jump();
+  bool jump();  // 返回是否真的起跳(着地且非死亡态才成立)
   void step(TimeType dt, const TileMap& map);
   void startDeathFall();
 

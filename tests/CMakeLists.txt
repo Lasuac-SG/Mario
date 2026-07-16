@@ -44,6 +44,9 @@ target_link_libraries(test_audio PRIVATE GTest::gtest_main)
 
 # ── CTest 注册 ─────────────────────────────────────────────────
 include(GoogleTest)
+# 在 ctest 运行时(而非构建时)枚举用例：避免 Windows 下构建阶段运行测试 exe
+# 因找不到 SFML/GTest 的 DLL 而失败(0xc0000139)。
+set(CMAKE_GTEST_DISCOVER_TESTS_DISCOVERY_MODE PRE_TEST)
 gtest_discover_tests(test_common)
 gtest_discover_tests(test_model)
 gtest_discover_tests(test_audio)

@@ -36,7 +36,7 @@ class GameModel {
   }
   void jump() {
     if (deathInProgress_ || goalReached_) return;
-    mario_.jump();
+    if (mario_.jump()) notifyChanged(Event::MARIO_JUMPED);  // 真正离地才上报(供跳跃音效)
   }
 
   void reset();
@@ -74,7 +74,7 @@ class GameModel {
   EventTrigger modelTrigger;
 
  private:
-  void notifyChanged();
+  void notifyChanged(Event ev = Event::STATE_CHANGED);  // 细粒度事件；默认为常规帧更新
   void rebuildTiles();
   void resetLevelState();
   void spawnEnemies();
