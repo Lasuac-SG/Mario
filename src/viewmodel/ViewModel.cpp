@@ -59,6 +59,7 @@ void ViewModel::syncFromModel() {
     goal_info_.h = model_->goalH();
     goal_info_.type = TileType::EMPTY;
     won_ = model_->won();
+    game_over_ = model_->gameOver();
 
     hud_info_.score = model_->score();
     hud_info_.coins = model_->coins();

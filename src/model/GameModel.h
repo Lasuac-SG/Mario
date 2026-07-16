@@ -23,19 +23,19 @@ class GameModel {
   void update(TimeType dt);
 
   void setMoveLeft(bool on) {
-    if (deathInProgress_ || goalReached_) return;
+    if (deathInProgress_ || goalReached_ || gameOver_) return;
     mario_.setMoveLeft(on);
   }
   void setMoveRight(bool on) {
-    if (deathInProgress_ || goalReached_) return;
+    if (deathInProgress_ || goalReached_ || gameOver_) return;
     mario_.setMoveRight(on);
   }
   void setMoveStop() {
-    if (deathInProgress_ || goalReached_) return;
+    if (deathInProgress_ || goalReached_ || gameOver_) return;
     mario_.stop();
   }
   void jump() {
-    if (deathInProgress_ || goalReached_) return;
+    if (deathInProgress_ || goalReached_ || gameOver_) return;
     if (mario_.jump()) notifyChanged(Event::MARIO_JUMPED);  // 真正离地才上报(供跳跃音效)
   }
 
@@ -70,6 +70,7 @@ class GameModel {
   PositionType goalH() const { return goalH_; }
   bool goalReached() const { return goalReached_; }
   bool won() const { return goalReached_; }
+  bool gameOver() const { return gameOver_; }  // 命数耗尽：View 据此播放 Game Over 动画/显示重开按钮
 
   EventTrigger modelTrigger;
 
@@ -111,6 +112,7 @@ class GameModel {
   PositionType goalW_ = 24.0f;
   PositionType goalH_ = 160.0f;
   bool goalReached_ = false;
+  bool gameOver_ = false;
 };
 
 #endif  // MARIO_GAMEMODEL_H

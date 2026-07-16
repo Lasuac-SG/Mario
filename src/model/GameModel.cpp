@@ -31,6 +31,11 @@ void GameModel::update(TimeType dt) {
     return;
   }
 
+  if (gameOver_) {  // 命数耗尽后冻结世界，Game Over 动画/重开按钮交由 View；重开走 reset()
+    notifyChanged();
+    return;
+  }
+
   if (deathInProgress_) {
     if (dt > 0.f) {
       TimeType remaining = dt;
@@ -44,7 +49,11 @@ void GameModel::update(TimeType dt) {
 
     if (deathElapsed_ >= kDeathSequenceSeconds) {
       lives_ = std::max(0, lives_ - 1);
-      respawnAfterDeath();
+      if (lives_ == 0) {
+        gameOver_ = true;  // 死亡序列结束且命数为 0 → Game Over(不再重生)
+      } else {
+        respawnAfterDeath();
+      }
     }
 
     notifyChanged();
@@ -115,6 +124,7 @@ void GameModel::resetLevelState() {
   deathInProgress_ = false;
   deathElapsed_ = 0.0f;
   goalReached_ = false;
+  gameOver_ = false;
   mario_.reset(tileMap_.spawnX(), tileMap_.spawnY());
   rebuildTiles();
   spawnEnemies();
