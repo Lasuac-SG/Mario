@@ -13,7 +13,6 @@ class GameView {
 
     void run();
     Notify_Funtion getRenderNotification();
-    Notify_Funtion getAudioNotification();
 
     void setCamera(const PositionType* cx, const PositionType* cy) { renderer_.setCamera(cx, cy); }
     void setPlayerInfo(const PlayerInfo* p) { renderer_.setPlayerInfo(p); }
@@ -21,6 +20,7 @@ class GameView {
     void setEnemyInfos(const EnemyInfos* e) { renderer_.setEnemyInfos(e); }
     void setGoalInfo(const TileInfo* g) { renderer_.setGoalInfo(g); }
     void setWon(const bool* w) { renderer_.setWon(w); }
+    void setGameOver(const bool* g) { renderer_.setGameOver(g); }
     void setHudInfo(const HudInfo* h) { renderer_.setHudInfo(h); }
 
     void setNextStepCommand(std::function<void(float)>&& cmd) { nextStepCommand_ = std::move(cmd); }

@@ -1,4 +1,4 @@
-#include "view/View.h"
+﻿#include "view/View.h"
 
 #include <algorithm>
 
@@ -9,10 +9,8 @@ sf::Vector2f effectiveViewportSize(const sf::Vector2u& windowSize) {
     const float rawH = static_cast<float>(windowSize.y);
 
     constexpr float kGrowthFactor = 0.2f;
-    const float viewW =
-        (rawW <= DefaultViewWidth) ? rawW : DefaultViewWidth + (rawW - DefaultViewWidth) * kGrowthFactor;
-    const float viewH =
-        (rawH <= DefaultViewHeight) ? rawH : DefaultViewHeight + (rawH - DefaultViewHeight) * kGrowthFactor;
+    const float viewW = (rawW <= DefaultViewWidth) ? rawW : DefaultViewWidth + (rawW - DefaultViewWidth) * kGrowthFactor;
+    const float viewH = (rawH <= DefaultViewHeight) ? rawH : DefaultViewHeight + (rawH - DefaultViewHeight) * kGrowthFactor;
 
     return {viewW, viewH};
 }
@@ -20,7 +18,8 @@ sf::Vector2f effectiveViewportSize(const sf::Vector2u& windowSize) {
 }  // namespace
 
 GameView::GameView()
-    : window_(sf::VideoMode({800, 600}), "Mario Demo", sf::Style::Titlebar | sf::Style::Close | sf::Style::Resize) {
+    : window_(sf::VideoMode({800, 600}), "Mario Demo",
+              sf::Style::Titlebar | sf::Style::Close | sf::Style::Resize) {
     window_.setVerticalSyncEnabled(false);
     window_.setFramerateLimit(120);
 }
@@ -34,7 +33,6 @@ void GameView::run() {
     float accumulator = 0.0f;
 
     audio_.playBGM("./audio/bgm.ogg");
-    audio_.loadAllSFX();
 
     while (window_.isOpen()) {
         float frameDt = clock.restart().asSeconds();
@@ -73,6 +71,16 @@ void GameView::processWindowEvents() {
                 const auto size = effectiveViewportSize(resized->size);
                 resizeCommand_(size.x, size.y);
             }
+            continue;
+        }
+
+        if (const auto* pressed = ev->getIf<sf::Event::MouseButtonPressed>()) {
+            if (pressed->button == sf::Mouse::Button::Left) {
+                const sf::Vector2f pos = window_.mapPixelToCoords(pressed->position, window_.getDefaultView());
+                if (renderer_.isRestartButtonHit(window_, pos)) {
+                    input_.triggerRestart();
+                }
+            }
         }
     }
 }
@@ -86,12 +94,9 @@ void GameView::NextStep(float dt) {
 
 Notify_Funtion GameView::getRenderNotification() {
     return [this](EventType id) {
-        // 只在常规帧更新(帧末的完整状态)时渲染；其余细粒度事件是帧中途/点事件，不驱动重绘。
         if (id == static_cast<EventType>(Event::STATE_CHANGED)) {
             renderer_.render(window_, lastDt_);
         }
     };
 }
-Notify_Funtion GameView::getAudioNotification() {
-    return audio_.getNotification();
-}
+

@@ -45,8 +45,13 @@ void InputHandler::dispatchInput() {
     prevJump_ = jump;
 
     if (restart && !prevRestart_) {
-        InputActionParameter p(InputAction::RESTART);
-        actionCmd_->exec(&p);
+        triggerRestart();
     }
     prevRestart_ = restart;
+}
+
+void InputHandler::triggerRestart() {
+    if (!actionCmd_) return;
+    InputActionParameter p(InputAction::RESTART);
+    actionCmd_->exec(&p);
 }
