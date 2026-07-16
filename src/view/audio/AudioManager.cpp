@@ -62,17 +62,19 @@ void AudioManager::onEvent(EventType ev) {
 }
 
 const std::unordered_map<EventType, std::string>& AudioManager::eventSFXMap() {
+    // SFX name 与 audio/sound/ 下的 .ogg 文件名一致（不含扩展名）
+    // 路径格式: ./audio/sound/<name>.ogg
     static const std::unordered_map<EventType, std::string> map = {
-        {static_cast<EventType>(Event::COIN_COLLECTED),     "coin"},
-        {static_cast<EventType>(Event::MUSHROOM_COLLECTED), "mushroom"},
-        {static_cast<EventType>(Event::MARIO_GROWN),        "grow"},
-        {static_cast<EventType>(Event::MARIO_SHRUNK),       "hurt"},
-        {static_cast<EventType>(Event::ENEMY_STOMPED),      "stomp"},
-        {static_cast<EventType>(Event::MARIO_HURT),         "hurt"},
-        {static_cast<EventType>(Event::MARIO_DIED),          "die"},
-        {static_cast<EventType>(Event::BLOCK_BUMPED),       "bump"},
-        {static_cast<EventType>(Event::BRICK_BROKEN),       "brick"},
-        {static_cast<EventType>(Event::GOAL_REACHED),       "goal"},
+        {static_cast<EventType>(Event::COIN_COLLECTED),     "COIN_COLLECTED"},
+        {static_cast<EventType>(Event::MUSHROOM_COLLECTED), "MUSHROOM_COLLECTED"},
+        {static_cast<EventType>(Event::MARIO_GROWN),        "MUSHROOM_COLLECTED"},  // 吃蘑菇长大
+        {static_cast<EventType>(Event::MARIO_SHRUNK),       "MARIO_SHRUNK"},
+        {static_cast<EventType>(Event::ENEMY_STOMPED),      "ENEMY_STOMPED"},
+        {static_cast<EventType>(Event::MARIO_HURT),         "MARIO_SHRUNK"},         // 受伤变小
+        {static_cast<EventType>(Event::MARIO_DIED),         "MARIO_DIED"},
+        {static_cast<EventType>(Event::BLOCK_BUMPED),       "BLOCK_BUMPED"},
+        {static_cast<EventType>(Event::BRICK_BROKEN),       "BRICK_BROKEN"},
+        {static_cast<EventType>(Event::GOAL_REACHED),       "GOAL_REACHED"},
     };
     return map;
 }
