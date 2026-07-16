@@ -9,6 +9,7 @@ void App::initialize() {
     view_->setCamera(vm_->getCameraX(), vm_->getCameraY());
     view_->setPlayerInfo(vm_->getPlayerInfo());
     view_->setTileInfos(vm_->getTileInfos());
+    view_->setCoinInfos(vm_->getCoinInfos());
     view_->setEnemyInfos(vm_->getEnemyInfos());
     view_->setGoalInfo(vm_->getGoalInfo());
     view_->setWon(vm_->getWon());

@@ -162,6 +162,7 @@ GameRenderer::GameRenderer() { rect_.setOutlineThickness(0.0f); }
 
 void GameRenderer::render(sf::RenderWindow& window, float dt) {
     enemyAnimationTime_ += std::max(0.0f, dt);
+    coinAnimationTime_ += std::max(0.0f, dt);
     if (won_ && *won_) {
         winAnimationTime_ += std::max(0.0f, dt);
     } else {
@@ -180,6 +181,12 @@ void GameRenderer::render(sf::RenderWindow& window, float dt) {
     }
 
     drawGoal(window);
+
+    if (coinInfos_) {
+        for (const auto& coin : *coinInfos_) {
+            drawCoin(window, coin);
+        }
+    }
 
     if (enemyInfos_) {
         for (const auto& enemy : *enemyInfos_) {
@@ -315,6 +322,40 @@ void GameRenderer::drawPlayer(sf::RenderWindow& window, float dt) {
     window.draw(sprite);
 }
 
+void GameRenderer::drawCoin(sf::RenderWindow& window, const TileInfo& coin) {
+    const float phase = std::fmod(coinAnimationTime_ * 7.0f, 6.2831853f);
+    const float squash = 0.28f + 0.72f * std::abs(std::cos(phase));
+    const float bob = std::sin(phase * 0.5f) * 1.5f;
+    const float centerX = coin.x + coin.w * 0.5f;
+    const float centerY = coin.y + coin.h * 0.5f + bob;
+
+    const float baseRadius = std::max(6.0f, coin.w * 0.5f);
+    const float widthScale = squash;
+    const float heightScale = std::max(1.05f, coin.h / std::max(1.0f, coin.w)) * (1.08f - squash * 0.08f);
+
+    sf::CircleShape outer(baseRadius);
+    outer.setOrigin({baseRadius, baseRadius});
+    outer.setPosition({centerX, centerY});
+    outer.setScale({widthScale, heightScale});
+    outer.setFillColor(sf::Color(245, 205, 55));
+    outer.setOutlineThickness(-2.0f / std::max(0.35f, widthScale));
+    outer.setOutlineColor(sf::Color(160, 110, 20));
+    window.draw(outer);
+
+    sf::RectangleShape shine({std::max(2.0f, coin.w * 0.16f * widthScale), std::max(coin.h * 0.5f, 8.0f)});
+    shine.setOrigin({shine.getSize().x * 0.5f, shine.getSize().y * 0.5f});
+    shine.setPosition({centerX, centerY});
+    shine.setFillColor(sf::Color(255, 240, 150));
+    window.draw(shine);
+
+    if (squash < 0.45f) {
+        sf::RectangleShape edge({std::max(2.0f, coin.w * 0.08f), std::max(coin.h * 0.56f, 9.0f)});
+        edge.setOrigin({edge.getSize().x * 0.5f, edge.getSize().y * 0.5f});
+        edge.setPosition({centerX, centerY});
+        edge.setFillColor(sf::Color(255, 225, 120));
+        window.draw(edge);
+    }
+}
 void GameRenderer::drawEnemy(sf::RenderWindow& window, const EnemyInfo& enemy) {
     const sf::Texture& texture = assets_.load(chooseEnemyFrame(enemyAnimationTime_));
     if (texture.getSize().x == 0 || texture.getSize().y == 0) {
