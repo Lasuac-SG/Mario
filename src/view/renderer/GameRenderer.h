@@ -15,6 +15,7 @@ class GameRenderer {
     }
     void setPlayerInfo(const PlayerInfo* p) { playerInfo_ = p; }
     void setTileInfos(const TileInfos* t) { tileInfos_ = t; }
+    void setCoinInfos(const TileInfos* c) { coinInfos_ = c; }
     void setEnemyInfos(const EnemyInfos* e) { enemyInfos_ = e; }
     void setGoalInfo(const TileInfo* g) { goalInfo_ = g; }
     void setWon(const bool* w) { won_ = w; }
@@ -28,6 +29,7 @@ class GameRenderer {
     void drawPixelText(sf::RenderWindow& window, const std::string& text, float x, float y, float scale);
     float measurePixelText(const std::string& text, float scale) const;
     void drawPlayer(sf::RenderWindow& window, float dt);
+    void drawCoin(sf::RenderWindow& window, const TileInfo& coin);
     void drawEnemy(sf::RenderWindow& window, const EnemyInfo& enemy);
     void drawGoal(sf::RenderWindow& window);
     void drawWinOverlay(sf::RenderWindow& window);
@@ -40,6 +42,7 @@ class GameRenderer {
     const PositionType* cameraY_ = nullptr;
     const PlayerInfo* playerInfo_ = nullptr;
     const TileInfos* tileInfos_ = nullptr;
+    const TileInfos* coinInfos_ = nullptr;
     const EnemyInfos* enemyInfos_ = nullptr;
     const TileInfo* goalInfo_ = nullptr;
     const bool* won_ = nullptr;
@@ -47,6 +50,7 @@ class GameRenderer {
 
     float runAnimationTime_ = 0.0f;
     float enemyAnimationTime_ = 0.0f;
+    float coinAnimationTime_ = 0.0f;
     float winAnimationTime_ = 0.0f;
     MarioState lastPlayerState_ = MarioState::IDLE;
     sf::RectangleShape rect_;
