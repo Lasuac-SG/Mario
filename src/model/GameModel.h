@@ -1,6 +1,7 @@
 #ifndef MARIO_GAMEMODEL_H
 #define MARIO_GAMEMODEL_H
 
+#include <cmath>
 #include <string>
 #include <unordered_set>
 #include <vector>
@@ -22,25 +23,24 @@ class GameModel {
   void update(TimeType dt);
 
   void setMoveLeft(bool on) {
-    if (deathInProgress_) return;
+    if (deathInProgress_ || goalReached_) return;
     mario_.setMoveLeft(on);
   }
   void setMoveRight(bool on) {
-    if (deathInProgress_) return;
+    if (deathInProgress_ || goalReached_) return;
     mario_.setMoveRight(on);
   }
   void setMoveStop() {
-    if (deathInProgress_) return;
+    if (deathInProgress_ || goalReached_) return;
     mario_.stop();
   }
   void jump() {
-    if (deathInProgress_) return;
+    if (deathInProgress_ || goalReached_) return;
     mario_.jump();
   }
 
   void reset();
   bool loadLevelFromFile(const std::string& path);
-  /// 仅用于单元测试：从字符串加载关卡，不依赖外部文件。
   bool testLoadLevelFromString(const std::string& text);
 
   PositionType playerX() const { return mario_.x(); }
@@ -52,9 +52,9 @@ class GameModel {
 
   const std::vector<Tile>& tiles() const { return tiles_; }
   const std::vector<Enemy>& enemies() const { return enemies_; }
-  const std::vector<Coin>& coinItems() const { return coinItems_; }  // 地图金币(含已拾取，alive 标记)
-  const std::vector<Mushroom>& mushrooms() const { return mushrooms_; }  // 变大蘑菇道具(含已吃，active 标记)
-  bool playerBig() const { return mario_.big(); }                        // 马里奥是否处于变大状态
+  const std::vector<Coin>& coinItems() const { return coinItems_; }
+  const std::vector<Mushroom>& mushrooms() const { return mushrooms_; }
+  bool playerBig() const { return mario_.big(); }
   PositionType levelWidthPx() const { return tileMap_.widthPx(); }
   PositionType levelHeightPx() const { return tileMap_.heightPx(); }
 
@@ -64,19 +64,29 @@ class GameModel {
   int timeRemaining() const { return static_cast<int>(std::ceil(std::max(0.0f, timeRemaining_))); }
   std::string world() const { return "1-1"; }
 
+  PositionType goalX() const { return goalX_; }
+  PositionType goalY() const { return goalY_; }
+  PositionType goalW() const { return goalW_; }
+  PositionType goalH() const { return goalH_; }
+  bool goalReached() const { return goalReached_; }
+  bool won() const { return goalReached_; }
+
   EventTrigger modelTrigger;
 
  private:
   void notifyChanged();
   void rebuildTiles();
-  void resetLevelState();            // 整关状态重置(不含命数)：reset 与死亡复活共用
-  void spawnEnemies();               // 依关卡出生点重建敌人列表
-  void spawnCoins();                 // 依关卡出生点重建金币列表
-  void collectCoins();               // 马里奥拾取重叠的金币(消失+计数+加分)
-  void handleBlockBump();            // 顶到问号块(出蘑菇)/大马里奥砸碎砖块
-  void spawnMushroomAt(int col, int row);  // 在指定问号块上方生成变大蘑菇
-  void collectMushrooms();           // 马里奥吃蘑菇变大(已大则无效果)
-  bool resolveEnemyCollisions();     // 处理马里奥-敌人碰撞；返回 true 表示马里奥死亡
+  void resetLevelState();
+  void spawnEnemies();
+  void spawnCoins();
+  void setupGoal();
+  void collectCoins();
+  void handleBlockBump();
+  void spawnMushroomAt(int col, int row);
+  void collectMushrooms();
+  bool resolveEnemyCollisions();
+  bool checkGoalReached() const;
+  void beginGoalClear();
   void beginDeath();
   void respawnAfterDeath();
 
@@ -86,7 +96,7 @@ class GameModel {
   std::vector<Enemy> enemies_;
   std::vector<Coin> coinItems_;
   std::vector<Mushroom> mushrooms_;
-  std::unordered_set<int> usedQuestions_;  // 已顶过的问号块(row*cols+col)，避免重复出道具
+  std::unordered_set<int> usedQuestions_;
   std::string levelFile_;
 
   int score_ = 0;
@@ -95,6 +105,12 @@ class GameModel {
   float timeRemaining_ = 300.0f;
   bool deathInProgress_ = false;
   float deathElapsed_ = 0.0f;
+
+  PositionType goalX_ = 0.0f;
+  PositionType goalY_ = 0.0f;
+  PositionType goalW_ = 24.0f;
+  PositionType goalH_ = 160.0f;
+  bool goalReached_ = false;
 };
 
 #endif  // MARIO_GAMEMODEL_H

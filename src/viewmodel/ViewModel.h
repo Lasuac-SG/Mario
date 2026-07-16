@@ -16,12 +16,11 @@ class ViewModel {
     const PlayerInfo* getPlayerInfo() const noexcept { return &player_info_; }
     const TileInfos* getTileInfos() const noexcept { return &tile_infos_; }
     const EnemyInfos* getEnemyInfos() const noexcept { return &enemy_infos_; }
-    // 未拾取的金币（复用 TileInfo 承载矩形，type 忽略），供 View 绘制
     const TileInfos* getCoinInfos() const noexcept { return &coin_infos_; }
-    // 未吃掉的变大蘑菇（复用 TileInfo 承载矩形），供 View 绘制
     const TileInfos* getMushroomInfos() const noexcept { return &mushroom_infos_; }
-    // 马里奥是否处于变大状态（供 View 选大/小精灵；尺寸已随 PlayerInfo.width/height 变化）
     const bool* getPlayerBig() const noexcept { return &player_big_; }
+    const TileInfo* getGoalInfo() const noexcept { return &goal_info_; }
+    const bool* getWon() const noexcept { return &won_; }
     const HudInfo* getHudInfo() const noexcept { return &hud_info_; }
     PositionType levelWidthPx() const { return model_->levelWidthPx(); }
     PositionType levelHeightPx() const { return model_->levelHeightPx(); }
@@ -59,9 +58,10 @@ class ViewModel {
     TileInfos coin_infos_;
     TileInfos mushroom_infos_;
     bool player_big_ = false;
+    TileInfo goal_info_{};
+    bool won_ = false;
     HudInfo hud_info_{};
 
-    // 相机中心初值无关紧要：构造时 syncFromModel→updateCamera 会立即覆盖为跟随玩家的值。
     PositionType cameraX_ = 0.0f;
     PositionType cameraY_ = 0.0f;
     ViewportDim viewW_ = DefaultViewWidth;

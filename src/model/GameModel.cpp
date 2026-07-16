@@ -11,11 +11,19 @@ namespace {
 constexpr float kInitialTimeSeconds = 300.0f;
 constexpr int kInitialLives = 3;
 constexpr float kDeathSequenceSeconds = 1.2f;
+constexpr int kGoalScoreBonus = 1000;
+constexpr PositionType kGoalPoleWidth = 24.0f;
+constexpr PositionType kGoalPoleHeight = 160.0f;
 }
 
 GameModel::GameModel() { reset(); }
 
 void GameModel::update(TimeType dt) {
+  if (goalReached_) {
+    notifyChanged();
+    return;
+  }
+
   if (deathInProgress_) {
     if (dt > 0.f) {
       TimeType remaining = dt;
@@ -48,13 +56,17 @@ void GameModel::update(TimeType dt) {
     while (remaining > 0.f) {
       const TimeType step = std::min(remaining, mario_cfg::kMaxStep);
       mario_.step(step, tileMap_);
-      handleBlockBump();  // 顶问号块出蘑菇 / 大马里奥砸砖块
+      handleBlockBump();
       for (auto& e : enemies_) e.step(step, tileMap_);
       for (auto& m : mushrooms_) m.step(step, tileMap_);
-      collectCoins();       // 拾取重叠的金币
-      collectMushrooms();   // 吃蘑菇变大
+      collectCoins();
+      collectMushrooms();
       if (resolveEnemyCollisions()) {
         beginDeath();
+        break;
+      }
+      if (checkGoalReached()) {
+        beginGoalClear();
         break;
       }
       remaining -= step;
@@ -89,20 +101,20 @@ bool GameModel::testLoadLevelFromString(const std::string& text) {
   return true;
 }
 
-// 整关状态重置（分数/金币/时间/马里奥/瓦片/敌人全部恢复初始），不含命数。
-// 供初始 reset 与死亡复活共用——死亡后同样做整关重置，只保留已扣的命数。
 void GameModel::resetLevelState() {
   score_ = 0;
   coins_ = 0;
   timeRemaining_ = kInitialTimeSeconds;
   deathInProgress_ = false;
   deathElapsed_ = 0.0f;
+  goalReached_ = false;
   mario_.reset(tileMap_.spawnX(), tileMap_.spawnY());
   rebuildTiles();
-  spawnEnemies();   // 之前被消灭的敌人全部回来
-  spawnCoins();     // 之前拾取的金币全部恢复
+  spawnEnemies();
+  spawnCoins();
   mushrooms_.clear();
   usedQuestions_.clear();
+  setupGoal();
 }
 
 void GameModel::rebuildTiles() {
@@ -125,7 +137,6 @@ void GameModel::beginDeath() {
 }
 
 void GameModel::respawnAfterDeath() {
-  // 死亡后整关重置：分数/金币/敌人/时间/位置全部恢复初始，仅保留已扣的命数。
   resetLevelState();
 }
 
@@ -141,7 +152,6 @@ void GameModel::spawnEnemies() {
   }
 }
 
-// 依关卡出生点重建金币：在出生格内居中放置。
 void GameModel::spawnCoins() {
   coinItems_.clear();
   const PositionType ts = mario_cfg::kTileSize;
@@ -158,7 +168,23 @@ void GameModel::spawnCoins() {
   }
 }
 
-// 马里奥 AABB 与金币重叠即拾取：金币消失、金币数 +1、加分。
+void GameModel::setupGoal() {
+  goalW_ = kGoalPoleWidth;
+  goalH_ = kGoalPoleHeight;
+
+  if (!tileMap_.hasGoal()) {
+    goalX_ = std::max(0.0f, tileMap_.widthPx() - 3.0f * mario_cfg::kTileSize);
+    goalY_ = std::max(0.0f, tileMap_.heightPx() - goalH_ - mario_cfg::kTileSize);
+    return;
+  }
+
+  const PositionType ts = mario_cfg::kTileSize;
+  const PositionType cellX = tileMap_.goalX();
+  const PositionType cellY = tileMap_.goalY();
+  goalX_ = cellX + (ts - goalW_) * 0.5f;
+  goalY_ = cellY + ts - goalH_;
+}
+
 void GameModel::collectCoins() {
   const PositionType mx = mario_.x();
   const PositionType my = mario_.y();
@@ -176,7 +202,7 @@ void GameModel::collectCoins() {
 }
 
 bool GameModel::resolveEnemyCollisions() {
-  if (mario_.invincible()) return false;  // 变小后短暂无敌，期间不受敌人影响
+  if (mario_.invincible()) return false;
   const PositionType mx = mario_.x();
   const PositionType my = mario_.y();
   const PositionType mw = mario_.width();
@@ -196,16 +222,15 @@ bool GameModel::resolveEnemyCollisions() {
       mario_.bounce(mario_cfg::kStompBounceSpeed);
       score_ += mario_cfg::kStompScore;
     } else if (mario_.big()) {
-      mario_.shrink();  // 大马里奥碰敌 → 变小(带短暂无敌)，非死亡
+      mario_.shrink();
       return false;
     } else {
-      return true;      // 小马里奥碰敌 → 死亡
+      return true;
     }
   }
   return false;
 }
 
-// 顶到问号块 → 上方出蘑菇(每块仅一次)；大马里奥顶到砖块 → 砸碎。
 void GameModel::handleBlockBump() {
   if (!mario_.headBumped()) return;
   const int row = mario_.headBumpRow();
@@ -216,11 +241,11 @@ void GameModel::handleBlockBump() {
     const TileType t = tileMap_.at(c, row);
     if (t == TileType::QUESTION) {
       const int key = row * tileMap_.cols() + c;
-      if (usedQuestions_.insert(key).second) {  // 首次顶该问号块
+      if (usedQuestions_.insert(key).second) {
         spawnMushroomAt(c, row);
       }
     } else if (t == TileType::BRICK && mario_.big()) {
-      tileMap_.setTile(c, row, TileType::EMPTY);  // 大马里奥砸碎砖块
+      tileMap_.setTile(c, row, TileType::EMPTY);
       score_ += mario_cfg::kBrickScore;
       tilesDirty = true;
     }
@@ -228,17 +253,15 @@ void GameModel::handleBlockBump() {
   if (tilesDirty) rebuildTiles();
 }
 
-// 在问号块(col,row)顶上生成一只向右移动的变大蘑菇。
 void GameModel::spawnMushroomAt(int col, int row) {
   const PositionType ts = mario_cfg::kTileSize;
   Mushroom m;
   const PositionType x = col * ts + (ts - mario_cfg::kMushroomWidth) * 0.5f;
-  const PositionType y = row * ts - mario_cfg::kMushroomHeight;  // 站在问号块顶面
+  const PositionType y = row * ts - mario_cfg::kMushroomHeight;
   m.reset(x, y, Direction::RIGHT);
   mushrooms_.push_back(m);
 }
 
-// 马里奥吃到蘑菇：小 → 变大 + 加分；已大 → 无效果(仍消耗蘑菇)。
 void GameModel::collectMushrooms() {
   const PositionType mx = mario_.x();
   const PositionType my = mario_.y();
@@ -256,6 +279,24 @@ void GameModel::collectMushrooms() {
       }
     }
   }
+}
+
+bool GameModel::checkGoalReached() const {
+  const PositionType mx = mario_.x();
+  const PositionType my = mario_.y();
+  const PositionType mw = mario_.width();
+  const PositionType mh = mario_.height();
+
+  const PositionType triggerX = goalX_ - 8.0f;
+  const PositionType triggerW = goalW_ + 16.0f;
+  return mx < triggerX + triggerW && mx + mw > triggerX && my < goalY_ + goalH_ && my + mh > goalY_;
+}
+
+void GameModel::beginGoalClear() {
+  if (goalReached_) return;
+  goalReached_ = true;
+  mario_.stop();
+  score_ += kGoalScoreBonus;
 }
 
 void GameModel::notifyChanged() {
