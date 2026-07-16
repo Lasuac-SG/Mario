@@ -32,6 +32,13 @@ void GameView::run() {
     sf::Clock clock;
     float accumulator = 0.0f;
 
+    sf::Music music;
+
+    music.openFromFile("./audio/bgm.ogg");
+    music.setLooping(true);
+    music.setVolume(30.f);
+    music.play();
+
     while (window_.isOpen()) {
         float frameDt = clock.restart().asSeconds();
         frameDt = std::min(frameDt, kMaxFrameDt);

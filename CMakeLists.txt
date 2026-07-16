@@ -6,7 +6,7 @@ set(
         CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 
-find_package(SFML COMPONENTS Graphics Window System CONFIG REQUIRED)
+find_package(SFML COMPONENTS Graphics Window System Audio CONFIG REQUIRED)
 
 add_subdirectory(src)
 
