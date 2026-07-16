@@ -14,9 +14,16 @@ constexpr float kDeathSequenceSeconds = 1.2f;
 constexpr int kGoalScoreBonus = 1000;
 constexpr PositionType kGoalPoleWidth = 24.0f;
 constexpr PositionType kGoalPoleHeight = 160.0f;
+
+// 默认加载的关卡文件（相对可执行文件工作目录）。切换关卡改这一行即可，例如 "map/map2.txt"。
+// 文件缺失时回退到 TileMap 的内置极简兜底关卡。
+constexpr const char* kLevelFile = "map/map1.txt";
 }
 
-GameModel::GameModel() { reset(); }
+GameModel::GameModel() {
+  levelFile_ = kLevelFile;  // reset() 会据此加载关卡文件
+  reset();
+}
 
 void GameModel::update(TimeType dt) {
   if (goalReached_) {

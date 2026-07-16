@@ -35,3 +35,11 @@ add_custom_command(
         $<TARGET_FILE_DIR:mario>/audio
         COMMENT "Copying audio folder to app directory"
 )
+
+add_custom_command(
+        TARGET mario POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${PROJECT_SOURCE_DIR}/map
+        $<TARGET_FILE_DIR:mario>/map
+        COMMENT "Copying map folder to app directory"
+)
