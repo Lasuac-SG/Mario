@@ -5,7 +5,7 @@
 
 #include "model/TileMap.h"
 
-void Mario::reset(PositionType x, PositionType y) {
+void Mario::reset(PositionType x, PositionType y) noexcept {
   x_ = x;
   y_ = y;
   vx_ = 0.f;
@@ -22,7 +22,7 @@ void Mario::reset(PositionType x, PositionType y) {
   moveRight_ = false;
 }
 
-bool Mario::jump() {
+bool Mario::jump() noexcept {
   if (!deathFalling_ && onGround_) {
     vy_ = -mario_cfg::kJumpSpeed;
     onGround_ = false;
@@ -31,7 +31,7 @@ bool Mario::jump() {
   return false;
 }
 
-void Mario::startDeathFall() {
+void Mario::startDeathFall() noexcept {
   stop();
   deathFalling_ = true;
   onGround_ = false;
@@ -40,7 +40,7 @@ void Mario::startDeathFall() {
   state_ = MarioState::DEAD;
 }
 
-void Mario::step(TimeType dt, const TileMap& map) {
+void Mario::step(TimeType dt, const TileMap& map) noexcept {
   headBump_ = false;                              // 每步重置头顶碰撞标记
   if (invincible_ > 0.f) invincible_ -= dt;       // 无敌计时衰减
 
@@ -62,7 +62,7 @@ void Mario::step(TimeType dt, const TileMap& map) {
   updateState();
 }
 
-void Mario::applyHorizontal(TimeType dt) {
+void Mario::applyHorizontal(TimeType dt) noexcept {
   if (moveLeft_) {
     vx_ = std::max(vx_ - mario_cfg::kMoveAccel * dt, -mario_cfg::kMoveMaxSpeed);
     facing_ = Direction::LEFT;
@@ -79,11 +79,11 @@ void Mario::applyHorizontal(TimeType dt) {
   }
 }
 
-void Mario::applyGravity(TimeType dt) {
+void Mario::applyGravity(TimeType dt) noexcept {
   vy_ = std::min(vy_ + mario_cfg::kGravity * dt, mario_cfg::kMaxFallSpeed);
 }
 
-void Mario::resolveHorizontal(const TileMap& map) {
+void Mario::resolveHorizontal(const TileMap& map) noexcept {
   const int r0 = map.toRow(y_);
   const int r1 = map.toRow(y_ + height() - kEps);
   if (vx_ > 0.f) {
@@ -107,7 +107,7 @@ void Mario::resolveHorizontal(const TileMap& map) {
   }
 }
 
-void Mario::resolveVertical(const TileMap& map) {
+void Mario::resolveVertical(const TileMap& map) noexcept {
   const int c0 = map.toCol(x_);
   const int c1 = map.toCol(x_ + width() - kEps);
   if (vy_ > 0.f) {
@@ -136,7 +136,7 @@ void Mario::resolveVertical(const TileMap& map) {
   }
 }
 
-void Mario::updateState() {
+void Mario::updateState() noexcept {
   if (deathFalling_) {
     state_ = MarioState::DEAD;
     return;

@@ -70,7 +70,7 @@ void ViewModel::syncFromModel() {
     updateCamera();
 }
 
-void ViewModel::updateCamera() {
+void ViewModel::updateCamera() noexcept {
     const PositionType playerCenterX = player_info_.x + player_info_.width / 2.0f;
     const PositionType playerCenterY = player_info_.y + player_info_.height / 2.0f;
 

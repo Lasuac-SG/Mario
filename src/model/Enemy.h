@@ -12,7 +12,7 @@
 
 class Enemy {
  public:
-  void reset(PositionType x, PositionType y, Direction dir) {
+  void reset(PositionType x, PositionType y, Direction dir) noexcept {
     x_ = x;
     y_ = y;
     vx_ = (dir == Direction::LEFT ? -1.0f : 1.0f) * mario_cfg::kEnemyMoveSpeed;
@@ -22,7 +22,7 @@ class Enemy {
   }
 
   // 单个固定子步长推进：重力落地 → 水平巡逻 → 撞墙/悬崖掉头。
-  void step(TimeType dt, const TileMap& map) {
+  void step(TimeType dt, const TileMap& map) noexcept {
     if (!alive_) return;
 
     // 竖直：重力 + 落地
@@ -38,22 +38,22 @@ class Enemy {
     if (!turnedAtWall && onGround_ && atLedge(map)) reverse();
   }
 
-  void kill() { alive_ = false; }
+  void kill() noexcept { alive_ = false; }
 
   // === 只读访问（供 GameModel 碰撞判定 / 组装 EnemyInfo）===
-  bool alive() const { return alive_; }
-  PositionType x() const { return x_; }
-  PositionType y() const { return y_; }
-  PositionType width() const { return mario_cfg::kEnemyWidth; }
-  PositionType height() const { return mario_cfg::kEnemyHeight; }
-  Direction facing() const { return vx_ < 0.0f ? Direction::LEFT : Direction::RIGHT; }
+  bool alive() const noexcept { return alive_; }
+  PositionType x() const noexcept { return x_; }
+  PositionType y() const noexcept { return y_; }
+  PositionType width() const noexcept { return mario_cfg::kEnemyWidth; }
+  PositionType height() const noexcept { return mario_cfg::kEnemyHeight; }
+  Direction facing() const noexcept { return vx_ < 0.0f ? Direction::LEFT : Direction::RIGHT; }
 
  private:
   static constexpr PositionType kEps = 1e-3f;
 
-  void reverse() { vx_ = -vx_; }
+  void reverse() noexcept { vx_ = -vx_; }
 
-  void resolveVertical(const TileMap& map) {
+  void resolveVertical(const TileMap& map) noexcept {
     const int c0 = map.toCol(x_);
     const int c1 = map.toCol(x_ + width() - kEps);
     if (vy_ > 0.0f) {  // 下落：检测脚下所在行
@@ -71,7 +71,7 @@ class Enemy {
   }
 
   // 撞到实心墙 → 贴边并掉头，返回是否掉头。
-  bool resolveHorizontal(const TileMap& map) {
+  bool resolveHorizontal(const TileMap& map) noexcept {
     const int r0 = map.toRow(y_);
     const int r1 = map.toRow(y_ + height() - kEps);
     if (vx_ > 0.0f) {
@@ -97,7 +97,7 @@ class Enemy {
   }
 
   // 前进方向前方、脚底下一格是否为空（悬崖）。越界视为实心（世界墙），不算悬崖。
-  bool atLedge(const TileMap& map) const {
+  bool atLedge(const TileMap& map) const noexcept {
     const PositionType frontX = (vx_ > 0.0f) ? (x_ + width() + kEps) : (x_ - kEps);
     const int col = map.toCol(frontX);
     const int row = map.toRow(y_ + height() + kEps);
