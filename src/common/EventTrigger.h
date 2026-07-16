@@ -15,7 +15,7 @@ public:
   void remove_notification(uintptr_t notificationFunctionIndex) noexcept;
 
 public:
-  void fire(EventType) noexcept;
+  void fire(EventType) noexcept; // 这里将采用Event类型
 
 private:
   std::vector<Notify_Funtion> notificationList_;
