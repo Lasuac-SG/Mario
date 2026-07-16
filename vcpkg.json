@@ -3,6 +3,9 @@
     {
       "name": "sfml",
       "features": ["graphics", "window", "audio", "network"]
+    },
+    {
+      "name": "gtest"
     }
   ]
 }

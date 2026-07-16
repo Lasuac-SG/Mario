@@ -1,0 +1,37 @@
+find_package(GTest CONFIG REQUIRED)
+
+enable_testing()
+
+# Common include path —— 与主项目一致，使用 src/ 相对路径
+set(TEST_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/src)
+
+# ── common 层测试 ──────────────────────────────────────────────
+add_executable(test_common
+    common/EventTriggerTest.cpp
+    ${CMAKE_SOURCE_DIR}/src/common/EventTrigger.cpp
+)
+target_precompile_headers(test_common PRIVATE ${CMAKE_SOURCE_DIR}/src/precompile.h)
+target_include_directories(test_common PRIVATE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/tests)
+target_link_libraries(test_common PRIVATE SFML::Graphics SFML::Window SFML::System)
+target_link_libraries(test_common PRIVATE GTest::gtest_main)
+
+# ── model 层测试 ───────────────────────────────────────────────
+add_executable(test_model
+    model/TileMapTest.cpp
+    model/MarioTest.cpp
+    model/EnemyTest.cpp
+    model/GameModelTest.cpp
+    ${CMAKE_SOURCE_DIR}/src/model/TileMap.cpp
+    ${CMAKE_SOURCE_DIR}/src/model/Mario.cpp
+    ${CMAKE_SOURCE_DIR}/src/model/GameModel.cpp
+    ${CMAKE_SOURCE_DIR}/src/common/EventTrigger.cpp
+)
+target_precompile_headers(test_model PRIVATE ${CMAKE_SOURCE_DIR}/src/precompile.h)
+target_include_directories(test_model PRIVATE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/tests)
+target_link_libraries(test_model PRIVATE SFML::Graphics SFML::Window SFML::System)
+target_link_libraries(test_model PRIVATE GTest::gtest_main)
+
+# ── CTest 注册 ─────────────────────────────────────────────────
+include(GoogleTest)
+gtest_discover_tests(test_common)
+gtest_discover_tests(test_model)

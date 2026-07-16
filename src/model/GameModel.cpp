@@ -76,6 +76,15 @@ bool GameModel::loadLevelFromFile(const std::string& path) {
   return true;
 }
 
+bool GameModel::testLoadLevelFromString(const std::string& text) {
+  if (!tileMap_.loadFromString(text)) return false;
+  levelFile_.clear();
+  lives_ = kInitialLives;
+  resetLevelState();
+  notifyChanged();
+  return true;
+}
+
 // 整关状态重置（分数/金币/时间/马里奥/瓦片/敌人全部恢复初始），不含命数。
 // 供初始 reset 与死亡复活共用——死亡后同样做整关重置，只保留已扣的命数。
 void GameModel::resetLevelState() {
