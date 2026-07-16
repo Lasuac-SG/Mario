@@ -19,6 +19,8 @@ class AudioManager {
     // ── SFX ──
     /// @return false if file not found or format unsupported
     bool loadSFX(const std::string& name, const std::string& path);
+    /// 加载 eventSFXMap 中所有 SFX（自动去重，跳过已加载的文件）
+    void loadAllSFX();
     void playSFX(const std::string& name);
     void setSFXVolume(float volume);
     void stopAllSFX();

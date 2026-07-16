@@ -152,6 +152,16 @@ TEST(AudioManagerTest, 同名重复加载后者覆盖前者) {
 }
 
 // ═══════════════════════════════════════════════════════════════
+// SFX —— loadAllSFX
+// ═══════════════════════════════════════════════════════════════
+
+TEST(AudioManagerTest, loadAllSFX无崩溃) {
+    AudioManager audio;
+    // 测试环境中 audio/sound/ 路径可能不存在，部分文件加载失败不影响方法本身
+    EXPECT_NO_THROW(audio.loadAllSFX());
+}
+
+// ═══════════════════════════════════════════════════════════════
 // SFX —— playSFX
 // ═══════════════════════════════════════════════════════════════
 
@@ -211,6 +221,7 @@ TEST(AudioManagerTest, 未加载SFX时回调已映射事件无崩溃) {
     auto fn = audio.getNotification();
 
     // 所有 eventSFXMap 中映射的事件，即使 SFX 未加载也不应崩溃
+    EXPECT_NO_THROW(fn(static_cast<EventType>(Event::MARIO_JUMPED)));
     EXPECT_NO_THROW(fn(static_cast<EventType>(Event::COIN_COLLECTED)));
     EXPECT_NO_THROW(fn(static_cast<EventType>(Event::ENEMY_STOMPED)));
     EXPECT_NO_THROW(fn(static_cast<EventType>(Event::MARIO_DIED)));

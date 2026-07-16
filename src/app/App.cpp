@@ -19,6 +19,7 @@ void App::initialize() {
     view_->getInputHandler()->setActionCommand(vm_->getActionCommand());
 
     vm_->addNotification(view_->getRenderNotification());
+    vm_->addNotification(view_->getAudioNotification());
     view_->pushCurrentViewportSize();
 }
 

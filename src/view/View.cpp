@@ -34,6 +34,7 @@ void GameView::run() {
     float accumulator = 0.0f;
 
     audio_.playBGM("./audio/bgm.ogg");
+    audio_.loadAllSFX();
 
     while (window_.isOpen()) {
         float frameDt = clock.restart().asSeconds();

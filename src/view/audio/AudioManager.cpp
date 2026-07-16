@@ -1,5 +1,7 @@
 #include "view/audio/AudioManager.h"
 
+#include <set>
+
 // ── BGM ────────────────────────────────────────────────────────────
 
 bool AudioManager::playBGM(const std::string& path, float volume) {
@@ -25,6 +27,16 @@ bool AudioManager::isBGMPlaying() const { return bgm_.getStatus() == sf::SoundSo
 bool AudioManager::loadSFX(const std::string& name, const std::string& path) {
     auto& buffer = buffers_[name];
     return buffer.loadFromFile(path);
+}
+
+void AudioManager::loadAllSFX() {
+    const auto& map = eventSFXMap();
+    std::set<std::string> loaded;  // 去重（多个 Event 可共用同一 SFX 文件）
+    for (const auto& [ev, name] : map) {
+        if (loaded.insert(name).second) {
+            loadSFX(name, "./audio/sound/" + name + ".ogg");
+        }
+    }
 }
 
 void AudioManager::playSFX(const std::string& name) {
@@ -65,6 +77,7 @@ const std::unordered_map<EventType, std::string>& AudioManager::eventSFXMap() {
     // SFX name 与 audio/sound/ 下的 .ogg 文件名一致（不含扩展名）
     // 路径格式: ./audio/sound/<name>.ogg
     static const std::unordered_map<EventType, std::string> map = {
+        {static_cast<EventType>(Event::MARIO_JUMPED),       "MARIO_JUMPED"},
         {static_cast<EventType>(Event::COIN_COLLECTED),     "COIN_COLLECTED"},
         {static_cast<EventType>(Event::MUSHROOM_COLLECTED), "MUSHROOM_COLLECTED"},
         {static_cast<EventType>(Event::MARIO_GROWN),        "MUSHROOM_COLLECTED"},  // 吃蘑菇长大
