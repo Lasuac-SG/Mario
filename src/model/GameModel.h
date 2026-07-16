@@ -74,7 +74,7 @@ class GameModel {
   EventTrigger modelTrigger;
 
  private:
-  void notifyChanged();
+  void notifyChanged(Event ev = Event::STATE_CHANGED);  // 细粒度事件；默认为常规帧更新
   void rebuildTiles();
   void resetLevelState();
   void spawnEnemies();

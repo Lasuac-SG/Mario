@@ -14,9 +14,14 @@ ViewModel::~ViewModel() { model_->modelTrigger.remove_notification(funct_callbac
 
 void ViewModel::tick(float dt) { model_->update(dt); }
 
-void ViewModel::onModelChanged(EventType /*ev*/) {
+void ViewModel::onModelChanged(EventType ev) {
     syncFromModel();
-    vmTrigger.fire(static_cast<uint32_t>(ViewModelEvent::RENDER_UPDATE));
+    // 向上转发细粒度事件（与 Model 共用 common 的 Event 词汇，View/未来订阅者据此处理）
+    vmTrigger.fire(ev);
+    // 兼容既有 View 的重绘约定：常规帧更新额外发一次 RENDER_UPDATE 触发渲染
+    if (ev == static_cast<EventType>(Event::STATE_CHANGED)) {
+        vmTrigger.fire(static_cast<EventType>(ViewModelEvent::RENDER_UPDATE));
+    }
 }
 
 void ViewModel::syncFromModel() {
