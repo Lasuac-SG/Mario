@@ -1,4 +1,4 @@
-﻿#include "viewmodel/ViewModel.h"
+#include "viewmodel/ViewModel.h"
 
 #include <algorithm>
 
@@ -14,9 +14,11 @@ ViewModel::~ViewModel() { model_->modelTrigger.remove_notification(funct_callbac
 
 void ViewModel::tick(float dt) { model_->update(dt); }
 
-void ViewModel::onModelChanged(EventType /*ev*/) {
+void ViewModel::onModelChanged(EventType ev) {
     syncFromModel();
-    vmTrigger.fire(static_cast<EventType>(Event::STATE_CHANGED));
+    // 统一向上转发 common::Event 事件；由 View 按事件类型自行决定处理
+    // （渲染只认 STATE_CHANGED，其余细粒度事件留给音效/特效等订阅者）。
+    vmTrigger.fire(ev);
 }
 
 void ViewModel::syncFromModel() {
@@ -57,7 +59,6 @@ void ViewModel::syncFromModel() {
     goal_info_.h = model_->goalH();
     goal_info_.type = TileType::EMPTY;
     won_ = model_->won();
-    game_over_ = model_->gameOver();
 
     hud_info_.score = model_->score();
     hud_info_.coins = model_->coins();
@@ -86,8 +87,8 @@ void ViewModel::setViewport(ViewportDim w, ViewportDim h) {
     viewW_ = w;
     viewH_ = h;
     updateCamera();
+    // 视口变化需重绘：发一个常规帧更新事件驱动 View 渲染
     vmTrigger.fire(static_cast<EventType>(Event::STATE_CHANGED));
 }
 
 void ViewModel::addNotification(Notify_Funtion func) { vmTrigger.add_notification(std::move(func)); }
-

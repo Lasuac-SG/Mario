@@ -1,4 +1,4 @@
-﻿#ifndef MARIO_GAMEMODEL_H
+#ifndef MARIO_GAMEMODEL_H
 #define MARIO_GAMEMODEL_H
 
 #include <cmath>
@@ -23,20 +23,20 @@ class GameModel {
   void update(TimeType dt);
 
   void setMoveLeft(bool on) {
-    if (deathInProgress_ || goalReached_ || gameOver_) return;
+    if (deathInProgress_ || goalReached_) return;
     mario_.setMoveLeft(on);
   }
   void setMoveRight(bool on) {
-    if (deathInProgress_ || goalReached_ || gameOver_) return;
+    if (deathInProgress_ || goalReached_) return;
     mario_.setMoveRight(on);
   }
   void setMoveStop() {
-    if (deathInProgress_ || goalReached_ || gameOver_) return;
+    if (deathInProgress_ || goalReached_) return;
     mario_.stop();
   }
   void jump() {
-    if (deathInProgress_ || goalReached_ || gameOver_) return;
-    mario_.jump();
+    if (deathInProgress_ || goalReached_) return;
+    if (mario_.jump()) notifyChanged(Event::MARIO_JUMPED);  // 真正离地才上报(供跳跃音效)
   }
 
   void reset();
@@ -63,7 +63,6 @@ class GameModel {
   int lives() const { return lives_; }
   int timeRemaining() const { return static_cast<int>(std::ceil(std::max(0.0f, timeRemaining_))); }
   std::string world() const { return "1-1"; }
-  bool gameOver() const { return gameOver_; }
 
   PositionType goalX() const { return goalX_; }
   PositionType goalY() const { return goalY_; }
@@ -75,7 +74,7 @@ class GameModel {
   EventTrigger modelTrigger;
 
  private:
-  void notifyChanged(Event ev = Event::STATE_CHANGED);
+  void notifyChanged(Event ev = Event::STATE_CHANGED);  // 细粒度事件；默认为常规帧更新
   void rebuildTiles();
   void resetLevelState();
   void spawnEnemies();
@@ -106,7 +105,6 @@ class GameModel {
   float timeRemaining_ = 300.0f;
   bool deathInProgress_ = false;
   float deathElapsed_ = 0.0f;
-  bool gameOver_ = false;
 
   PositionType goalX_ = 0.0f;
   PositionType goalY_ = 0.0f;
@@ -116,4 +114,3 @@ class GameModel {
 };
 
 #endif  // MARIO_GAMEMODEL_H
-

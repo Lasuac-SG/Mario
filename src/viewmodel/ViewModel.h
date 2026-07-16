@@ -21,7 +21,6 @@ class ViewModel {
     const bool* getPlayerBig() const noexcept { return &player_big_; }
     const TileInfo* getGoalInfo() const noexcept { return &goal_info_; }
     const bool* getWon() const noexcept { return &won_; }
-    const bool* getGameOver() const noexcept { return &game_over_; }
     const HudInfo* getHudInfo() const noexcept { return &hud_info_; }
     PositionType levelWidthPx() const { return model_->levelWidthPx(); }
     PositionType levelHeightPx() const { return model_->levelHeightPx(); }
@@ -61,7 +60,6 @@ class ViewModel {
     bool player_big_ = false;
     TileInfo goal_info_{};
     bool won_ = false;
-    bool game_over_ = false;
     HudInfo hud_info_{};
 
     PositionType cameraX_ = 0.0f;

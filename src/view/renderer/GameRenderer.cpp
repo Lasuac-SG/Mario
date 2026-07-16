@@ -1,4 +1,4 @@
-﻿#include "GameRenderer.h"
+#include "GameRenderer.h"
 
 namespace {
 
@@ -24,13 +24,11 @@ const std::unordered_map<char, std::vector<std::string>>& glyphs() {
         {'C', {"01111", "10000", "10000", "10000", "10000", "10000", "01111"}},
         {'D', {"11110", "10001", "10001", "10001", "10001", "10001", "11110"}},
         {'E', {"11111", "10000", "10000", "11110", "10000", "10000", "11111"}},
-        {'G', {"01111", "10000", "10000", "10011", "10001", "10001", "01110"}},
         {'I', {"11111", "00100", "00100", "00100", "00100", "00100", "11111"}},
         {'L', {"10000", "10000", "10000", "10000", "10000", "10000", "11111"}},
         {'M', {"10001", "11011", "10101", "10101", "10001", "10001", "10001"}},
         {'N', {"10001", "11001", "10101", "10011", "10001", "10001", "10001"}},
         {'O', {"01110", "10001", "10001", "10001", "10001", "10001", "01110"}},
-        {'P', {"11110", "10001", "10001", "11110", "10000", "10000", "10000"}},
         {'R', {"11110", "10001", "10001", "11110", "10100", "10010", "10001"}},
         {'S', {"01111", "10000", "10000", "01110", "00001", "00001", "11110"}},
         {'T', {"11111", "00100", "00100", "00100", "00100", "00100", "00100"}},
@@ -195,15 +193,7 @@ void GameRenderer::render(sf::RenderWindow& window, float dt) {
     if (won_ && *won_) {
         drawWinOverlay(window);
     }
-    if (gameOver_ && *gameOver_) {
-        drawGameOverOverlay(window);
-    }
     window.display();
-}
-
-bool GameRenderer::isRestartButtonHit(const sf::RenderWindow& window, sf::Vector2f pos) const {
-    if (!gameOver_ || !*gameOver_) return false;
-    return restartButtonBounds(window).contains(pos);
 }
 
 void GameRenderer::drawHud(sf::RenderWindow& window) {
@@ -256,7 +246,7 @@ void GameRenderer::drawPixelText(sf::RenderWindow& window, const std::string& te
                 const float px = cursorX + col * (scale + kPixelGap);
                 const float py = y + row * (scale + kPixelGap);
 
-                pixel.setPosition({px + scale * 0.45f, py + scale * 0.45f});
+                pixel.setPosition({px + scale * 0.35f, py + scale * 0.35f});
                 pixel.setFillColor(sf::Color::Black);
                 window.draw(pixel);
 
@@ -398,7 +388,7 @@ void GameRenderer::drawGoal(sf::RenderWindow& window) {
 }
 
 void GameRenderer::drawWinOverlay(sf::RenderWindow& window) {
-    const sf::View overlayView = window.getDefaultView();
+    const sf::View overlayView = window.getView();
     const sf::Vector2f size = overlayView.getSize();
     const sf::Vector2f center = overlayView.getCenter();
     const float left = center.x - size.x * 0.5f;
@@ -430,79 +420,6 @@ void GameRenderer::drawWinOverlay(sf::RenderWindow& window) {
 
     drawPixelText(window, topText, topX, bandY + 18.0f + bob, kScale);
     drawPixelText(window, bottomText, bottomX, bandY + 62.0f + bob, kScale);
-}
-
-sf::FloatRect GameRenderer::restartButtonBounds(const sf::RenderWindow& window) const {
-    const sf::View overlayView = window.getDefaultView();
-    const sf::Vector2f size = overlayView.getSize();
-    const sf::Vector2f center = overlayView.getCenter();
-    const float left = center.x - size.x * 0.5f;
-    const float top = center.y - size.y * 0.5f;
-
-    const float bandW = std::min(size.x * 0.62f, 420.0f);
-    const float bandH = 64.0f;
-    const float x = left + (size.x - bandW) * 0.5f;
-    const float y = top + size.y * 0.60f;
-    return sf::FloatRect({x, y}, {bandW, bandH});
-}
-
-void GameRenderer::drawGameOverOverlay(sf::RenderWindow& window) {
-    const sf::View overlayView = window.getDefaultView();
-    const sf::Vector2f size = overlayView.getSize();
-    const sf::Vector2f center = overlayView.getCenter();
-    const float left = center.x - size.x * 0.5f;
-    const float top = center.y - size.y * 0.5f;
-
-    sf::RectangleShape black(size);
-    black.setPosition({left, top});
-    black.setFillColor(sf::Color(0, 0, 0, 185));
-    window.draw(black);
-
-    const float titleW = size.x;
-    const float titleH = std::max(132.0f, size.y * 0.20f);
-    const float titleY = top + size.y * 0.28f;
-
-    sf::RectangleShape titleBand({titleW, titleH});
-    titleBand.setPosition({left, titleY});
-    titleBand.setFillColor(sf::Color(0, 0, 0, 220));
-    window.draw(titleBand);
-
-    sf::RectangleShape edge({titleW, 4.0f});
-    edge.setFillColor(sf::Color(245, 245, 245, 230));
-    edge.setPosition({left, titleY});
-    window.draw(edge);
-    edge.setPosition({left, titleY + titleH - 4.0f});
-    window.draw(edge);
-
-    constexpr float titleScale = 5.0f;
-    const std::string topText = "GAME";
-    const std::string bottomText = "OVER";
-    const float topX = left + (titleW - measurePixelText(topText, titleScale)) * 0.5f;
-    const float bottomX = left + (titleW - measurePixelText(bottomText, titleScale)) * 0.5f;
-    drawPixelText(window, topText, topX, titleY + 18.0f, titleScale);
-    drawPixelText(window, bottomText, bottomX, titleY + 72.0f, titleScale);
-
-    const sf::FloatRect button = restartButtonBounds(window);
-    const sf::Vector2f mouse = window.mapPixelToCoords(sf::Mouse::getPosition(window), window.getDefaultView());
-    const bool hovered = button.contains(mouse);
-    const float hoverScale = hovered ? 0.94f : 1.0f;
-    const sf::Vector2f buttonSize(button.size.x * hoverScale, button.size.y * hoverScale);
-    const sf::Vector2f buttonPos(button.position.x + (button.size.x - buttonSize.x) * 0.5f,
-                                 button.position.y + (button.size.y - buttonSize.y) * 0.5f);
-
-    sf::RectangleShape buttonBand(buttonSize);
-    buttonBand.setPosition(buttonPos);
-    buttonBand.setFillColor(hovered ? sf::Color(245, 245, 245, 250) : sf::Color(235, 235, 235, 245));
-    buttonBand.setOutlineThickness(3.0f);
-    buttonBand.setOutlineColor(sf::Color::Black);
-    window.draw(buttonBand);
-
-    constexpr float buttonScale = 3.0f;
-    const float textScale = hovered ? buttonScale * 0.94f : buttonScale;
-    const std::string buttonText = "RESTART";
-    const float textX = buttonPos.x + (buttonSize.x - measurePixelText(buttonText, textScale)) * 0.5f;
-    const float textY = buttonPos.y + (buttonSize.y - 7.0f * (textScale + 1.0f)) * 0.5f;
-    drawPixelText(window, buttonText, textX, textY, textScale);
 }
 
 void GameRenderer::drawTile(sf::RenderWindow& window, const TileInfo& tile) {
@@ -559,7 +476,3 @@ void GameRenderer::drawFallbackTile(sf::RenderWindow& window, const TileInfo& ti
 
     window.draw(rect_);
 }
-
-
-
-

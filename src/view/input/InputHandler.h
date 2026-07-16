@@ -11,7 +11,6 @@ class InputHandler {
     void pollEvents(sf::RenderWindow& window);
 
     void dispatchInput();
-    void triggerRestart();
 
    private:
     ICommandBase* actionCmd_ = nullptr;

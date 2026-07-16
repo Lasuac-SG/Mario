@@ -18,11 +18,9 @@ class GameRenderer {
     void setEnemyInfos(const EnemyInfos* e) { enemyInfos_ = e; }
     void setGoalInfo(const TileInfo* g) { goalInfo_ = g; }
     void setWon(const bool* w) { won_ = w; }
-    void setGameOver(const bool* g) { gameOver_ = g; }
     void setHudInfo(const HudInfo* h) { hudInfo_ = h; }
 
     void render(sf::RenderWindow& window, float dt);
-    bool isRestartButtonHit(const sf::RenderWindow& window, sf::Vector2f pos) const;
 
    private:
     void drawHud(sf::RenderWindow& window);
@@ -33,8 +31,6 @@ class GameRenderer {
     void drawEnemy(sf::RenderWindow& window, const EnemyInfo& enemy);
     void drawGoal(sf::RenderWindow& window);
     void drawWinOverlay(sf::RenderWindow& window);
-    void drawGameOverOverlay(sf::RenderWindow& window);
-    sf::FloatRect restartButtonBounds(const sf::RenderWindow& window) const;
     void drawTile(sf::RenderWindow& window, const TileInfo& tile);
     void drawFallbackTile(sf::RenderWindow& window, const TileInfo& tile);
 
@@ -47,7 +43,6 @@ class GameRenderer {
     const EnemyInfos* enemyInfos_ = nullptr;
     const TileInfo* goalInfo_ = nullptr;
     const bool* won_ = nullptr;
-    const bool* gameOver_ = nullptr;
     const HudInfo* hudInfo_ = nullptr;
 
     float runAnimationTime_ = 0.0f;

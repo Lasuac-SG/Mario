@@ -12,7 +12,6 @@ void App::initialize() {
     view_->setEnemyInfos(vm_->getEnemyInfos());
     view_->setGoalInfo(vm_->getGoalInfo());
     view_->setWon(vm_->getWon());
-    view_->setGameOver(vm_->getGameOver());
     view_->setHudInfo(vm_->getHudInfo());
 
     view_->setNextStepCommand(vm_->getNextStepCommand());
@@ -20,6 +19,7 @@ void App::initialize() {
     view_->getInputHandler()->setActionCommand(vm_->getActionCommand());
 
     vm_->addNotification(view_->getRenderNotification());
+    vm_->addNotification(view_->getAudioNotification());
     view_->pushCurrentViewportSize();
 }
 
