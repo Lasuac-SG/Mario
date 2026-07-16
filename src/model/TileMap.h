@@ -56,15 +56,19 @@ class TileMap {
   PositionType spawnY() const { return spawnRow_ * mario_cfg::kTileSize; }
 
   // 敌人出生点（瓦片格坐标）。文本中的 'G'/'g' 标记，可多只；该格记为 EMPTY。
-  struct EnemySpawn {
+  struct SpawnCell {
     int col;
     int row;
   };
-  const std::vector<EnemySpawn>& enemySpawns() const { return enemySpawns_; }
+  const std::vector<SpawnCell>& enemySpawns() const { return enemySpawns_; }
+
+  // 金币出生点（瓦片格坐标）。文本中的 'C'/'c' 标记，可多枚；该格记为 EMPTY。
+  const std::vector<SpawnCell>& coinSpawns() const { return coinSpawns_; }
 
  private:
   std::vector<TileType> tiles_;
-  std::vector<EnemySpawn> enemySpawns_;
+  std::vector<SpawnCell> enemySpawns_;
+  std::vector<SpawnCell> coinSpawns_;
   int cols_ = 0;
   int rows_ = 0;
   int spawnCol_ = 1;

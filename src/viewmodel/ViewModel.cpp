@@ -39,6 +39,13 @@ void ViewModel::syncFromModel() {
         enemy_infos_.push_back({e.x(), e.y(), e.width(), e.height(), e.facing()});
     }
 
+    // 仅同步未拾取金币（复用 TileInfo 承载矩形；已拾取的不下发，View 即不再绘制）
+    coin_infos_.clear();
+    for (const auto& c : model_->coinItems()) {
+        if (!c.alive) continue;
+        coin_infos_.push_back({c.x, c.y, c.w, c.h, TileType::EMPTY});
+    }
+
     hud_info_.score = model_->score();
     hud_info_.coins = model_->coins();
     hud_info_.lives = model_->lives();
