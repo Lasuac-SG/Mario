@@ -14,6 +14,12 @@ ViewModel::~ViewModel() { model_->modelTrigger.remove_notification(funct_callbac
 
 void ViewModel::tick(float dt) { model_->update(dt); }
 
+void ViewModel::startGame(int mapId) {
+    model_->startGame(mapId);  // 载入所选地图并复位(经 modelTrigger 回调 syncFromModel)
+    started_ = true;
+    vmTrigger.fire(static_cast<EventType>(Event::STATE_CHANGED));  // 离开菜单并绘制新关卡
+}
+
 void ViewModel::onModelChanged(EventType ev) {
     syncFromModel();
     // 统一向上转发 common::Event 事件；由 View 按事件类型自行决定处理

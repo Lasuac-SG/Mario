@@ -22,6 +22,7 @@ class ViewModel {
     const TileInfo* getGoalInfo() const noexcept { return &goal_info_; }
     const bool* getWon() const noexcept { return &won_; }
     const bool* getGameOver() const noexcept { return &game_over_; }  // 命数耗尽，供 View 播 GameOver/重开按钮
+    const bool* getGameStarted() const noexcept { return &started_; }  // false=开始菜单, true=已选图进入游戏
     const HudInfo* getHudInfo() const noexcept { return &hud_info_; }
     PositionType levelWidthPx() const noexcept { return model_->levelWidthPx(); }
     PositionType levelHeightPx() const noexcept { return model_->levelHeightPx(); }
@@ -42,11 +43,17 @@ class ViewModel {
         return [this](ViewportDim w, ViewportDim h) { this->setViewport(w, h); };
     }
 
+    // 开始菜单点击"开始游戏"并选定地图(1/2)后调用：载入该地图并进入游戏。退出游戏为纯 View 行为(关窗)。
+    std::function<void(int)> getStartGameCommand() {
+        return [this](int mapId) { this->startGame(mapId); };
+    }
+
    private:
     void onModelChanged(EventType ev);
     void syncFromModel();
     void updateCamera() noexcept;
     void tick(float dt);
+    void startGame(int mapId);
 
     GameModel* model_;
     EventTrigger vmTrigger;
@@ -62,6 +69,7 @@ class ViewModel {
     TileInfo goal_info_{};
     bool won_ = false;
     bool game_over_ = false;
+    bool started_ = false;
     HudInfo hud_info_{};
 
     PositionType cameraX_ = 0.0f;

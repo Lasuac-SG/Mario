@@ -40,6 +40,7 @@ class GameModel {
   }
 
   void reset();
+  void startGame(int mapId);  // 从开始菜单选择地图(1/2)后载入对应关卡并开始
   bool loadLevelFromFile(const std::string& path);
   bool testLoadLevelFromString(const std::string& text);
 
