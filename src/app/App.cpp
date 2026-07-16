@@ -10,6 +10,8 @@ void App::initialize() {
     view_->setPlayerInfo(vm_->getPlayerInfo());
     view_->setTileInfos(vm_->getTileInfos());
     view_->setCoinInfos(vm_->getCoinInfos());
+    view_->setMushroomInfos(vm_->getMushroomInfos());
+    view_->setPlayerBig(vm_->getPlayerBig());
     view_->setEnemyInfos(vm_->getEnemyInfos());
     view_->setGoalInfo(vm_->getGoalInfo());
     view_->setWon(vm_->getWon());

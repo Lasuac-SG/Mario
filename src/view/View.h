@@ -19,6 +19,8 @@ class GameView {
     void setPlayerInfo(const PlayerInfo* p) { renderer_.setPlayerInfo(p); }
     void setTileInfos(const TileInfos* t) { renderer_.setTileInfos(t); }
     void setCoinInfos(const TileInfos* c) { renderer_.setCoinInfos(c); }
+    void setMushroomInfos(const TileInfos* m) { renderer_.setMushroomInfos(m); }
+    void setPlayerBig(const bool* b) { renderer_.setPlayerBig(b); }
     void setEnemyInfos(const EnemyInfos* e) { renderer_.setEnemyInfos(e); }
     void setGoalInfo(const TileInfo* g) { renderer_.setGoalInfo(g); }
     void setWon(const bool* w) { renderer_.setWon(w); }

@@ -16,6 +16,8 @@ class GameRenderer {
     void setPlayerInfo(const PlayerInfo* p) { playerInfo_ = p; }
     void setTileInfos(const TileInfos* t) { tileInfos_ = t; }
     void setCoinInfos(const TileInfos* c) { coinInfos_ = c; }
+    void setMushroomInfos(const TileInfos* m) { mushroomInfos_ = m; }
+    void setPlayerBig(const bool* b) { playerBig_ = b; }
     void setEnemyInfos(const EnemyInfos* e) { enemyInfos_ = e; }
     void setGoalInfo(const TileInfo* g) { goalInfo_ = g; }
     void setWon(const bool* w) { won_ = w; }
@@ -30,6 +32,7 @@ class GameRenderer {
     float measurePixelText(const std::string& text, float scale) const;
     void drawPlayer(sf::RenderWindow& window, float dt);
     void drawCoin(sf::RenderWindow& window, const TileInfo& coin);
+    void drawMushroom(sf::RenderWindow& window, const TileInfo& mushroom);
     void drawEnemy(sf::RenderWindow& window, const EnemyInfo& enemy);
     void drawGoal(sf::RenderWindow& window);
     void drawWinOverlay(sf::RenderWindow& window);
@@ -43,6 +46,8 @@ class GameRenderer {
     const PlayerInfo* playerInfo_ = nullptr;
     const TileInfos* tileInfos_ = nullptr;
     const TileInfos* coinInfos_ = nullptr;
+    const TileInfos* mushroomInfos_ = nullptr;
+    const bool* playerBig_ = nullptr;
     const EnemyInfos* enemyInfos_ = nullptr;
     const TileInfo* goalInfo_ = nullptr;
     const bool* won_ = nullptr;
