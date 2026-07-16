@@ -1,4 +1,4 @@
-#include "model/GameModel.h"
+﻿#include "model/GameModel.h"
 
 #include <algorithm>
 #include <cmath>
@@ -19,7 +19,7 @@ constexpr PositionType kGoalPoleHeight = 160.0f;
 GameModel::GameModel() { reset(); }
 
 void GameModel::update(TimeType dt) {
-  if (goalReached_) {
+  if (goalReached_ || gameOver_) {
     notifyChanged();
     return;
   }
@@ -36,8 +36,15 @@ void GameModel::update(TimeType dt) {
     }
 
     if (deathElapsed_ >= kDeathSequenceSeconds) {
-      lives_ = std::max(0, lives_ - 1);
-      respawnAfterDeath();
+      if (lives_ > 1) {
+        lives_ -= 1;
+        respawnAfterDeath();
+      } else {
+        lives_ = 0;
+        deathInProgress_ = false;
+        gameOver_ = true;
+        mario_.stop();
+      }
     }
 
     notifyChanged();
@@ -80,7 +87,7 @@ void GameModel::reset() {
   if (!levelFile_.empty()) tileMap_.loadFromFile(levelFile_);
   lives_ = kInitialLives;
   resetLevelState();
-  notifyChanged(Event::LEVEL_RESET);
+  notifyChanged();
 }
 
 bool GameModel::loadLevelFromFile(const std::string& path) {
@@ -88,7 +95,7 @@ bool GameModel::loadLevelFromFile(const std::string& path) {
   levelFile_ = path;
   lives_ = kInitialLives;
   resetLevelState();
-  notifyChanged(Event::LEVEL_LOADED);
+  notifyChanged();
   return true;
 }
 
@@ -97,7 +104,7 @@ bool GameModel::testLoadLevelFromString(const std::string& text) {
   levelFile_.clear();
   lives_ = kInitialLives;
   resetLevelState();
-  notifyChanged(Event::LEVEL_LOADED);
+  notifyChanged();
   return true;
 }
 
@@ -107,6 +114,7 @@ void GameModel::resetLevelState() {
   timeRemaining_ = kInitialTimeSeconds;
   deathInProgress_ = false;
   deathElapsed_ = 0.0f;
+  gameOver_ = false;
   goalReached_ = false;
   mario_.reset(tileMap_.spawnX(), tileMap_.spawnY());
   rebuildTiles();
@@ -131,10 +139,10 @@ void GameModel::rebuildTiles() {
 }
 
 void GameModel::beginDeath() {
+  if (deathInProgress_ || gameOver_) return;
   deathInProgress_ = true;
   deathElapsed_ = 0.0f;
   mario_.startDeathFall();
-  notifyChanged(Event::MARIO_DIED);
 }
 
 void GameModel::respawnAfterDeath() {
@@ -198,7 +206,6 @@ void GameModel::collectCoins() {
       c.alive = false;
       ++coins_;
       score_ += mario_cfg::kCoinScore;
-      notifyChanged(Event::COIN_COLLECTED);
     }
   }
 }
@@ -223,10 +230,8 @@ bool GameModel::resolveEnemyCollisions() {
       e.kill();
       mario_.bounce(mario_cfg::kStompBounceSpeed);
       score_ += mario_cfg::kStompScore;
-      notifyChanged(Event::ENEMY_STOMPED);
     } else if (mario_.big()) {
       mario_.shrink();
-      notifyChanged(Event::MARIO_SHRUNK);
       return false;
     } else {
       return true;
@@ -247,13 +252,11 @@ void GameModel::handleBlockBump() {
       const int key = row * tileMap_.cols() + c;
       if (usedQuestions_.insert(key).second) {
         spawnMushroomAt(c, row);
-        notifyChanged(Event::BLOCK_BUMPED);
       }
     } else if (t == TileType::BRICK && mario_.big()) {
       tileMap_.setTile(c, row, TileType::EMPTY);
       score_ += mario_cfg::kBrickScore;
       tilesDirty = true;
-      notifyChanged(Event::BRICK_BROKEN);
     }
   }
   if (tilesDirty) rebuildTiles();
@@ -279,11 +282,9 @@ void GameModel::collectMushrooms() {
         mx < m.x() + m.width() && mx + mw > m.x() && my < m.y() + m.height() && my + mh > m.y();
     if (overlap) {
       m.consume();
-      notifyChanged(Event::MUSHROOM_COLLECTED);
       if (!mario_.big()) {
         mario_.grow();
         score_ += mario_cfg::kMushroomScore;
-        notifyChanged(Event::MARIO_GROWN);
       }
     }
   }
@@ -305,9 +306,10 @@ void GameModel::beginGoalClear() {
   goalReached_ = true;
   mario_.stop();
   score_ += kGoalScoreBonus;
-  notifyChanged(Event::GOAL_REACHED);
 }
 
 void GameModel::notifyChanged(Event ev) {
   modelTrigger.fire(static_cast<EventType>(ev));
 }
+
+
