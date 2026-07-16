@@ -2,7 +2,7 @@
 
 namespace {
 
-constexpr const char* kTileAtlas = "picture/mario/地图/map.png";
+constexpr const char* kTileAtlas = "picture/mario/map/map.png";
 constexpr const char* kEnemyFrameA = "picture/mario/enemy/monster_44.png";
 constexpr const char* kEnemyFrameB = "picture/mario/enemy/monster_45.png";
 const sf::IntRect kPlatformRect({0, 360}, {80, 40});
@@ -32,8 +32,10 @@ const std::unordered_map<char, std::vector<std::string>>& glyphs() {
         {'R', {"11110", "10001", "10001", "11110", "10100", "10010", "10001"}},
         {'S', {"01111", "10000", "10000", "01110", "00001", "00001", "11110"}},
         {'T', {"11111", "00100", "00100", "00100", "00100", "00100", "00100"}},
+        {'U', {"10001", "10001", "10001", "10001", "10001", "10001", "01110"}},
         {'V', {"10001", "10001", "10001", "10001", "10001", "01010", "00100"}},
         {'W', {"10001", "10001", "10001", "10101", "10101", "10101", "01010"}},
+        {'Y', {"10001", "10001", "01010", "00100", "00100", "00100", "00100"}},
         {'0', {"01110", "10001", "10011", "10101", "11001", "10001", "01110"}},
         {'1', {"00100", "01100", "00100", "00100", "00100", "00100", "01110"}},
         {'2', {"01110", "10001", "00001", "00010", "00100", "01000", "11111"}},
@@ -52,10 +54,10 @@ const std::unordered_map<char, std::vector<std::string>>& glyphs() {
 
 const char* choosePlayerFrame(MarioState state, float runAnimationTime) {
     static constexpr const char* kRunFrames[] = {
-        "picture/mario/人物/player_1/red_9.png",
-        "picture/mario/人物/player_1/red_10.png",
-        "picture/mario/人物/player_1/red_11.png",
-        "picture/mario/人物/player_1/red_12.png",
+        "picture/mario/player_1/red_9.png",
+        "picture/mario/player_1/red_10.png",
+        "picture/mario/player_1/red_11.png",
+        "picture/mario/player_1/red_12.png",
     };
 
     switch (state) {
@@ -66,14 +68,14 @@ const char* choosePlayerFrame(MarioState state, float runAnimationTime) {
             return kRunFrames[frame];
         }
         case MarioState::JUMPING:
-            return "picture/mario/人物/player_1/red_6.png";
+            return "picture/mario/player_1/red_6.png";
         case MarioState::FALLING:
-            return "picture/mario/人物/player_1/red_7.png";
+            return "picture/mario/player_1/red_7.png";
         case MarioState::DEAD:
-            return "picture/mario/人物/player_1/red_27.png";
+            return "picture/mario/player_1/red_27.png";
         case MarioState::IDLE:
         default:
-            return "picture/mario/人物/player_1/red_1.png";
+            return "picture/mario/player_1/red_1.png";
     }
 }
 
@@ -159,6 +161,12 @@ GameRenderer::GameRenderer() { rect_.setOutlineThickness(0.0f); }
 
 void GameRenderer::render(sf::RenderWindow& window, float dt) {
     enemyAnimationTime_ += std::max(0.0f, dt);
+    if (won_ && *won_) {
+        winAnimationTime_ += std::max(0.0f, dt);
+    } else {
+        winAnimationTime_ = 0.0f;
+    }
+
     window.clear(sf::Color(107, 140, 255));
 
     const auto viewSize = effectiveViewportSize(window.getSize());
@@ -170,6 +178,8 @@ void GameRenderer::render(sf::RenderWindow& window, float dt) {
         drawTile(window, tile);
     }
 
+    drawGoal(window);
+
     if (enemyInfos_) {
         for (const auto& enemy : *enemyInfos_) {
             drawEnemy(window, enemy);
@@ -180,6 +190,9 @@ void GameRenderer::render(sf::RenderWindow& window, float dt) {
 
     window.setView(window.getDefaultView());
     drawHud(window);
+    if (won_ && *won_) {
+        drawWinOverlay(window);
+    }
     window.display();
 }
 
@@ -329,6 +342,84 @@ void GameRenderer::drawEnemy(sf::RenderWindow& window, const EnemyInfo& enemy) {
     }
 
     window.draw(sprite);
+}
+
+void GameRenderer::drawGoal(sf::RenderWindow& window) {
+    if (!goalInfo_ || goalInfo_->w <= 0.0f || goalInfo_->h <= 0.0f) return;
+
+    const float poleX = goalInfo_->x + goalInfo_->w * 0.45f;
+    const float poleY = goalInfo_->y;
+    const float poleW = std::max(4.0f, goalInfo_->w * 0.18f);
+    const float poleH = goalInfo_->h;
+
+    sf::RectangleShape pole({poleW, poleH});
+    pole.setPosition({poleX, poleY});
+    pole.setFillColor(sf::Color(234, 236, 238));
+    pole.setOutlineThickness(-1.0f);
+    pole.setOutlineColor(sf::Color(130, 140, 150));
+    window.draw(pole);
+
+    sf::CircleShape topper(std::max(5.0f, goalInfo_->w * 0.22f));
+    topper.setFillColor(sf::Color(245, 245, 210));
+    topper.setOutlineThickness(-1.0f);
+    topper.setOutlineColor(sf::Color(130, 140, 150));
+    topper.setPosition({poleX - topper.getRadius() + poleW * 0.5f, poleY - topper.getRadius() * 1.2f});
+    window.draw(topper);
+
+    const float flagW = std::max(20.0f, goalInfo_->w * 1.4f);
+    const float flagH = std::max(16.0f, goalInfo_->h * 0.12f);
+    const float slide = (won_ && *won_) ? std::min(goalInfo_->h - flagH - 10.0f, winAnimationTime_ * 90.0f) : 0.0f;
+    const float flagY = poleY + 8.0f + slide;
+
+    sf::ConvexShape flag;
+    flag.setPointCount(3);
+    flag.setPoint(0, {poleX + poleW, flagY});
+    flag.setPoint(1, {poleX + poleW + flagW, flagY + flagH * 0.5f});
+    flag.setPoint(2, {poleX + poleW, flagY + flagH});
+    flag.setFillColor(sf::Color(220, 52, 52));
+    flag.setOutlineThickness(-1.0f);
+    flag.setOutlineColor(sf::Color(120, 20, 20));
+    window.draw(flag);
+
+    sf::RectangleShape base({goalInfo_->w + 10.0f, 6.0f});
+    base.setPosition({goalInfo_->x - 5.0f, goalInfo_->y + goalInfo_->h - 6.0f});
+    base.setFillColor(sf::Color(160, 82, 45));
+    window.draw(base);
+}
+
+void GameRenderer::drawWinOverlay(sf::RenderWindow& window) {
+    const sf::View overlayView = window.getView();
+    const sf::Vector2f size = overlayView.getSize();
+    const sf::Vector2f center = overlayView.getCenter();
+    const float left = center.x - size.x * 0.5f;
+    const float top = center.y - size.y * 0.5f;
+
+    const float bandW = size.x;
+    const float bandH = std::max(110.0f, size.y * 0.15f);
+    const float bandY = top + size.y * 0.32f;
+
+    sf::RectangleShape shade({bandW, bandH});
+    shade.setPosition({left, bandY});
+    shade.setFillColor(sf::Color(0, 0, 0, 185));
+    window.draw(shade);
+
+    sf::RectangleShape edge({bandW, 4.0f});
+    edge.setFillColor(sf::Color(245, 245, 245, 210));
+    edge.setPosition({left, bandY});
+    window.draw(edge);
+    edge.setPosition({left, bandY + bandH - 4.0f});
+    window.draw(edge);
+
+    constexpr float kScale = 4.0f;
+    const float bob = std::sin(winAnimationTime_ * 3.5f) * 2.0f;
+
+    const std::string topText = "YOU";
+    const std::string bottomText = "WIN";
+    const float topX = left + (bandW - measurePixelText(topText, kScale)) * 0.5f;
+    const float bottomX = left + (bandW - measurePixelText(bottomText, kScale)) * 0.5f;
+
+    drawPixelText(window, topText, topX, bandY + 18.0f + bob, kScale);
+    drawPixelText(window, bottomText, bottomX, bandY + 62.0f + bob, kScale);
 }
 
 void GameRenderer::drawTile(sf::RenderWindow& window, const TileInfo& tile) {

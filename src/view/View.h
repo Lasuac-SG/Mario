@@ -17,6 +17,8 @@ class GameView {
     void setPlayerInfo(const PlayerInfo* p) { renderer_.setPlayerInfo(p); }
     void setTileInfos(const TileInfos* t) { renderer_.setTileInfos(t); }
     void setEnemyInfos(const EnemyInfos* e) { renderer_.setEnemyInfos(e); }
+    void setGoalInfo(const TileInfo* g) { renderer_.setGoalInfo(g); }
+    void setWon(const bool* w) { renderer_.setWon(w); }
     void setHudInfo(const HudInfo* h) { renderer_.setHudInfo(h); }
 
     void setNextStepCommand(std::function<void(float)>&& cmd) { nextStepCommand_ = std::move(cmd); }
