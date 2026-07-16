@@ -37,6 +37,8 @@ class GameModel {
 
   void reset();
   bool loadLevelFromFile(const std::string& path);
+  /// 仅用于单元测试：从字符串加载关卡，不依赖外部文件。
+  bool testLoadLevelFromString(const std::string& text);
 
   PositionType playerX() const { return mario_.x(); }
   PositionType playerY() const { return mario_.y(); }

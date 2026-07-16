@@ -9,3 +9,5 @@ set(
 find_package(SFML COMPONENTS Graphics Window System CONFIG REQUIRED)
 
 add_subdirectory(src)
+
+add_subdirectory(tests)
