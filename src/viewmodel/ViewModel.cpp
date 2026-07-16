@@ -32,27 +32,31 @@ void ViewModel::syncFromModel() {
         tile_infos_.push_back({tile.x, tile.y, tile.w, tile.h, tile.type});
     }
 
-    // 仅同步存活敌人（绝对像素坐标；死亡的不下发，View 即不再绘制）
     enemy_infos_.clear();
     for (const auto& e : model_->enemies()) {
         if (!e.alive()) continue;
         enemy_infos_.push_back({e.x(), e.y(), e.width(), e.height(), e.facing()});
     }
 
-    // 仅同步未拾取金币（复用 TileInfo 承载矩形；已拾取的不下发，View 即不再绘制）
     coin_infos_.clear();
     for (const auto& c : model_->coinItems()) {
         if (!c.alive) continue;
         coin_infos_.push_back({c.x, c.y, c.w, c.h, TileType::EMPTY});
     }
 
-    // 仅同步未吃掉的变大蘑菇（复用 TileInfo 承载矩形）
     mushroom_infos_.clear();
     for (const auto& m : model_->mushrooms()) {
         if (!m.active()) continue;
         mushroom_infos_.push_back({m.x(), m.y(), m.width(), m.height(), TileType::EMPTY});
     }
     player_big_ = model_->playerBig();
+
+    goal_info_.x = model_->goalX();
+    goal_info_.y = model_->goalY();
+    goal_info_.w = model_->goalW();
+    goal_info_.h = model_->goalH();
+    goal_info_.type = TileType::EMPTY;
+    won_ = model_->won();
 
     hud_info_.score = model_->score();
     hud_info_.coins = model_->coins();
