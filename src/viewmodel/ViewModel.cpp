@@ -16,12 +16,9 @@ void ViewModel::tick(float dt) { model_->update(dt); }
 
 void ViewModel::onModelChanged(EventType ev) {
     syncFromModel();
-    // 向上转发细粒度事件（与 Model 共用 common 的 Event 词汇，View/未来订阅者据此处理）
+    // 统一向上转发 common::Event 事件；由 View 按事件类型自行决定处理
+    // （渲染只认 STATE_CHANGED，其余细粒度事件留给音效/特效等订阅者）。
     vmTrigger.fire(ev);
-    // 兼容既有 View 的重绘约定：常规帧更新额外发一次 RENDER_UPDATE 触发渲染
-    if (ev == static_cast<EventType>(Event::STATE_CHANGED)) {
-        vmTrigger.fire(static_cast<EventType>(ViewModelEvent::RENDER_UPDATE));
-    }
 }
 
 void ViewModel::syncFromModel() {
@@ -90,7 +87,8 @@ void ViewModel::setViewport(ViewportDim w, ViewportDim h) {
     viewW_ = w;
     viewH_ = h;
     updateCamera();
-    vmTrigger.fire(static_cast<uint32_t>(ViewModelEvent::RENDER_UPDATE));
+    // 视口变化需重绘：发一个常规帧更新事件驱动 View 渲染
+    vmTrigger.fire(static_cast<EventType>(Event::STATE_CHANGED));
 }
 
 void ViewModel::addNotification(Notify_Funtion func) { vmTrigger.add_notification(std::move(func)); }

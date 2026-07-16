@@ -84,7 +84,8 @@ void GameView::NextStep(float dt) {
 
 Notify_Funtion GameView::getRenderNotification() {
     return [this](EventType id) {
-        if (id == static_cast<EventType>(ViewModelEvent::RENDER_UPDATE)) {
+        // 只在常规帧更新(帧末的完整状态)时渲染；其余细粒度事件是帧中途/点事件，不驱动重绘。
+        if (id == static_cast<EventType>(Event::STATE_CHANGED)) {
             renderer_.render(window_, lastDt_);
         }
     };

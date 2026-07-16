@@ -36,7 +36,7 @@ class GameModel {
   }
   void jump() {
     if (deathInProgress_ || goalReached_) return;
-    mario_.jump();
+    if (mario_.jump()) notifyChanged(Event::MARIO_JUMPED);  // 真正离地才上报(供跳跃音效)
   }
 
   void reset();
