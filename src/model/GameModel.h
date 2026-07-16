@@ -38,6 +38,10 @@ class GameModel {
     if (deathInProgress_ || goalReached_ || gameOver_) return;
     if (mario_.jump()) notifyChanged(Event::MARIO_JUMPED);  // 真正离地才上报(供跳跃音效)
   }
+  void endJump() noexcept {  // 松开跳键：可变跳跃高度(松键截断)。仅调速度，无通知/分配，故 noexcept
+    if (deathInProgress_ || goalReached_ || gameOver_) return;
+    mario_.endJump();
+  }
 
   void reset();
   void startGame(int mapId);  // 从开始菜单选择地图(1/2)后载入对应关卡并开始

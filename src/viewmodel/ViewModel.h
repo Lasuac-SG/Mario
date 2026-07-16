@@ -48,6 +48,11 @@ class ViewModel {
         return [this](int mapId) { this->startGame(mapId); };
     }
 
+    // 松开跳键时调用(空格/上键 KeyReleased)：实现可变跳跃高度——按得越久跳得越高。
+    std::function<void()> getJumpReleaseCommand() {
+        return [this] { model_->endJump(); };
+    }
+
    private:
     void onModelChanged(EventType ev);
     void syncFromModel();
