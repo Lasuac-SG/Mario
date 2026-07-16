@@ -7,6 +7,7 @@ add_executable(mario
         viewmodel/ViewModel.cpp
         viewmodel/command/Commands.cpp
         view/View.cpp
+        view/audio/AudioManager.cpp
         view/input/InputHandler.cpp
         view/renderer/GameRenderer.cpp
         app/App.cpp

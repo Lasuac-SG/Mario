@@ -2,6 +2,7 @@
 #define MARIO_VIEW_H
 
 #include "common/Type.h"
+#include "view/audio/AudioManager.h"
 #include "view/input/InputHandler.h"
 #include "view/renderer/GameRenderer.h"
 
@@ -32,6 +33,7 @@ class GameView {
     void NextStep(float dt);
 
     sf::RenderWindow window_;
+    AudioManager audio_;
     InputHandler input_;
     GameRenderer renderer_;
     std::function<void(float)> nextStepCommand_;
