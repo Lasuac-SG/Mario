@@ -1,4 +1,4 @@
-﻿#include "GameRenderer.h"
+#include "GameRenderer.h"
 
 namespace {
 
@@ -21,6 +21,7 @@ sf::Vector2f effectiveViewportSize(const sf::Vector2u& windowSize) {
 const std::unordered_map<char, std::vector<std::string>>& glyphs() {
     static const std::unordered_map<char, std::vector<std::string>> kGlyphs = {
         {'A', {"01110", "10001", "10001", "11111", "10001", "10001", "10001"}},
+        {'B', {"11110", "10001", "10001", "11110", "10001", "10001", "11110"}},
         {'C', {"01111", "10000", "10000", "10000", "10000", "10000", "01111"}},
         {'D', {"11110", "10001", "10001", "10001", "10001", "10001", "11110"}},
         {'E', {"11111", "10000", "10000", "11110", "10000", "10000", "11111"}},
@@ -30,6 +31,7 @@ const std::unordered_map<char, std::vector<std::string>>& glyphs() {
         {'M', {"10001", "11011", "10101", "10101", "10001", "10001", "10001"}},
         {'N', {"10001", "11001", "10101", "10011", "10001", "10001", "10001"}},
         {'O', {"01110", "10001", "10001", "10001", "10001", "10001", "01110"}},
+        {'Q', {"01110", "10001", "10001", "10001", "10101", "10010", "01101"}},
         {'R', {"11110", "10001", "10001", "11110", "10100", "10010", "10001"}},
         {'S', {"01111", "10000", "10000", "01110", "00001", "00001", "11110"}},
         {'T', {"11111", "00100", "00100", "00100", "00100", "00100", "00100"}},
@@ -53,20 +55,46 @@ const std::unordered_map<char, std::vector<std::string>>& glyphs() {
     return kGlyphs;
 }
 
-const char* choosePlayerFrame(MarioState state, float runAnimationTime) {
-    static constexpr const char* kRunFrames[] = {
+const char* choosePlayerFrame(bool isBig, MarioState state, float runAnimationTime) {
+    static constexpr const char* kSmallRunFrames[] = {
         "picture/mario/player_1/red_9.png",
         "picture/mario/player_1/red_10.png",
         "picture/mario/player_1/red_11.png",
         "picture/mario/player_1/red_12.png",
     };
+    static constexpr const char* kBigRunFrames[] = {
+        "picture/mario/player_1_big/red_20.png",
+        "picture/mario/player_1_big/red_21.png",
+        "picture/mario/player_1_big/red_22.png",
+        "picture/mario/player_1_big/red_23.png",
+    };
+
+    if (isBig) {
+        switch (state) {
+            case MarioState::RUNNING: {
+                constexpr float kRunFrameDuration = 0.09f;
+                const int frameCount = static_cast<int>(std::size(kBigRunFrames));
+                const int frame = static_cast<int>(runAnimationTime / kRunFrameDuration) % frameCount;
+                return kBigRunFrames[frame];
+            }
+            case MarioState::JUMPING:
+                return "picture/mario/player_1_big/red_18.png";
+            case MarioState::FALLING:
+                return "picture/mario/player_1_big/red_19.png";
+            case MarioState::DEAD:
+                return "picture/mario/player_1/red_27.png";
+            case MarioState::IDLE:
+            default:
+                return "picture/mario/player_1_big/red_13.png";
+        }
+    }
 
     switch (state) {
         case MarioState::RUNNING: {
             constexpr float kRunFrameDuration = 0.09f;
-            const int frameCount = static_cast<int>(std::size(kRunFrames));
-            int frame = static_cast<int>(runAnimationTime / kRunFrameDuration) % frameCount;
-            return kRunFrames[frame];
+            const int frameCount = static_cast<int>(std::size(kSmallRunFrames));
+            const int frame = static_cast<int>(runAnimationTime / kRunFrameDuration) % frameCount;
+            return kSmallRunFrames[frame];
         }
         case MarioState::JUMPING:
             return "picture/mario/player_1/red_6.png";
@@ -156,6 +184,63 @@ void drawPipe(sf::RenderWindow& window, const TileInfo& tile) {
     window.draw(highlight);
 }
 
+void drawQuestionBlock(sf::RenderWindow& window, const TileInfo& tile) {
+    sf::RectangleShape block({tile.w, tile.h});
+    block.setPosition({tile.x, tile.y});
+    block.setFillColor(sf::Color(239, 163, 44));
+    block.setOutlineThickness(-2.0f);
+    block.setOutlineColor(sf::Color(141, 72, 17));
+    window.draw(block);
+
+    sf::RectangleShape dot({std::max(4.0f, tile.w * 0.12f), std::max(4.0f, tile.h * 0.12f)});
+    dot.setFillColor(sf::Color(88, 44, 8));
+    dot.setPosition({tile.x + tile.w * 0.16f, tile.y + tile.h * 0.16f});
+    window.draw(dot);
+    dot.setPosition({tile.x + tile.w * 0.72f, tile.y + tile.h * 0.16f});
+    window.draw(dot);
+    dot.setPosition({tile.x + tile.w * 0.16f, tile.y + tile.h * 0.72f});
+    window.draw(dot);
+    dot.setPosition({tile.x + tile.w * 0.72f, tile.y + tile.h * 0.72f});
+    window.draw(dot);
+
+    sf::RectangleShape q;
+    q.setFillColor(sf::Color(88, 44, 8));
+    q.setPosition({tile.x + tile.w * 0.34f, tile.y + tile.h * 0.20f});
+    q.setSize({tile.w * 0.24f, tile.h * 0.12f});
+    window.draw(q);
+    q.setPosition({tile.x + tile.w * 0.56f, tile.y + tile.h * 0.30f});
+    q.setSize({tile.w * 0.10f, tile.h * 0.18f});
+    window.draw(q);
+    q.setPosition({tile.x + tile.w * 0.42f, tile.y + tile.h * 0.42f});
+    q.setSize({tile.w * 0.16f, tile.h * 0.10f});
+    window.draw(q);
+    q.setPosition({tile.x + tile.w * 0.42f, tile.y + tile.h * 0.58f});
+    q.setSize({tile.w * 0.10f, tile.h * 0.10f});
+    window.draw(q);
+}
+
+void drawBrickBlock(sf::RenderWindow& window, const TileInfo& tile) {
+    sf::RectangleShape block({tile.w, tile.h});
+    block.setPosition({tile.x, tile.y});
+    block.setFillColor(sf::Color(177, 96, 38));
+    block.setOutlineThickness(-2.0f);
+    block.setOutlineColor(sf::Color(102, 52, 18));
+    window.draw(block);
+
+    sf::RectangleShape mortar;
+    mortar.setFillColor(sf::Color(110, 56, 22));
+    mortar.setPosition({tile.x, tile.y + tile.h * 0.48f});
+    mortar.setSize({tile.w, tile.h * 0.08f});
+    window.draw(mortar);
+
+    mortar.setPosition({tile.x + tile.w * 0.32f, tile.y});
+    mortar.setSize({tile.w * 0.08f, tile.h * 0.48f});
+    window.draw(mortar);
+    mortar.setPosition({tile.x + tile.w * 0.64f, tile.y + tile.h * 0.48f});
+    mortar.setSize({tile.w * 0.08f, tile.h * 0.52f});
+    window.draw(mortar);
+}
+
 }  // namespace
 
 GameRenderer::GameRenderer() { rect_.setOutlineThickness(0.0f); }
@@ -185,6 +270,12 @@ void GameRenderer::render(sf::RenderWindow& window, float dt) {
     if (coinInfos_) {
         for (const auto& coin : *coinInfos_) {
             drawCoin(window, coin);
+        }
+    }
+
+    if (mushroomInfos_) {
+        for (const auto& mushroom : *mushroomInfos_) {
+            drawMushroom(window, mushroom);
         }
     }
 
@@ -296,7 +387,8 @@ void GameRenderer::drawPlayer(sf::RenderWindow& window, float dt) {
     }
     lastPlayerState_ = player.state;
 
-    const sf::Texture& texture = assets_.load(choosePlayerFrame(player.state, runAnimationTime_));
+    const bool isBig = playerBig_ && *playerBig_;
+    const sf::Texture& texture = assets_.load(choosePlayerFrame(isBig, player.state, runAnimationTime_));
     if (texture.getSize().x == 0 || texture.getSize().y == 0) {
         rect_.setTexture(nullptr, true);
         rect_.setSize(sf::Vector2f(player.width, player.height));
@@ -356,6 +448,38 @@ void GameRenderer::drawCoin(sf::RenderWindow& window, const TileInfo& coin) {
         window.draw(edge);
     }
 }
+
+void GameRenderer::drawMushroom(sf::RenderWindow& window, const TileInfo& mushroom) {
+    const float centerX = mushroom.x + mushroom.w * 0.5f;
+    const float footY = mushroom.y + mushroom.h;
+
+    sf::RectangleShape stem({mushroom.w * 0.34f, mushroom.h * 0.42f});
+    stem.setOrigin({stem.getSize().x * 0.5f, stem.getSize().y});
+    stem.setPosition({centerX, footY});
+    stem.setFillColor(sf::Color(255, 232, 196));
+    stem.setOutlineThickness(-1.0f);
+    stem.setOutlineColor(sf::Color(118, 86, 60));
+    window.draw(stem);
+
+    sf::CircleShape cap(std::max(6.0f, mushroom.w * 0.34f));
+    cap.setOrigin({cap.getRadius(), cap.getRadius()});
+    cap.setPosition({centerX, mushroom.y + mushroom.h * 0.42f});
+    cap.setScale({1.32f, 1.0f});
+    cap.setFillColor(sf::Color(220, 62, 48));
+    cap.setOutlineThickness(-1.0f);
+    cap.setOutlineColor(sf::Color(112, 20, 10));
+    window.draw(cap);
+
+    sf::CircleShape spot(std::max(2.0f, mushroom.w * 0.10f));
+    spot.setFillColor(sf::Color(255, 244, 220));
+    spot.setPosition({centerX - mushroom.w * 0.22f, mushroom.y + mushroom.h * 0.28f});
+    window.draw(spot);
+    spot.setPosition({centerX - mushroom.w * 0.02f, mushroom.y + mushroom.h * 0.20f});
+    window.draw(spot);
+    spot.setPosition({centerX + mushroom.w * 0.16f, mushroom.y + mushroom.h * 0.30f});
+    window.draw(spot);
+}
+
 void GameRenderer::drawEnemy(sf::RenderWindow& window, const EnemyInfo& enemy) {
     const sf::Texture& texture = assets_.load(chooseEnemyFrame(enemyAnimationTime_));
     if (texture.getSize().x == 0 || texture.getSize().y == 0) {
@@ -545,6 +669,14 @@ void GameRenderer::drawTile(sf::RenderWindow& window, const TileInfo& tile) {
         drawPipe(window, tile);
         return;
     }
+    if (tile.type == TileType::QUESTION) {
+        drawQuestionBlock(window, tile);
+        return;
+    }
+    if (tile.type == TileType::BRICK) {
+        drawBrickBlock(window, tile);
+        return;
+    }
 
     const sf::Texture& atlas = assets_.load(kTileAtlas);
     if (atlas.getSize().x == 0 || atlas.getSize().y == 0) {
@@ -583,6 +715,12 @@ void GameRenderer::drawFallbackTile(sf::RenderWindow& window, const TileInfo& ti
         case TileType::PIPE:
             rect_.setFillColor(sf::Color(50, 205, 50));
             break;
+        case TileType::QUESTION:
+            rect_.setFillColor(sf::Color(239, 163, 44));
+            break;
+        case TileType::BRICK:
+            rect_.setFillColor(sf::Color(177, 96, 38));
+            break;
         default:
             rect_.setFillColor(sf::Color::Magenta);
             break;
@@ -590,3 +728,4 @@ void GameRenderer::drawFallbackTile(sf::RenderWindow& window, const TileInfo& ti
 
     window.draw(rect_);
 }
+
