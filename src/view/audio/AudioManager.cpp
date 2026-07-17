@@ -1,16 +1,23 @@
 #include "view/audio/AudioManager.h"
 
+#include <exception>
 #include <set>
 
 // ── BGM ────────────────────────────────────────────────────────────
 
 bool AudioManager::playBGM(const std::string& path, float volume) {
-    if (!bgm_.openFromFile(path)) return false;
-    bgm_.setLooping(true);
-    bgmVolume_ = volume;
-    bgm_.setVolume(volume);
-    bgm_.play();
-    return true;
+    try {
+        if (!bgm_.openFromFile(path)) return false;
+        bgm_.setLooping(true);
+        bgmVolume_ = volume;
+        bgm_.setVolume(volume);
+        bgm_.play();
+        return true;
+    } catch (const std::exception&) {
+        return false;
+    } catch (...) {
+        return false;
+    }
 }
 
 void AudioManager::stopBGM() { bgm_.stop(); }
@@ -25,8 +32,14 @@ bool AudioManager::isBGMPlaying() const { return bgm_.getStatus() == sf::SoundSo
 // ── SFX ────────────────────────────────────────────────────────────
 
 bool AudioManager::loadSFX(const std::string& name, const std::string& path) {
-    auto& buffer = buffers_[name];
-    return buffer.loadFromFile(path);
+    try {
+        auto& buffer = buffers_[name];
+        return buffer.loadFromFile(path);
+    } catch (const std::exception&) {
+        return false;
+    } catch (...) {
+        return false;
+    }
 }
 
 void AudioManager::loadAllSFX() {
