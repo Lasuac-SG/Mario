@@ -16,10 +16,12 @@ void App::initialize() {
     view_->setGoalInfo(vm_->getGoalInfo());
     view_->setWon(vm_->getWon());
     view_->setGameOver(vm_->getGameOver());
+    view_->setGameStarted(vm_->getGameStarted());
     view_->setHudInfo(vm_->getHudInfo());
 
     view_->setNextStepCommand(vm_->getNextStepCommand());
     view_->setResizeCommand(vm_->getResizeCommand());
+    view_->setStartGameCommand(vm_->getStartGameCommand());
     view_->getInputHandler()->setActionCommand(vm_->getActionCommand());
 
     vm_->addNotification(view_->getRenderNotification());

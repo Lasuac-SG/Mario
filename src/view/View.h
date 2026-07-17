@@ -28,10 +28,15 @@ class GameView {
         gameOver_ = g;
         renderer_.setGameOver(g);
     }
+    void setGameStarted(const bool* gs) {
+        gameStarted_ = gs;
+        renderer_.setGameStarted(gs);
+    }
     void setHudInfo(const HudInfo* h) { renderer_.setHudInfo(h); }
 
     void setNextStepCommand(std::function<void(float)>&& cmd) { nextStepCommand_ = std::move(cmd); }
     void setResizeCommand(std::function<void(ViewportDim, ViewportDim)>&& cmd) { resizeCommand_ = std::move(cmd); }
+    void setStartGameCommand(std::function<void(int)>&& cmd) { startGameCommand_ = std::move(cmd); }
     void pushCurrentViewportSize();
 
     InputHandler* getInputHandler() { return &input_; }
@@ -45,8 +50,10 @@ class GameView {
     InputHandler input_;
     GameRenderer renderer_;
     const bool* gameOver_ = nullptr;
+    const bool* gameStarted_ = nullptr;
     std::function<void(float)> nextStepCommand_;
     std::function<void(ViewportDim, ViewportDim)> resizeCommand_;
+    std::function<void(int)> startGameCommand_;
     float lastDt_ = 0.0f;
 };
 
