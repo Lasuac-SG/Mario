@@ -53,6 +53,13 @@ class ViewModel {
         return [this] { model_->endJump(); };
     }
 
+    std::function<void()> getBackToMenuCommand() {
+        return [this] {
+            started_ = false;
+            vmTrigger.fire(static_cast<EventType>(Event::STATE_CHANGED));
+        };
+    }
+
    private:
     void onModelChanged(EventType ev);
     void syncFromModel();
