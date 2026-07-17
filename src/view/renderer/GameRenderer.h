@@ -43,6 +43,7 @@ class GameRenderer {
     void drawMushroom(sf::RenderWindow& window, const TileInfo& mushroom);
     void drawEnemy(sf::RenderWindow& window, const EnemyInfo& enemy);
     void drawGoal(sf::RenderWindow& window);
+    void drawCastle(sf::RenderWindow& window);
     void drawWinOverlay(sf::RenderWindow& window);
     void drawGameOverOverlay(sf::RenderWindow& window);
     void drawStartMenu(sf::RenderWindow& window);
