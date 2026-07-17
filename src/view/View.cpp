@@ -87,18 +87,18 @@ void GameView::processWindowEvents() {
             }
         }
 
-        // 菜单模式：鼠标 hover + 点击选关
+        // 菜单模式：鼠标 hover + 点击选关（直接用像素坐标，与 drawStartMenu 的自定义 1:1 view 一致）
         if (gameStarted_ && !(*gameStarted_)) {
             if (const auto* moved = ev->getIf<sf::Event::MouseMoved>()) {
-                const sf::Vector2f point = window_.mapPixelToCoords(
-                    {moved->position.x, moved->position.y}, window_.getDefaultView());
+                const sf::Vector2f point(static_cast<float>(moved->position.x),
+                                         static_cast<float>(moved->position.y));
                 renderer_.setLevel1Hovered(renderer_.level1Bounds(window_).contains(point));
                 renderer_.setLevel2Hovered(renderer_.level2Bounds(window_).contains(point));
             }
             if (const auto* pressed = ev->getIf<sf::Event::MouseButtonPressed>()) {
                 if (pressed->button == sf::Mouse::Button::Left) {
-                    const sf::Vector2f point = window_.mapPixelToCoords(
-                        {pressed->position.x, pressed->position.y}, window_.getDefaultView());
+                    const sf::Vector2f point(static_cast<float>(pressed->position.x),
+                                             static_cast<float>(pressed->position.y));
                     if (renderer_.level1Bounds(window_).contains(point)) {
                         if (startGameCommand_) startGameCommand_(1);
                     } else if (renderer_.level2Bounds(window_).contains(point)) {

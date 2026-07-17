@@ -569,9 +569,12 @@ void GameRenderer::drawGoal(sf::RenderWindow& window) {
 }
 
 void GameRenderer::drawStartMenu(sf::RenderWindow& window) {
+    const auto winSize = window.getSize();
+    sf::View screenView(sf::FloatRect({0.0f, 0.0f},
+                                       {static_cast<float>(winSize.x), static_cast<float>(winSize.y)}));
+    window.setView(screenView);
     window.clear(sf::Color::Black);
 
-    const auto winSize = window.getSize();
     const float scale = std::min(static_cast<float>(winSize.x) / 2848.0f,
                                  static_cast<float>(winSize.y) / 1600.0f);
     const float drawW = 2848.0f * scale;
@@ -633,12 +636,12 @@ sf::FloatRect GameRenderer::level2Bounds(const sf::RenderWindow& window) const {
     const float scale = std::min(static_cast<float>(winSize.x) / 2848.0f,
                                  static_cast<float>(winSize.y) / 1600.0f);
     const float drawW = 2848.0f * scale;
-    const float offsetX = (static_cast<float>(winSize.x) - drawW) * 0.7f;
-    const float offsetY = (static_cast<float>(winSize.y) - 1600.0f * scale) * 0.7f;
+    const float offsetX = (static_cast<float>(winSize.x) - drawW) * 0.5f;
+    const float offsetY = (static_cast<float>(winSize.y) - 1600.0f * scale) * 0.5f;
 
     constexpr float kHotzoneWRatio = 0.25f;
     constexpr float kHotzoneHRatio = 0.05f;
-    constexpr float kLevel2YRatio = 0.645f;
+    constexpr float kLevel2YRatio = 0.7f;
 
     const float hw = 2848.0f * kHotzoneWRatio * scale;
     const float hh = 1600.0f * kHotzoneHRatio * scale;
