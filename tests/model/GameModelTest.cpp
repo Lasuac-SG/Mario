@@ -187,3 +187,23 @@ TEST(GameModelTest, PlayerStateInitiallyIdle) {
     GameModel model;
     EXPECT_EQ(model.playerState(), MarioState::IDLE);
 }
+
+// ═══════════════════════════════════════════════════════════════
+// 掉落死亡：坠出地图下边界触发死亡逻辑
+// ═══════════════════════════════════════════════════════════════
+
+TEST(GameModelTest, FallOffMapBottomTriggersDeath) {
+    GameModel model;
+    // 无地面的小关卡：马里奥出生后无立足点，持续下落直至坠出下边界。
+    model.testLoadLevelFromString(
+        "M.........\n"
+        "..........\n"
+        "..........\n");
+
+    const int livesBefore = model.lives();
+    // 一路更新直到坠落触发死亡序列并结算(命数-1)。
+    ASSERT_TRUE(updateUntil(model, 1.f / 60.f, [&] {
+        return model.lives() < livesBefore;
+    }));
+    EXPECT_EQ(model.lives(), livesBefore - 1);
+}
