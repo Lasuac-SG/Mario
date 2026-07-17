@@ -87,6 +87,22 @@ void GameView::processWindowEvents() {
             }
         }
 
+        if (won_ && *won_) {
+            if (const auto* moved = ev->getIf<sf::Event::MouseMoved>()) {
+                const sf::Vector2f point = window_.mapPixelToCoords({moved->position.x, moved->position.y}, window_.getDefaultView());
+                renderer_.setBackToMenuHovered(renderer_.backToMenuButtonBounds(window_).contains(point));
+            }
+
+            if (const auto* pressed = ev->getIf<sf::Event::MouseButtonPressed>()) {
+                if (pressed->button == sf::Mouse::Button::Left) {
+                    const sf::Vector2f point = window_.mapPixelToCoords({pressed->position.x, pressed->position.y}, window_.getDefaultView());
+                    if (renderer_.backToMenuButtonBounds(window_).contains(point)) {
+                        if (backToMenuCommand_) backToMenuCommand_();
+                    }
+                }
+            }
+        }
+
         // 菜单模式：鼠标 hover + 点击选关（直接用像素坐标，与 drawStartMenu 的自定义 1:1 view 一致）
         if (gameStarted_ && !(*gameStarted_)) {
             if (const auto* moved = ev->getIf<sf::Event::MouseMoved>()) {

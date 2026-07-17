@@ -24,10 +24,12 @@ class GameRenderer {
     void setGameOver(const bool* g) { gameOver_ = g; }
     void setHudInfo(const HudInfo* h) { hudInfo_ = h; }
     void setRestartHovered(bool hovered) { restartHovered_ = hovered; }
+    void setBackToMenuHovered(bool hovered) { backToMenuHovered_ = hovered; }
     void setGameStarted(const bool* gs) { gameStarted_ = gs; }
     void setLevel1Hovered(bool h) { level1Hovered_ = h; }
     void setLevel2Hovered(bool h) { level2Hovered_ = h; }
     sf::FloatRect restartButtonBounds(const sf::RenderWindow& window) const;
+    sf::FloatRect backToMenuButtonBounds(const sf::RenderWindow& window) const;
     sf::FloatRect level1Bounds(const sf::RenderWindow& window) const;
     sf::FloatRect level2Bounds(const sf::RenderWindow& window) const;
 
@@ -70,6 +72,7 @@ class GameRenderer {
     float coinAnimationTime_ = 0.0f;
     float winAnimationTime_ = 0.0f;
     bool restartHovered_ = false;
+    bool backToMenuHovered_ = false;
     const bool* gameStarted_ = nullptr;
     bool level1Hovered_ = false;
     bool level2Hovered_ = false;

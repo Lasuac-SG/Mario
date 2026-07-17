@@ -23,7 +23,7 @@ class GameView {
     void setPlayerBig(const bool* b) { renderer_.setPlayerBig(b); }
     void setEnemyInfos(const EnemyInfos* e) { renderer_.setEnemyInfos(e); }
     void setGoalInfo(const TileInfo* g) { renderer_.setGoalInfo(g); }
-    void setWon(const bool* w) { renderer_.setWon(w); }
+    void setWon(const bool* w) { won_ = w; renderer_.setWon(w); }
     void setGameOver(const bool* g) {
         gameOver_ = g;
         renderer_.setGameOver(g);
@@ -38,6 +38,7 @@ class GameView {
     void setResizeCommand(std::function<void(ViewportDim, ViewportDim)>&& cmd) { resizeCommand_ = std::move(cmd); }
     void setStartGameCommand(std::function<void(int)>&& cmd) { startGameCommand_ = std::move(cmd); }
     void setJumpReleaseCommand(std::function<void()>&& cmd) { jumpReleaseCommand_ = std::move(cmd); }
+    void setBackToMenuCommand(std::function<void()>&& cmd) { backToMenuCommand_ = std::move(cmd); }
     void pushCurrentViewportSize();
 
     InputHandler* getInputHandler() { return &input_; }
@@ -51,11 +52,13 @@ class GameView {
     InputHandler input_;
     GameRenderer renderer_;
     const bool* gameOver_ = nullptr;
+    const bool* won_ = nullptr;
     const bool* gameStarted_ = nullptr;
     std::function<void(float)> nextStepCommand_;
     std::function<void(ViewportDim, ViewportDim)> resizeCommand_;
     std::function<void(int)> startGameCommand_;
     std::function<void()> jumpReleaseCommand_;
+    std::function<void()> backToMenuCommand_;
     float lastDt_ = 0.0f;
 };
 

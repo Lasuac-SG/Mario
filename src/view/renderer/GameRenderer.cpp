@@ -689,7 +689,7 @@ sf::FloatRect GameRenderer::level2Bounds(const sf::RenderWindow& window) const {
     return {{hx, hy}, {hw, hh}};
 }
 
- sf::FloatRect GameRenderer::restartButtonBounds(const sf::RenderWindow& window) const {
+sf::FloatRect GameRenderer::restartButtonBounds(const sf::RenderWindow& window) const {
     const sf::View overlayView = window.getDefaultView();
     const sf::Vector2f size = overlayView.getSize();
     const sf::Vector2f center = overlayView.getCenter();
@@ -700,6 +700,24 @@ sf::FloatRect GameRenderer::level2Bounds(const sf::RenderWindow& window) const {
     const float buttonX = left + (size.x - buttonW) * 0.5f;
     const float buttonY = top + size.y * 0.66f;
     const float hoverScale = restartHovered_ ? 0.94f : 1.0f;
+    const float drawW = buttonW * hoverScale;
+    const float drawH = buttonH * hoverScale;
+    const float drawX = buttonX + (buttonW - drawW) * 0.5f;
+    const float drawY = buttonY + (buttonH - drawH) * 0.5f;
+    return {{drawX, drawY}, {drawW, drawH}};
+}
+
+sf::FloatRect GameRenderer::backToMenuButtonBounds(const sf::RenderWindow& window) const {
+    const sf::View overlayView = window.getDefaultView();
+    const sf::Vector2f size = overlayView.getSize();
+    const sf::Vector2f center = overlayView.getCenter();
+    const float left = center.x - size.x * 0.5f;
+    const float top = center.y - size.y * 0.5f;
+    const float buttonW = 360.0f;
+    const float buttonH = 56.0f;
+    const float buttonX = left + (size.x - buttonW) * 0.5f;
+    const float buttonY = top + size.y * 0.53f;
+    const float hoverScale = backToMenuHovered_ ? 0.96f : 1.0f;
     const float drawW = buttonW * hoverScale;
     const float drawH = buttonH * hoverScale;
     const float drawX = buttonX + (buttonW - drawW) * 0.5f;
@@ -740,6 +758,20 @@ void GameRenderer::drawWinOverlay(sf::RenderWindow& window) {
 
     drawPixelText(window, topText, topX, bandY + 18.0f + bob, kScale);
     drawPixelText(window, bottomText, bottomX, bandY + 62.0f + bob, kScale);
+
+    const sf::FloatRect button = backToMenuButtonBounds(window);
+    sf::RectangleShape buttonShape(button.size);
+    buttonShape.setPosition(button.position);
+    buttonShape.setFillColor(backToMenuHovered_ ? sf::Color(180, 225, 255) : sf::Color(150, 205, 245));
+    buttonShape.setOutlineThickness(-2.0f);
+    buttonShape.setOutlineColor(backToMenuHovered_ ? sf::Color(35, 90, 145) : sf::Color(30, 70, 120));
+    window.draw(buttonShape);
+
+    const std::string menuText = "BACK TO MENU";
+    constexpr float kButtonScale = 2.2f;
+    const float textX = button.position.x + (button.size.x - measurePixelText(menuText, kButtonScale)) * 0.5f;
+    const float textY = button.position.y + (button.size.y - (7.0f * (kButtonScale + 1.0f))) * 0.5f - 1.0f;
+    drawPixelText(window, menuText, textX, textY, kButtonScale);
 }
 
 void GameRenderer::drawGameOverOverlay(sf::RenderWindow& window) {
