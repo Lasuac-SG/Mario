@@ -6,6 +6,7 @@ constexpr const char* kTileAtlas = "picture/mario/map/map.png";
 constexpr const char* kEnemyFrameA = "picture/mario/enemy/monster_44.png";
 constexpr const char* kEnemyFrameB = "picture/mario/enemy/monster_45.png";
 const sf::IntRect kPlatformRect({0, 360}, {80, 40});
+constexpr const char* kCastleTexture = "assets/castle.png";
 
 sf::Vector2f effectiveViewportSize(const sf::Vector2u& windowSize) {
     const float rawW = static_cast<float>(windowSize.x);
@@ -278,6 +279,7 @@ void GameRenderer::render(sf::RenderWindow& window, float dt) {
     }
 
     drawGoal(window);
+    drawCastle(window);
 
     if (coinInfos_) {
         for (const auto& coin : *coinInfos_) {
@@ -566,6 +568,43 @@ void GameRenderer::drawGoal(sf::RenderWindow& window) {
     base.setPosition({goalInfo_->x - 5.0f, goalInfo_->y + goalInfo_->h - 6.0f});
     base.setFillColor(sf::Color(160, 82, 45));
     window.draw(base);
+}
+
+void GameRenderer::drawCastle(sf::RenderWindow& window) {
+    if (!goalInfo_ || goalInfo_->w <= 0.0f || goalInfo_->h <= 0.0f) return;
+
+    const float poleX = goalInfo_->x + goalInfo_->w * 0.45f;
+    const float poleW = std::max(4.0f, goalInfo_->w * 0.18f);
+    const float flagW = std::max(20.0f, goalInfo_->w * 1.4f);
+    const float flagRightEdge = poleX + poleW + flagW;
+
+    constexpr float kCastleGap = 12.0f;
+    const float castleTargetHeight = goalInfo_->h;
+    const float groundY = goalInfo_->y + goalInfo_->h;
+
+    const sf::Texture& texture = assets_.load(kCastleTexture);
+    const auto texSize = texture.getSize();
+
+    if (texSize.x == 0 || texSize.y == 0) {
+        const float fallbackW = castleTargetHeight * 0.5f;
+        const float castleX = flagRightEdge + kCastleGap;
+        const float castleY = groundY - castleTargetHeight;
+        rect_.setTexture(nullptr, true);
+        rect_.setSize({fallbackW, castleTargetHeight});
+        rect_.setPosition({castleX, castleY});
+        rect_.setFillColor(sf::Color(128, 128, 128));
+        window.draw(rect_);
+        return;
+    }
+
+    const float scale = castleTargetHeight / static_cast<float>(texSize.y);
+    const float castleX = flagRightEdge + kCastleGap;
+    const float castleY = groundY - castleTargetHeight;
+
+    sf::Sprite sprite(texture);
+    sprite.setScale({scale, scale});
+    sprite.setPosition({castleX, castleY});
+    window.draw(sprite);
 }
 
 void GameRenderer::drawStartMenu(sf::RenderWindow& window) {
