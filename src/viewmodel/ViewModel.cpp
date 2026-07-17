@@ -86,7 +86,16 @@ void ViewModel::updateCamera() noexcept {
     const PositionType levelH = model_->levelHeightPx();
 
     cameraX_ = (levelW > viewW_) ? std::clamp(playerCenterX, halfW, levelW - halfW) : levelW / 2.0f;
-    cameraY_ = (levelH > viewH_) ? std::clamp(playerCenterY, halfH, levelH - halfH) : levelH / 2.0f;
+
+    // 竖直：让地图底部与画面底部对齐(cameraY + halfH == levelH)，多出的空间留作上方天空，
+    // 这样地面永远贴屏幕底、玩家自然位于画面偏下，坠底死亡与画面底部一致。
+    // 地图比视口更高时改为跟随玩家(仍把玩家保持在偏下位置)，并夹紧不越出上下边界。
+    if (levelH <= viewH_) {
+        cameraY_ = levelH - halfH;
+    } else {
+        const PositionType downBias = viewH_ * 0.15f;  // 玩家相对画面中心的下移量
+        cameraY_ = std::clamp(playerCenterY - downBias, halfH, levelH - halfH);
+    }
 }
 
 void ViewModel::setViewport(ViewportDim w, ViewportDim h) {
