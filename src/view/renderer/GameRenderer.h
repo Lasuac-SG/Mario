@@ -9,29 +9,29 @@ class GameRenderer {
     GameRenderer();
     ~GameRenderer() = default;
 
-    void setCamera(const PositionType* cx, const PositionType* cy) {
+    void setCamera(const PositionType* cx, const PositionType* cy) noexcept {
         cameraX_ = cx;
         cameraY_ = cy;
     }
-    void setPlayerInfo(const PlayerInfo* p) { playerInfo_ = p; }
-    void setTileInfos(const TileInfos* t) { tileInfos_ = t; }
-    void setCoinInfos(const TileInfos* c) { coinInfos_ = c; }
-    void setMushroomInfos(const TileInfos* m) { mushroomInfos_ = m; }
-    void setPlayerBig(const bool* b) { playerBig_ = b; }
-    void setEnemyInfos(const EnemyInfos* e) { enemyInfos_ = e; }
-    void setGoalInfo(const TileInfo* g) { goalInfo_ = g; }
-    void setWon(const bool* w) { won_ = w; }
-    void setGameOver(const bool* g) { gameOver_ = g; }
-    void setHudInfo(const HudInfo* h) { hudInfo_ = h; }
-    void setRestartHovered(bool hovered) { restartHovered_ = hovered; }
-    void setBackToMenuHovered(bool hovered) { backToMenuHovered_ = hovered; }
-    void setGameStarted(const bool* gs) { gameStarted_ = gs; }
-    void setLevel1Hovered(bool h) { level1Hovered_ = h; }
-    void setLevel2Hovered(bool h) { level2Hovered_ = h; }
-    sf::FloatRect restartButtonBounds(const sf::RenderWindow& window) const;
-    sf::FloatRect backToMenuButtonBounds(const sf::RenderWindow& window) const;
-    sf::FloatRect level1Bounds(const sf::RenderWindow& window) const;
-    sf::FloatRect level2Bounds(const sf::RenderWindow& window) const;
+    void setPlayerInfo(const PlayerInfo* p) noexcept { playerInfo_ = p; }
+    void setTileInfos(const TileInfos* t) noexcept { tileInfos_ = t; }
+    void setCoinInfos(const TileInfos* c) noexcept { coinInfos_ = c; }
+    void setMushroomInfos(const TileInfos* m) noexcept { mushroomInfos_ = m; }
+    void setPlayerBig(const bool* b) noexcept { playerBig_ = b; }
+    void setEnemyInfos(const EnemyInfos* e) noexcept { enemyInfos_ = e; }
+    void setGoalInfo(const TileInfo* g) noexcept { goalInfo_ = g; }
+    void setWon(const bool* w) noexcept { won_ = w; }
+    void setGameOver(const bool* g) noexcept { gameOver_ = g; }
+    void setHudInfo(const HudInfo* h) noexcept { hudInfo_ = h; }
+    void setRestartHovered(bool hovered) noexcept { restartHovered_ = hovered; }
+    void setBackToMenuHovered(bool hovered) noexcept { backToMenuHovered_ = hovered; }
+    void setGameStarted(const bool* gs) noexcept { gameStarted_ = gs; }
+    void setLevel1Hovered(bool h) noexcept { level1Hovered_ = h; }
+    void setLevel2Hovered(bool h) noexcept { level2Hovered_ = h; }
+    sf::FloatRect restartButtonBounds(const sf::RenderWindow& window) const noexcept;
+    sf::FloatRect backToMenuButtonBounds(const sf::RenderWindow& window) const noexcept;
+    sf::FloatRect level1Bounds(const sf::RenderWindow& window) const noexcept;
+    sf::FloatRect level2Bounds(const sf::RenderWindow& window) const noexcept;
 
     void render(sf::RenderWindow& window, float dt);
 
@@ -39,7 +39,7 @@ class GameRenderer {
     void drawHud(sf::RenderWindow& window);
     void drawHudBlock(sf::RenderWindow& window, const std::string& label, const std::string& value, float centerX);
     void drawPixelText(sf::RenderWindow& window, const std::string& text, float x, float y, float scale);
-    float measurePixelText(const std::string& text, float scale) const;
+    float measurePixelText(const std::string& text, float scale) const noexcept;
     void drawPlayer(sf::RenderWindow& window, float dt);
     void drawCoin(sf::RenderWindow& window, const TileInfo& coin);
     void drawMushroom(sf::RenderWindow& window, const TileInfo& mushroom);

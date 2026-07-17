@@ -1,4 +1,5 @@
 ﻿//
+#include <exception>
 
 #ifndef MARIO_ASSETMANAGER_H
 #define MARIO_ASSETMANAGER_H

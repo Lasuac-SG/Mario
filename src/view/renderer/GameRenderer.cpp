@@ -376,7 +376,7 @@ void GameRenderer::drawPixelText(sf::RenderWindow& window, const std::string& te
     }
 }
 
-float GameRenderer::measurePixelText(const std::string& text, float scale) const {
+float GameRenderer::measurePixelText(const std::string& text, float scale) const noexcept {
     constexpr float kPixelGap = 1.0f;
     constexpr float kLetterGap = 2.0f;
     const auto& font = glyphs();
@@ -651,7 +651,7 @@ void GameRenderer::drawStartMenu(sf::RenderWindow& window) {
     window.display();
 }
 
-sf::FloatRect GameRenderer::level1Bounds(const sf::RenderWindow& window) const {
+sf::FloatRect GameRenderer::level1Bounds(const sf::RenderWindow& window) const noexcept {
     const auto winSize = window.getSize();
     const float scale = std::min(static_cast<float>(winSize.x) / 2848.0f,
                                  static_cast<float>(winSize.y) / 1600.0f);
@@ -670,7 +670,7 @@ sf::FloatRect GameRenderer::level1Bounds(const sf::RenderWindow& window) const {
     return {{hx, hy}, {hw, hh}};
 }
 
-sf::FloatRect GameRenderer::level2Bounds(const sf::RenderWindow& window) const {
+sf::FloatRect GameRenderer::level2Bounds(const sf::RenderWindow& window) const noexcept {
     const auto winSize = window.getSize();
     const float scale = std::min(static_cast<float>(winSize.x) / 2848.0f,
                                  static_cast<float>(winSize.y) / 1600.0f);
@@ -689,7 +689,7 @@ sf::FloatRect GameRenderer::level2Bounds(const sf::RenderWindow& window) const {
     return {{hx, hy}, {hw, hh}};
 }
 
-sf::FloatRect GameRenderer::restartButtonBounds(const sf::RenderWindow& window) const {
+sf::FloatRect GameRenderer::restartButtonBounds(const sf::RenderWindow& window) const noexcept {
     const sf::View overlayView = window.getDefaultView();
     const sf::Vector2f size = overlayView.getSize();
     const sf::Vector2f center = overlayView.getCenter();
@@ -707,7 +707,7 @@ sf::FloatRect GameRenderer::restartButtonBounds(const sf::RenderWindow& window) 
     return {{drawX, drawY}, {drawW, drawH}};
 }
 
-sf::FloatRect GameRenderer::backToMenuButtonBounds(const sf::RenderWindow& window) const {
+sf::FloatRect GameRenderer::backToMenuButtonBounds(const sf::RenderWindow& window) const noexcept {
     const sf::View overlayView = window.getDefaultView();
     const sf::Vector2f size = overlayView.getSize();
     const sf::Vector2f center = overlayView.getCenter();
