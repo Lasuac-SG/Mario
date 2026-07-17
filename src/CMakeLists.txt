@@ -43,3 +43,11 @@ add_custom_command(
         $<TARGET_FILE_DIR:mario>/map
         COMMENT "Copying map folder to app directory"
 )
+
+add_custom_command(
+        TARGET mario POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${PROJECT_SOURCE_DIR}/assets
+        $<TARGET_FILE_DIR:mario>/assets
+        COMMENT "Copying assets folder to app directory"
+)
