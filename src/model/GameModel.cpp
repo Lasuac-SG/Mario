@@ -79,6 +79,12 @@ void GameModel::update(TimeType dt) {
       const TimeType step = std::min(remaining, mario_cfg::kMaxStep);
       mario_.step(step, tileMap_);
       handleBlockBump();
+      // 掉落死亡：坠到地图下边界(坑洞见底)。地图外(row>=rows)被 TileMap 视为实心地板，
+      // 马里奥脚底会停在 heightPx 处；正常站在最后一行瓦片上脚底只到 heightPx-kTileSize，故不误触。
+      if (mario_.y() + mario_.height() >= tileMap_.heightPx()) {
+        beginDeath();
+        break;
+      }
       for (auto& e : enemies_) e.step(step, tileMap_);
       for (auto& m : mushrooms_) m.step(step, tileMap_);
       collectCoins();
