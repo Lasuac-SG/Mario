@@ -1,20 +1,16 @@
 #ifndef MARIO_VIEW_H
 #define MARIO_VIEW_H
-
 #include "common/Type.h"
 #include "view/audio/AudioManager.h"
 #include "view/input/InputHandler.h"
 #include "view/renderer/GameRenderer.h"
-
 class GameView {
    public:
     GameView();
     ~GameView() = default;
-
     void run();
     Notify_Funtion getRenderNotification();
     Notify_Funtion getAudioNotification();
-
     void setCamera(const PositionType* cx, const PositionType* cy) noexcept { renderer_.setCamera(cx, cy); }
     void setPlayerInfo(const PlayerInfo* p) noexcept { renderer_.setPlayerInfo(p); }
     void setTileInfos(const TileInfos* t) noexcept { renderer_.setTileInfos(t); }
@@ -33,20 +29,16 @@ class GameView {
         renderer_.setGameStarted(gs);
     }
     void setHudInfo(const HudInfo* h) noexcept { renderer_.setHudInfo(h); }
-
     void setNextStepCommand(std::function<void(float)>&& cmd) { nextStepCommand_ = std::move(cmd); }
     void setResizeCommand(std::function<void(ViewportDim, ViewportDim)>&& cmd) { resizeCommand_ = std::move(cmd); }
     void setStartGameCommand(std::function<void(int)>&& cmd) { startGameCommand_ = std::move(cmd); }
     void setJumpReleaseCommand(std::function<void()>&& cmd) { jumpReleaseCommand_ = std::move(cmd); }
     void setBackToMenuCommand(std::function<void()>&& cmd) { backToMenuCommand_ = std::move(cmd); }
     void pushCurrentViewportSize();
-
     InputHandler* getInputHandler() noexcept { return &input_; }
-
    private:
     void processWindowEvents();
     void NextStep(float dt);
-
     sf::RenderWindow window_;
     AudioManager audio_;
     InputHandler input_;
@@ -61,5 +53,4 @@ class GameView {
     std::function<void()> backToMenuCommand_;
     float lastDt_ = 0.0f;
 };
-
 #endif  // MARIO_VIEW_H

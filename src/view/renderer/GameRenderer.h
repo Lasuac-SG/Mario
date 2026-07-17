@@ -1,14 +1,11 @@
 #ifndef MARIO_GAMERENDERER_H
 #define MARIO_GAMERENDERER_H
-
 #include "common/Type.h"
 #include "view/renderer/AssetManager.h"
-
 class GameRenderer {
    public:
     GameRenderer();
     ~GameRenderer() = default;
-
     void setCamera(const PositionType* cx, const PositionType* cy) noexcept {
         cameraX_ = cx;
         cameraY_ = cy;
@@ -32,9 +29,7 @@ class GameRenderer {
     sf::FloatRect backToMenuButtonBounds(const sf::RenderWindow& window) const noexcept;
     sf::FloatRect level1Bounds(const sf::RenderWindow& window) const noexcept;
     sf::FloatRect level2Bounds(const sf::RenderWindow& window) const noexcept;
-
     void render(sf::RenderWindow& window, float dt);
-
    private:
     void drawHud(sf::RenderWindow& window);
     void drawHudBlock(sf::RenderWindow& window, const std::string& label, const std::string& value, float centerX);
@@ -51,9 +46,7 @@ class GameRenderer {
     void drawStartMenu(sf::RenderWindow& window);
     void drawTile(sf::RenderWindow& window, const TileInfo& tile);
     void drawFallbackTile(sf::RenderWindow& window, const TileInfo& tile);
-
     AssetManager assets_;
-
     const PositionType* cameraX_ = nullptr;
     const PositionType* cameraY_ = nullptr;
     const PlayerInfo* playerInfo_ = nullptr;
@@ -66,7 +59,6 @@ class GameRenderer {
     const bool* won_ = nullptr;
     const bool* gameOver_ = nullptr;
     const HudInfo* hudInfo_ = nullptr;
-
     float runAnimationTime_ = 0.0f;
     float enemyAnimationTime_ = 0.0f;
     float coinAnimationTime_ = 0.0f;
@@ -79,5 +71,4 @@ class GameRenderer {
     MarioState lastPlayerState_ = MarioState::IDLE;
     sf::RectangleShape rect_;
 };
-
 #endif  // MARIO_GAMERENDERER_H
