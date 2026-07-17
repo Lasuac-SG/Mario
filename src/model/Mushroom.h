@@ -1,5 +1,6 @@
 // 变大蘑菇道具：从问号块顶出后水平移动 + 受重力，遇实心墙掉头，遇空缺自然下落（不掉头）。
-// 被马里奥接触后由 GameModel 置 active=false。header-only，随 GameModel 一起编译。
+// 若坠入虚空(掉到地图下边界)则直接消失。被马里奥接触后由 GameModel 置 active=false。
+// header-only，随 GameModel 一起编译。
 
 #ifndef MARIO_MODEL_MUSHROOM_H
 #define MARIO_MODEL_MUSHROOM_H
@@ -27,6 +28,11 @@ class Mushroom {
     vy_ = std::min(vy_ + mario_cfg::kGravity * dt, mario_cfg::kMaxFallSpeed);
     y_ += vy_ * dt;
     resolveVertical(map);
+    // 坠入虚空(掉到地图下边界)→ 直接消失
+    if (y_ + height() >= map.heightPx()) {
+      active_ = false;
+      return;
+    }
     // 水平：匀速 + 撞墙掉头
     x_ += vx_ * dt;
     resolveHorizontal(map);
