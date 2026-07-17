@@ -19,9 +19,9 @@ constexpr PositionType kGoalPoleHeight = 160.0f;
 // 文件缺失时回退到 TileMap 的内置极简兜底关卡。
 const char* mapPathForId(int mapId) {
   switch (mapId) {
-    case 2: return "map/map2.txt";
+    case 2: return "assets/map/map2.txt";
     case 1:
-    default: return "map/map1.txt";
+    default: return "assets/map/map1.txt";
   }
 }
 }

@@ -39,8 +39,8 @@ add_executable(test_audio
 target_precompile_headers(test_audio PRIVATE ${CMAKE_SOURCE_DIR}/src/precompile.h)
 target_include_directories(test_audio PRIVATE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/tests)
 target_compile_definitions(test_audio PRIVATE
-    AUDIO_TEST_FILE="${CMAKE_SOURCE_DIR}/audio/bgm.ogg"
-    AUDIO_SFX_TEST_FILE="${CMAKE_SOURCE_DIR}/audio/sound/COIN_COLLECTED.ogg"
+    AUDIO_TEST_FILE="${CMAKE_SOURCE_DIR}/assets/audio/bgm.ogg"
+    AUDIO_SFX_TEST_FILE="${CMAKE_SOURCE_DIR}/assets/audio/sound/COIN_COLLECTED.ogg"
 )
 target_link_libraries(test_audio PRIVATE SFML::Graphics SFML::Window SFML::System SFML::Audio)
 target_link_libraries(test_audio PRIVATE GTest::gtest_main)

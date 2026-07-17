@@ -33,7 +33,7 @@ void GameView::run() {
     sf::Clock clock;
     float accumulator = 0.0f;
 
-    audio_.playBGM("./audio/bgm.ogg");
+    audio_.playBGM("./assets/audio/bgm.ogg");
     audio_.loadAllSFX();
 
     while (window_.isOpen()) {

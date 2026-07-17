@@ -2,9 +2,9 @@
 
 namespace {
 
-constexpr const char* kTileAtlas = "picture/mario/map/map.png";
-constexpr const char* kEnemyFrameA = "picture/mario/enemy/monster_44.png";
-constexpr const char* kEnemyFrameB = "picture/mario/enemy/monster_45.png";
+constexpr const char* kTileAtlas = "assets/picture/mario/map/map.png";
+constexpr const char* kEnemyFrameA = "assets/picture/mario/enemy/monster_44.png";
+constexpr const char* kEnemyFrameB = "assets/picture/mario/enemy/monster_45.png";
 const sf::IntRect kPlatformRect({0, 360}, {80, 40});
 constexpr const char* kCastleTexture = "assets/castle.png";
 
@@ -65,16 +65,16 @@ const std::unordered_map<char, std::vector<std::string>>& glyphs() {
 
 const char* choosePlayerFrame(bool isBig, MarioState state, float runAnimationTime) {
     static constexpr const char* kSmallRunFrames[] = {
-        "picture/mario/player_1/red_9.png",
-        "picture/mario/player_1/red_10.png",
-        "picture/mario/player_1/red_11.png",
-        "picture/mario/player_1/red_12.png",
+        "assets/picture/mario/player_1/red_9.png",
+        "assets/picture/mario/player_1/red_10.png",
+        "assets/picture/mario/player_1/red_11.png",
+        "assets/picture/mario/player_1/red_12.png",
     };
     static constexpr const char* kBigRunFrames[] = {
-        "picture/mario/player_1_big/red_20.png",
-        "picture/mario/player_1_big/red_21.png",
-        "picture/mario/player_1_big/red_22.png",
-        "picture/mario/player_1_big/red_23.png",
+        "assets/picture/mario/player_1_big/red_20.png",
+        "assets/picture/mario/player_1_big/red_21.png",
+        "assets/picture/mario/player_1_big/red_22.png",
+        "assets/picture/mario/player_1_big/red_23.png",
     };
 
     if (isBig) {
@@ -86,14 +86,14 @@ const char* choosePlayerFrame(bool isBig, MarioState state, float runAnimationTi
                 return kBigRunFrames[frame];
             }
             case MarioState::JUMPING:
-                return "picture/mario/player_1_big/red_18.png";
+                return "assets/picture/mario/player_1_big/red_18.png";
             case MarioState::FALLING:
-                return "picture/mario/player_1_big/red_19.png";
+                return "assets/picture/mario/player_1_big/red_19.png";
             case MarioState::DEAD:
-                return "picture/mario/player_1/red_27.png";
+                return "assets/picture/mario/player_1/red_27.png";
             case MarioState::IDLE:
             default:
-                return "picture/mario/player_1_big/red_13.png";
+                return "assets/picture/mario/player_1_big/red_13.png";
         }
     }
 
@@ -105,14 +105,14 @@ const char* choosePlayerFrame(bool isBig, MarioState state, float runAnimationTi
             return kSmallRunFrames[frame];
         }
         case MarioState::JUMPING:
-            return "picture/mario/player_1/red_6.png";
+            return "assets/picture/mario/player_1/red_6.png";
         case MarioState::FALLING:
-            return "picture/mario/player_1/red_7.png";
+            return "assets/picture/mario/player_1/red_7.png";
         case MarioState::DEAD:
-            return "picture/mario/player_1/red_27.png";
+            return "assets/picture/mario/player_1/red_27.png";
         case MarioState::IDLE:
         default:
-            return "picture/mario/player_1/red_1.png";
+            return "assets/picture/mario/player_1/red_1.png";
     }
 }
 

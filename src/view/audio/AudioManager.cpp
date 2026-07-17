@@ -47,7 +47,7 @@ void AudioManager::loadAllSFX() {
     std::set<std::string> loaded;  // 去重（多个 Event 可共用同一 SFX 文件）
     for (const auto& [ev, name] : map) {
         if (loaded.insert(name).second) {
-            loadSFX(name, "./audio/sound/" + name + ".ogg");
+            loadSFX(name, "./assets/audio/sound/" + name + ".ogg");
         }
     }
 }
