@@ -22,6 +22,7 @@ void App::initialize() {
     view_->setNextStepCommand(vm_->getNextStepCommand());
     view_->setResizeCommand(vm_->getResizeCommand());
     view_->setStartGameCommand(vm_->getStartGameCommand());
+    view_->setJumpReleaseCommand(vm_->getJumpReleaseCommand());
     view_->getInputHandler()->setActionCommand(vm_->getActionCommand());
 
     vm_->addNotification(view_->getRenderNotification());

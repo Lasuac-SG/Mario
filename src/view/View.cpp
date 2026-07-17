@@ -115,6 +115,13 @@ void GameView::processWindowEvents() {
             }
         }
 
+        if (const auto* released = ev->getIf<sf::Event::KeyReleased>()) {
+            if (jumpReleaseCommand_ &&
+                (released->code == sf::Keyboard::Key::Space || released->code == sf::Keyboard::Key::Up)) {
+                jumpReleaseCommand_();
+            }
+        }
+
         if (const auto* resized = ev->getIf<sf::Event::Resized>()) {
             if (resizeCommand_) {
                 const auto size = effectiveViewportSize(resized->size);

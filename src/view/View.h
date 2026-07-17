@@ -37,6 +37,7 @@ class GameView {
     void setNextStepCommand(std::function<void(float)>&& cmd) { nextStepCommand_ = std::move(cmd); }
     void setResizeCommand(std::function<void(ViewportDim, ViewportDim)>&& cmd) { resizeCommand_ = std::move(cmd); }
     void setStartGameCommand(std::function<void(int)>&& cmd) { startGameCommand_ = std::move(cmd); }
+    void setJumpReleaseCommand(std::function<void()>&& cmd) { jumpReleaseCommand_ = std::move(cmd); }
     void pushCurrentViewportSize();
 
     InputHandler* getInputHandler() { return &input_; }
@@ -54,6 +55,7 @@ class GameView {
     std::function<void(float)> nextStepCommand_;
     std::function<void(ViewportDim, ViewportDim)> resizeCommand_;
     std::function<void(int)> startGameCommand_;
+    std::function<void()> jumpReleaseCommand_;
     float lastDt_ = 0.0f;
 };
 
