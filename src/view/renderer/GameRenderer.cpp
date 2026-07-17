@@ -25,12 +25,17 @@ const std::unordered_map<char, std::vector<std::string>>& glyphs() {
         {'C', {"01111", "10000", "10000", "10000", "10000", "10000", "01111"}},
         {'D', {"11110", "10001", "10001", "10001", "10001", "10001", "11110"}},
         {'E', {"11111", "10000", "10000", "11110", "10000", "10000", "11111"}},
+        {'F', {"11111", "10000", "10000", "11110", "10000", "10000", "10000"}},
         {'G', {"01111", "10000", "10000", "10011", "10001", "10001", "01110"}},
+        {'H', {"10001", "10001", "10001", "11111", "10001", "10001", "10001"}},
         {'I', {"11111", "00100", "00100", "00100", "00100", "00100", "11111"}},
+        {'J', {"11111", "00001", "00001", "00001", "10001", "10001", "01110"}},
+        {'K', {"10001", "10010", "10100", "11000", "10100", "10010", "10001"}},
         {'L', {"10000", "10000", "10000", "10000", "10000", "10000", "11111"}},
         {'M', {"10001", "11011", "10101", "10101", "10001", "10001", "10001"}},
         {'N', {"10001", "11001", "10101", "10011", "10001", "10001", "10001"}},
         {'O', {"01110", "10001", "10001", "10001", "10001", "10001", "01110"}},
+        {'P', {"11110", "10001", "10001", "11110", "10000", "10000", "10000"}},
         {'Q', {"01110", "10001", "10001", "10001", "10101", "10010", "01101"}},
         {'R', {"11110", "10001", "10001", "11110", "10100", "10010", "10001"}},
         {'S', {"01111", "10000", "10000", "01110", "00001", "00001", "11110"}},
@@ -38,7 +43,9 @@ const std::unordered_map<char, std::vector<std::string>>& glyphs() {
         {'U', {"10001", "10001", "10001", "10001", "10001", "10001", "01110"}},
         {'V', {"10001", "10001", "10001", "10001", "10001", "01010", "00100"}},
         {'W', {"10001", "10001", "10001", "10101", "10101", "10101", "01010"}},
+        {'X', {"10001", "01010", "00100", "00100", "00100", "01010", "10001"}},
         {'Y', {"10001", "10001", "01010", "00100", "00100", "00100", "00100"}},
+        {'Z', {"11111", "00001", "00010", "00100", "01000", "10000", "11111"}},
         {'0', {"01110", "10001", "10011", "10101", "11001", "10001", "01110"}},
         {'1', {"00100", "01100", "00100", "00100", "00100", "00100", "01110"}},
         {'2', {"01110", "10001", "00001", "00010", "00100", "01000", "11111"}},
@@ -246,6 +253,11 @@ void drawBrickBlock(sf::RenderWindow& window, const TileInfo& tile) {
 GameRenderer::GameRenderer() { rect_.setOutlineThickness(0.0f); }
 
 void GameRenderer::render(sf::RenderWindow& window, float dt) {
+    if (gameStarted_ && !(*gameStarted_)) {
+        drawStartMenu(window);
+        return;
+    }
+
     enemyAnimationTime_ += std::max(0.0f, dt);
     coinAnimationTime_ += std::max(0.0f, dt);
     if (won_ && *won_) {
@@ -554,6 +566,85 @@ void GameRenderer::drawGoal(sf::RenderWindow& window) {
     base.setPosition({goalInfo_->x - 5.0f, goalInfo_->y + goalInfo_->h - 6.0f});
     base.setFillColor(sf::Color(160, 82, 45));
     window.draw(base);
+}
+
+void GameRenderer::drawStartMenu(sf::RenderWindow& window) {
+    window.clear(sf::Color::Black);
+
+    const auto winSize = window.getSize();
+    const float scale = std::min(static_cast<float>(winSize.x) / 2848.0f,
+                                 static_cast<float>(winSize.y) / 1600.0f);
+    const float drawW = 2848.0f * scale;
+    const float drawH = 1600.0f * scale;
+    const float offsetX = (static_cast<float>(winSize.x) - drawW) * 0.5f;
+    const float offsetY = (static_cast<float>(winSize.y) - drawH) * 0.5f;
+
+    const sf::Texture& texture = assets_.load("assets/titlescreen.png");
+    if (texture.getSize().x > 0) {
+        sf::Sprite sprite(texture);
+        sprite.setScale({scale, scale});
+        sprite.setPosition({offsetX, offsetY});
+        window.draw(sprite);
+    }
+
+    // hover 高亮
+    if (level1Hovered_ || level2Hovered_) {
+        sf::RectangleShape highlight;
+        highlight.setFillColor(sf::Color(255, 255, 200, 80));
+
+        if (level1Hovered_) {
+            const auto b = level1Bounds(window);
+            highlight.setPosition(b.position);
+            highlight.setSize(b.size);
+            window.draw(highlight);
+        }
+        if (level2Hovered_) {
+            const auto b = level2Bounds(window);
+            highlight.setPosition(b.position);
+            highlight.setSize(b.size);
+            window.draw(highlight);
+        }
+    }
+
+    window.display();
+}
+
+sf::FloatRect GameRenderer::level1Bounds(const sf::RenderWindow& window) const {
+    const auto winSize = window.getSize();
+    const float scale = std::min(static_cast<float>(winSize.x) / 2848.0f,
+                                 static_cast<float>(winSize.y) / 1600.0f);
+    const float drawW = 2848.0f * scale;
+    const float offsetX = (static_cast<float>(winSize.x) - drawW) * 0.5f;
+    const float offsetY = (static_cast<float>(winSize.y) - 1600.0f * scale) * 0.5f;
+
+    constexpr float kHotzoneWRatio = 0.25f;
+    constexpr float kHotzoneHRatio = 0.05f;
+    constexpr float kLevel1YRatio = 0.63f;
+
+    const float hw = 2848.0f * kHotzoneWRatio * scale;
+    const float hh = 1600.0f * kHotzoneHRatio * scale;
+    const float hx = offsetX + (drawW - hw) * 0.5f;
+    const float hy = offsetY + 1600.0f * kLevel1YRatio * scale;
+    return {{hx, hy}, {hw, hh}};
+}
+
+sf::FloatRect GameRenderer::level2Bounds(const sf::RenderWindow& window) const {
+    const auto winSize = window.getSize();
+    const float scale = std::min(static_cast<float>(winSize.x) / 2848.0f,
+                                 static_cast<float>(winSize.y) / 1600.0f);
+    const float drawW = 2848.0f * scale;
+    const float offsetX = (static_cast<float>(winSize.x) - drawW) * 0.7f;
+    const float offsetY = (static_cast<float>(winSize.y) - 1600.0f * scale) * 0.7f;
+
+    constexpr float kHotzoneWRatio = 0.25f;
+    constexpr float kHotzoneHRatio = 0.05f;
+    constexpr float kLevel2YRatio = 0.645f;
+
+    const float hw = 2848.0f * kHotzoneWRatio * scale;
+    const float hh = 1600.0f * kHotzoneHRatio * scale;
+    const float hx = offsetX + (drawW - hw) * 0.5f;
+    const float hy = offsetY + 1600.0f * kLevel2YRatio * scale;
+    return {{hx, hy}, {hw, hh}};
 }
 
  sf::FloatRect GameRenderer::restartButtonBounds(const sf::RenderWindow& window) const {

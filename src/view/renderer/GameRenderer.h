@@ -24,7 +24,12 @@ class GameRenderer {
     void setGameOver(const bool* g) { gameOver_ = g; }
     void setHudInfo(const HudInfo* h) { hudInfo_ = h; }
     void setRestartHovered(bool hovered) { restartHovered_ = hovered; }
+    void setGameStarted(const bool* gs) { gameStarted_ = gs; }
+    void setLevel1Hovered(bool h) { level1Hovered_ = h; }
+    void setLevel2Hovered(bool h) { level2Hovered_ = h; }
     sf::FloatRect restartButtonBounds(const sf::RenderWindow& window) const;
+    sf::FloatRect level1Bounds(const sf::RenderWindow& window) const;
+    sf::FloatRect level2Bounds(const sf::RenderWindow& window) const;
 
     void render(sf::RenderWindow& window, float dt);
 
@@ -40,6 +45,7 @@ class GameRenderer {
     void drawGoal(sf::RenderWindow& window);
     void drawWinOverlay(sf::RenderWindow& window);
     void drawGameOverOverlay(sf::RenderWindow& window);
+    void drawStartMenu(sf::RenderWindow& window);
     void drawTile(sf::RenderWindow& window, const TileInfo& tile);
     void drawFallbackTile(sf::RenderWindow& window, const TileInfo& tile);
 
@@ -63,6 +69,9 @@ class GameRenderer {
     float coinAnimationTime_ = 0.0f;
     float winAnimationTime_ = 0.0f;
     bool restartHovered_ = false;
+    const bool* gameStarted_ = nullptr;
+    bool level1Hovered_ = false;
+    bool level2Hovered_ = false;
     MarioState lastPlayerState_ = MarioState::IDLE;
     sf::RectangleShape rect_;
 };

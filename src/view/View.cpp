@@ -42,8 +42,10 @@ void GameView::run() {
         accumulator += frameDt;
 
         processWindowEvents();
-        input_.pollEvents(window_);
-        input_.dispatchInput();
+        if (gameStarted_ && *gameStarted_) {
+            input_.pollEvents(window_);
+            input_.dispatchInput();
+        }
 
         int updates = 0;
         while (accumulator >= kFixedDt && updates < kMaxUpdatesPerFrame && window_.isOpen()) {
@@ -81,6 +83,34 @@ void GameView::processWindowEvents() {
                         InputActionParameter p(InputAction::RESTART);
                         input_.getActionCommand()->exec(&p);
                     }
+                }
+            }
+        }
+
+        // 菜单模式：鼠标 hover + 点击选关
+        if (gameStarted_ && !(*gameStarted_)) {
+            if (const auto* moved = ev->getIf<sf::Event::MouseMoved>()) {
+                const sf::Vector2f point = window_.mapPixelToCoords(
+                    {moved->position.x, moved->position.y}, window_.getDefaultView());
+                renderer_.setLevel1Hovered(renderer_.level1Bounds(window_).contains(point));
+                renderer_.setLevel2Hovered(renderer_.level2Bounds(window_).contains(point));
+            }
+            if (const auto* pressed = ev->getIf<sf::Event::MouseButtonPressed>()) {
+                if (pressed->button == sf::Mouse::Button::Left) {
+                    const sf::Vector2f point = window_.mapPixelToCoords(
+                        {pressed->position.x, pressed->position.y}, window_.getDefaultView());
+                    if (renderer_.level1Bounds(window_).contains(point)) {
+                        if (startGameCommand_) startGameCommand_(1);
+                    } else if (renderer_.level2Bounds(window_).contains(point)) {
+                        if (startGameCommand_) startGameCommand_(2);
+                    }
+                }
+            }
+            if (const auto* key = ev->getIf<sf::Event::KeyPressed>()) {
+                if (key->code == sf::Keyboard::Key::Num1 || key->code == sf::Keyboard::Key::Numpad1) {
+                    if (startGameCommand_) startGameCommand_(1);
+                } else if (key->code == sf::Keyboard::Key::Num2 || key->code == sf::Keyboard::Key::Numpad2) {
+                    if (startGameCommand_) startGameCommand_(2);
                 }
             }
         }
