@@ -36,7 +36,7 @@ jobs:
         shell: pwsh
         run: >
           cmake --build build
-          --target test_common test_model test_audio
+          --target test_common test_model test_audio test_view
 
       - name: Run tests
         shell: pwsh
