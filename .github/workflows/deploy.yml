@@ -15,13 +15,14 @@ permissions:
 jobs:
   package:
     runs-on: windows-latest
-
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Set up MSBuild
-        uses: microsoft/setup-msbuild@v2
+      # 使用这个 Action 替代 microsoft/setup-msbuild@v2
+      # 它会像打开 "x64 Native Tools Command Prompt for VS 2022" 一样配置所有必需的环境变量
+      - name: Enable MSVC Dev Cmd
+        uses: ilammy/msvc-dev-cmd@v1
 
       - name: Set up vcpkg
         shell: pwsh
