@@ -10,6 +10,7 @@ add_executable(mario
         view/audio/AudioManager.cpp
         view/input/InputHandler.cpp
         view/renderer/GameRenderer.cpp
+        view/ViewInteraction.cpp
         app/App.cpp
 )
 
