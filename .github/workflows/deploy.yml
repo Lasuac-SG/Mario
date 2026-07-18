@@ -19,9 +19,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      # 使用这个 Action 替代 microsoft/setup-msbuild@v2
-      # 它会像打开 "x64 Native Tools Command Prompt for VS 2022" 一样配置所有必需的环境变量
-      - name: Enable MSVC Dev Cmd
+      - name: Set up MSVC developer environment
         uses: ilammy/msvc-dev-cmd@v1
 
       - name: Set up vcpkg
@@ -30,30 +28,36 @@ jobs:
           git clone https://github.com/microsoft/vcpkg.git "$env:GITHUB_WORKSPACE\vcpkg"
           & "$env:GITHUB_WORKSPACE\vcpkg\bootstrap-vcpkg.bat"
 
-      - name: Configure CMake
+      - name: Configure CMake (Debug)
         shell: pwsh
         run: >
-          cmake -B build
-          -G "Visual Studio 17 2022"
-          -A x64
+          cmake -B build-debug
+          -G "Ninja"
+          -DCMAKE_BUILD_TYPE=Debug
           -DCMAKE_TOOLCHAIN_FILE="$env:GITHUB_WORKSPACE\vcpkg\scripts\buildsystems\vcpkg.cmake"
 
       - name: Build tests
         shell: pwsh
         run: >
-          cmake --build build
-          --config Debug
+          cmake --build build-debug
           --target test_common test_model test_audio
 
       - name: Run tests before packaging
         shell: pwsh
-        run: ctest --test-dir build/tests -C Debug --output-on-failure
+        run: ctest --test-dir build-debug/tests --output-on-failure
+
+      - name: Configure CMake (Release)
+        shell: pwsh
+        run: >
+          cmake -B build-release
+          -G "Ninja"
+          -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_TOOLCHAIN_FILE="$env:GITHUB_WORKSPACE\vcpkg\scripts\buildsystems\vcpkg.cmake"
 
       - name: Build release game
         shell: pwsh
         run: >
-          cmake --build build
-          --config Release
+          cmake --build build-release
           --target mario
 
       - name: Assemble package
@@ -61,7 +65,7 @@ jobs:
         run: |
           $packageDir = Join-Path $env:GITHUB_WORKSPACE "dist\Mario-windows-x64"
           New-Item -ItemType Directory -Force -Path $packageDir | Out-Null
-          Copy-Item "build\Release\*" $packageDir -Recurse -Force
+          Copy-Item "build-release\*" $packageDir -Recurse -Force
           Compress-Archive -Path "$packageDir\*" -DestinationPath "dist\Mario-windows-x64.zip" -Force
 
       - name: Upload deployment artifact
