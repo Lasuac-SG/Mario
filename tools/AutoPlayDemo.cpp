@@ -3,9 +3,9 @@
 #include <utility>
 #include <vector>
 
-#include "src/model/GameModel.h"
-#include "src/view/View.h"
-#include "src/viewmodel/ViewModel.h"
+#include "model/GameModel.h"
+#include "view/View.h"
+#include "viewmodel/ViewModel.h"
 
 namespace {
 

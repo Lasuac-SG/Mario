@@ -1,6 +1,6 @@
 #include "common/Type.h"
-#include "src/view/ViewInteraction.h"
-#include "src/view/input/InputHandler.h"
+#include "view/ViewInteraction.h"
+#include "view/input/InputHandler.h"
 
 namespace {
 
