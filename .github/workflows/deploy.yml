@@ -19,7 +19,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Enable MSVC Dev Cmd
+      - name: Set up MSVC developer environment
         uses: ilammy/msvc-dev-cmd@v1
 
       - name: Set up vcpkg
@@ -28,11 +28,11 @@ jobs:
           git clone https://github.com/microsoft/vcpkg.git "$env:GITHUB_WORKSPACE\vcpkg"
           & "$env:GITHUB_WORKSPACE\vcpkg\bootstrap-vcpkg.bat"
 
-      - name: Configure debug build
+      - name: Configure CMake (Debug)
         shell: pwsh
         run: >
           cmake -B build-debug
-          -G Ninja
+          -G "Ninja"
           -DCMAKE_BUILD_TYPE=Debug
           -DCMAKE_TOOLCHAIN_FILE="$env:GITHUB_WORKSPACE\vcpkg\scripts\buildsystems\vcpkg.cmake"
 
@@ -46,11 +46,11 @@ jobs:
         shell: pwsh
         run: ctest --test-dir build-debug/tests --output-on-failure
 
-      - name: Configure release build
+      - name: Configure CMake (Release)
         shell: pwsh
         run: >
           cmake -B build-release
-          -G Ninja
+          -G "Ninja"
           -DCMAKE_BUILD_TYPE=Release
           -DCMAKE_TOOLCHAIN_FILE="$env:GITHUB_WORKSPACE\vcpkg\scripts\buildsystems\vcpkg.cmake"
 
