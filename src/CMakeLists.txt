@@ -15,13 +15,13 @@ add_executable(mario
 )
 
 add_executable(input_test_window
-        tools/InputIntegrationWindow.cpp
+        ${CMAKE_SOURCE_DIR}/tools/InputIntegrationWindow.cpp
         view/input/InputHandler.cpp
         view/ViewInteraction.cpp
 )
 
 add_executable(mario_autoplay_demo
-        tools/AutoPlayDemo.cpp
+        ${CMAKE_SOURCE_DIR}/tools/AutoPlayDemo.cpp
         common/EventTrigger.cpp
         model/TileMap.cpp
         model/Mario.cpp
@@ -35,10 +35,18 @@ add_executable(mario_autoplay_demo
         view/renderer/GameRenderer.cpp
 )
 
-# 统一头文件路径, 相对src/目录的路径
+# 统一头文件路径, 包含平级的 src 和 tools 目录
 target_include_directories(mario PRIVATE ${CMAKE_SOURCE_DIR}/src)
-target_include_directories(input_test_window PRIVATE ${CMAKE_SOURCE_DIR}/src)
-target_include_directories(mario_autoplay_demo PRIVATE ${CMAKE_SOURCE_DIR}/src)
+
+target_include_directories(input_test_window PRIVATE 
+        ${CMAKE_SOURCE_DIR}/src 
+        ${CMAKE_SOURCE_DIR}/tools
+)
+
+target_include_directories(mario_autoplay_demo PRIVATE 
+        ${CMAKE_SOURCE_DIR}/src 
+        ${CMAKE_SOURCE_DIR}/tools
+)
 
 target_precompile_headers(mario PRIVATE precompile.h)
 target_precompile_headers(input_test_window PRIVATE precompile.h)
