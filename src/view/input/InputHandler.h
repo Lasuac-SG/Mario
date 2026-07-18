@@ -1,6 +1,8 @@
 ﻿#ifndef MARIO_INPUTHANDLER_H
 #define MARIO_INPUTHANDLER_H
 
+#include "SFML/Graphics/RenderWindow.hpp"
+#include "SFML/Window/Keyboard.hpp"
 #include "common/ICommand.h"
 
 class InputHandler {
@@ -12,6 +14,8 @@ class InputHandler {
     void pollEvents(sf::RenderWindow& window);
 
     void dispatchInput();
+    void setKeyStateForTest(sf::Keyboard::Key key, bool pressed) noexcept;
+    void resetKeyStateForTest() noexcept;
 
    private:
     ICommandBase* actionCmd_ = nullptr;

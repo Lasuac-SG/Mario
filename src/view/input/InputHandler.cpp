@@ -1,5 +1,7 @@
 #include "InputHandler.h"
 
+#include <algorithm>
+
 #include "common/Type.h"
 
 void InputHandler::pollEvents(sf::RenderWindow& window) {
@@ -49,4 +51,17 @@ void InputHandler::dispatchInput() {
         actionCmd_->exec(&p);
     }
     prevRestart_ = restart;
+}
+
+void InputHandler::setKeyStateForTest(sf::Keyboard::Key key, bool pressed) noexcept {
+    const int index = static_cast<int>(key);
+    if (index >= 0 && index < static_cast<int>(std::size(keys_))) {
+        keys_[index] = pressed;
+    }
+}
+
+void InputHandler::resetKeyStateForTest() noexcept {
+    std::fill(std::begin(keys_), std::end(keys_), false);
+    prevJump_ = false;
+    prevRestart_ = false;
 }

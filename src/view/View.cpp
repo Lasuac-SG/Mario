@@ -2,6 +2,8 @@
 
 #include <algorithm>
 
+#include "view/ViewInteraction.h"
+
 namespace {
 
 sf::Vector2f effectiveViewportSize(const sf::Vector2u& windowSize) {
@@ -115,18 +117,17 @@ void GameView::processWindowEvents() {
                 if (pressed->button == sf::Mouse::Button::Left) {
                     const sf::Vector2f point(static_cast<float>(pressed->position.x),
                                              static_cast<float>(pressed->position.y));
-                    if (renderer_.level1Bounds(window_).contains(point)) {
-                        if (startGameCommand_) startGameCommand_(1);
-                    } else if (renderer_.level2Bounds(window_).contains(point)) {
-                        if (startGameCommand_) startGameCommand_(2);
+                    const auto selectedLevel =
+                        levelFromMenuClick(renderer_.level1Bounds(window_), renderer_.level2Bounds(window_), point);
+                    if (selectedLevel && startGameCommand_) {
+                        startGameCommand_(*selectedLevel);
                     }
                 }
             }
             if (const auto* key = ev->getIf<sf::Event::KeyPressed>()) {
-                if (key->code == sf::Keyboard::Key::Num1 || key->code == sf::Keyboard::Key::Numpad1) {
-                    if (startGameCommand_) startGameCommand_(1);
-                } else if (key->code == sf::Keyboard::Key::Num2 || key->code == sf::Keyboard::Key::Numpad2) {
-                    if (startGameCommand_) startGameCommand_(2);
+                const auto selectedLevel = levelFromMenuKey(key->code);
+                if (selectedLevel && startGameCommand_) {
+                    startGameCommand_(*selectedLevel);
                 }
             }
         }

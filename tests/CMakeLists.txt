@@ -45,6 +45,17 @@ target_compile_definitions(test_audio PRIVATE
 target_link_libraries(test_audio PRIVATE SFML::Graphics SFML::Window SFML::System SFML::Audio)
 target_link_libraries(test_audio PRIVATE GTest::gtest_main)
 
+add_executable(test_view
+    view/InputHandlerTest.cpp
+    view/ViewInteractionTest.cpp
+    ${CMAKE_SOURCE_DIR}/src/view/input/InputHandler.cpp
+    ${CMAKE_SOURCE_DIR}/src/view/ViewInteraction.cpp
+)
+target_precompile_headers(test_view PRIVATE ${CMAKE_SOURCE_DIR}/src/precompile.h)
+target_include_directories(test_view PRIVATE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/tests)
+target_link_libraries(test_view PRIVATE SFML::Graphics SFML::Window SFML::System)
+target_link_libraries(test_view PRIVATE GTest::gtest_main)
+
 # ── CTest 注册 ─────────────────────────────────────────────────
 include(GoogleTest)
 # 在 ctest 运行时(而非构建时)枚举用例：避免 Windows 下构建阶段运行测试 exe
@@ -53,3 +64,4 @@ set(CMAKE_GTEST_DISCOVER_TESTS_DISCOVERY_MODE PRE_TEST)
 gtest_discover_tests(test_common)
 gtest_discover_tests(test_model)
 gtest_discover_tests(test_audio)
+gtest_discover_tests(test_view)
